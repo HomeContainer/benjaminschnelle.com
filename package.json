@@ -1,0 +1,19 @@
+{
+  "name": "benjaminschnelle.com",
+  "version": "0.1.0",
+  "description": "a site about some guy",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bschnelle/benjaminschnelle.com.git"
+  },
+  "author": "Benjamin Schnelle <benjamin.schnelle@gmail.com> (https://github.com/bschnelle)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bschnelle/benjaminschnelle.com/issues"
+  },
+  "homepage": "https://github.com/bschnelle/benjaminschnelle.com#readme"
+}

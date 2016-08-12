@@ -88,3 +88,46 @@ git push -u origin master
 5. Push our local repository to the master branch on GitHub and set the upstream repository to our GitHub repo.  You'll be prompted for your GitHub credentials when this command is run.
 
 If everything worked correctly you should be able to refresh the repo on GitHub and see your local project's files there now!
+
+### 3. Install our initial dependencies with Node Package Manager (NPM)
+Great! We have somewhere to put our application code now, but wouldn't it be great if we were able to piggy back off of all of the hard work people have been doing for years?  I agree!  So there are lots of ways we could use other people's code, but the easiest by far, that I know of, is to use NPM.  How do we get NPM?  We install Node.js which comes with NPM!  So cruise over to the [Node](https://nodejs.org/en/) site and follow the installation instructions.
+
+All done?  Awesome.
+
+Let's install stuff!  Wait, how do we do that?  Well first we need to initialize our project with NPM so that we can use it to manage our dependencies.  Run the command below.  It'll ask you a bunch of questions to which you can either accept the default (by pressing enter) or provide your own values.  If you screw something up, don't worry.  You can always change all of the values afterwards.
+
+```bash
+npm init
+```
+
+This command will generate a `package.json` file in the root of our project containing our answers to the questions asked.  This file is magical.  It is how we'll manage all of our dependencies.  You can either edit it manually or the NPM command line interface (CLI) will edit it for you if you tell it to.  We'll see how to do that shortly.  Here's what I got after I answered some of the questions.
+
+```json
+{
+  "name": "benjaminschnelle.com",
+  "version": "0.1.0",
+  "description": "a site about some guy",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bschnelle/benjaminschnelle.com.git"
+  },
+  "author": "Benjamin Schnelle <benjamin.schnelle@gmail.com> (https://github.com/bschnelle)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bschnelle/benjaminschnelle.com/issues"
+  },
+  "homepage": "https://github.com/bschnelle/benjaminschnelle.com#readme"
+}
+```
+
+Since we now have our project under version control, you're free to commit anytime you see fit.  There aren't really any downsides to committing frequently and doing so gives you more flexibility if you need to rollback for any reason.  So we'll do a commit here, but going forward I won't state every time I'm making a commit.
+
+```bash
+git add .
+git commit -m 'initialized NPM'
+git push origin master
+```
