@@ -131,3 +131,60 @@ git add .
 git commit -m 'initialized NPM'
 git push origin master
 ```
+
+### 4. Setup ESLint
+If you're unfamiliar with hinting/linting it's just the idea of following certain conventions when writing code so that things are standardized.  It's especially helpful when working on a team of developers so that you don't run into a scenario where one person is using tabs to indent and another is using spaces.  Consistency good, inconsistency bad.
+
+ESLint makes it easy for us to enforce those rules.  ESLint + Atom makes it easy to get *realtime* feedback right in the IDE.  There are many preconfigured sets of rules available for ESLint and Airbnb provides a pretty good one so we'll use that.  If you/me/we decide we want to change something later we can do that also!
+
+Let's go get it from our handy friend NPM in addition to some other related dependencies.  Run the two commands below, which as suggested by the "eslint-config-airbnb" page, will get the package's peer dependencies then pipe them through some regex and install all of them in addition to the package itself.  Finally, we also need to install "babel-eslint" in order to properly lint certain ES6/ES7 features like class properties.
+
+```bash
+export PKG=eslint-config-airbnb;
+npm info "$PKG" peerDependencies --json \
+  | command sed 's/[\{\},]//g ; s/: /@/g' \
+  | xargs npm install --save-dev "$PKG"
+npm install babel-eslint
+```
+
+If you take a look at your `package.json` file now, there should be a new section called `devDependencies` similar to the one below.
+
+```json
+{
+  "babel-eslint": "^6.1.2",
+  "eslint": "^3.2.2",
+  "eslint-config-airbnb": "^10.0.0",
+  "eslint-plugin-import": "^1.13.0",
+  "eslint-plugin-jsx-a11y": "^2.1.0",
+  "eslint-plugin-react": "^6.0.0"
+}
+```
+
+Now that we have our packages installed we need to tell ESLint to use the Airbnb rules when linting.  To do that we need to add a new file in the root of our project named ".eslintrc".  Make your file look like the one below which tells ESLint we want to use "babel-eslint" as our parser, we'll be writing code for the browser so ignore browser global variables, and use the "eslint-config-airbnb" rules.
+
+```json
+{
+  "parser": "babel-eslint",
+  "env": {
+    "browser": true
+  },
+  "extends" : "airbnb"
+}
+```
+
+At this point we could add a linting script to our `package.json` file, but we'll hold off on that until a little later.
+
+#### But wait, how do we make it work with Atom?
+Oh, remember how I said Atom is awesome?  It has its own package manager to install plugins for the editor to add all sorts of functionality.  ESLint is one of those packages.  Surprise.
+
+If you installed Atom earlier you already have APM (Atom Package Manager) installed.  To get the ESLint plugin run the command below.
+
+```bash
+apm install linter-eslint
+```
+
+That was eerily similar to how we install NPM packages right?  That's because APM is built on top of NPM.
+
+Ok, one more thing to get it working in Atom.  From the Atom menu click Preferences which should open up a new tab.  Click the Packages link on the lefthand side of the tab, then search for "linter-eslint" and enable the package.  It should look like the image below after it has been enabled.
+
+![Atom linter-eslint](../../images/atom-linter-eslint.jpg)
