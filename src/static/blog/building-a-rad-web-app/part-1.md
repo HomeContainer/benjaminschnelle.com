@@ -32,7 +32,7 @@ This post is being written from within the project we're building. Whoa.
 ### Steps we're going to take (they'll all be elaborated on later)
 1. Create our project
 2. Add version control with Git and use Github as our repo host
-3. Install our initial dependencies with Node Package Manager (NPM)
+3. Initialize Node Package Manager (NPM)
 4. Setup ESLint
 5. Configure Webpack
 6. Add our testing framework
@@ -89,7 +89,7 @@ git push -u origin master
 
 If everything worked correctly you should be able to refresh the repo on GitHub and see your local project's files there now!
 
-### 3. Install our initial dependencies with Node Package Manager (NPM)
+### 3. Initialize Node Package Manager (NPM)
 Great! We have somewhere to put our application code now, but wouldn't it be great if we were able to piggy back off of all of the hard work people have been doing for years?  I agree!  So there are lots of ways we could use other people's code, but the easiest by far, that I know of, is to use NPM.  How do we get NPM?  We install Node.js which comes with NPM!  So cruise over to the [Node](https://nodejs.org/en/) site and follow the installation instructions.
 
 All done?  Awesome.
