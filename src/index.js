@@ -2,4 +2,4 @@ class Dog {
   woof = () => 'woof'
 }
 
-export default Dog;
+export default Dog

@@ -16,7 +16,7 @@ This post is being written from within the project we're building. Whoa.
 - [GitHub](https://github.com/): our Git repository (where our source code lives) host
 - [Node](https://nodejs.org/en/): server side Javascript runtime
 - [NPM](https://www.npmjs.com/): Node's package manager (fuggin' amazing)
- - go [here](http://www.modulecounts.com/) to checkout how quickly NPM has overtaken other package managers over the last few years
+ - [Checkout](http://www.modulecounts.com/) how quickly NPM has overtaken other package managers over the last few years
 - [ESLint](http://eslint.org/): make sure we write consistent, well-formatted code
 - [Webpack](https://webpack.github.io/): module bundler which takes many files and combines them into one or more files...WARNING: docs are no bueno, but this is an absolutely amazing tool
 - Testing
@@ -188,3 +188,13 @@ That was eerily similar to how we install NPM packages right?  That's because AP
 Ok, one more thing to get it working in Atom.  From the Atom menu click Preferences which should open up a new tab.  Click the Packages link on the lefthand side of the tab, then search for "linter-eslint" and enable the package.  It should look like the image below after it has been enabled.
 
 ![Atom linter-eslint](../../images/atom-linter-eslint.jpg)
+
+Go ahead and create an `index.js` file in the "src" folder and paste in the code below.  If ESLint is setup correctly you should get an error telling you that line 5 is missing a newline then when you fix that it'll say it's missing a semicolon.  We'll need this file later (with different contents) so you can keep it around if you please.
+
+```javascript
+class Dog {
+  woof = () => 'woof'
+}
+
+export default Dog
+```
