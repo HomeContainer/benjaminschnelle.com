@@ -89,6 +89,8 @@ git push -u origin master
 
 If everything worked correctly you should be able to refresh the repo on GitHub and see your local project's files there now!
 
+Later we'll use GitHub to create a milestone for our project and assign tasks/issues to the milestone to track our progress towards our big 1.0.0 release.
+
 ### 3. Initialize Node Package Manager (NPM)
 Great! We have somewhere to put our application code now, but wouldn't it be great if we were able to piggy back off of all of the hard work people have been doing for years?  I agree!  So there are lots of ways we could use other people's code, but the easiest by far, that I know of, is to use NPM.  How do we get NPM?  We install Node.js which comes with NPM!  So cruise over to the [Node](https://nodejs.org/en/) site and follow the installation instructions.
 
