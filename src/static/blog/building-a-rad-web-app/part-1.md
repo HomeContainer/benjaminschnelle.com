@@ -34,7 +34,7 @@ This post is being written from within the project we're building. Whoa.
 2. Add version control with Git and use Github as our repo host
 3. Initialize Node Package Manager (NPM)
 4. Setup ESLint
-5. Add React and Configure Webpack
+5. Add React and configure Webpack
 6. Add our testing framework
 7. Use test driven development (TDD) to build the app (to be expanded)
 8. Setup continuous integration/continuous delivery with Codeship

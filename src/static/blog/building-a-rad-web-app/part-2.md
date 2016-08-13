@@ -5,12 +5,12 @@
 2. Add version control with Git and use Github as our repo host
 3. Initialize Node Package Manager (NPM)
 4. Setup ESLint
-5. Add React and Configure Webpack
+5. Add React and configure Webpack
 6. Add our testing framework
 7. Use test driven development (TDD) to build the app (to be expanded)
 8. Setup continuous integration/continuous delivery with Codeship
 
-## 5. Add React and Configure Webpack
+## 5. Add React and configure Webpack
 Per the React site, React makes it painless to create interactive UIs.  That is no understatement.  React is all *component* (you can think of them as widgets of functionality) based meaning you break your UI into separate components and *compose* your UI from those components.  I highly recommend reading [Thinking in React](https://facebook.github.io/react/docs/thinking-in-react.html) by [Pete Hunt](https://twitter.com/floydophone) for a quick overview of using React.
 
 Webpack is an amazing bundling tool written with single page applications (SPAs) like the one we're going to build with React and Redux in mind.  Webpack by itself doesn't actually do much, the real power comes from *loaders* and *plugins*.
@@ -117,7 +117,7 @@ So we're looking for files with a ".js" file extension, that are *not* in the "n
 ```
 #### Presets
 - es2015: turn new JS into old JS
-- react: turn JSX into old JS
+- react: turn JSX into old JS (we'll need this a little later)
 - stage-0: turn more new JS into old JS
 
 We're using a bunch of packages that we haven't yet installed, let's do that now.  You'll see webpack installed twice, once locally, then again globally (with the `-g` option).  We need it installed locally because we'll need to use the package directly a little later and we need it installed globally so that we can use it from the command line.  Additionally, we need to install `webpack-dev-server` globally so that we can serve up our application (it creates a small Node.js web server).
@@ -209,3 +209,166 @@ If you want to build the source maps to disk you'll need to run the command belo
 ```bash
 webpack --debug
 ```
+
+For now, I'm going to comment out the UglifyJsPlugin line since it's just going to add overhead during development.  Later when we address deploying our code we'll add it back.
+
+### Moving on...let's add React
+
+Go ahead and install React and React DOM (React package for working with the DOM).
+
+```bash
+npm install --save react react-dom
+```
+
+Change the file extension of src/index.js to ".jsx" and replace the contents with the code below.  If you prefer you can continue to use the original ".js" file extension, but you'll need to modify your ESLint rules because the Airbnb presets we're using dictate use of ".jsx".
+
+```javascript
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+class Test extends React.Component {
+  render() {
+    return <div>Hey dude!</div>;
+  }
+}
+
+ReactDOM.render(<Test />, document.getElementById('root'));
+
+```
+
+Assuming you updated the file extension you'll also need to make two changes to your "webpack.config.js" file.
+
+```javascript
+module.exports = {
+  // more config...
+
+  entry: './src/index.jsx', // update file extension here
+
+  module: {
+    loaders: [
+      {
+        test: /\.(js|jsx)$/, // update to match .js and .jsx
+        exclude: /node_modules/,
+        loader: 'babel',
+      },
+    ],
+  },
+
+  // more config...
+};
+```
+
+That weird looking syntax in "index.js" is JSX, it's just JavaScript in disguise.  You can read more [here](https://facebook.github.io/react/docs/jsx-in-depth.html) where they give before and after code examples.
+
+You'll notice that ESLint is now throwing a fit about preferring pure functions.  In React you can create your components a few different ways, if you read through [Thinking in React](https://facebook.github.io/react/docs/thinking-in-react.html) you would have seen components written by calling `createClass` (as of this writing anyway).  
+
+```javascript
+var ProductCategoryRow = React.createClass({})
+```
+
+The second way you can create components is using [ES6 classes](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes).
+
+```javascript
+class ProductCategoryRow extends React.Component {}
+```
+
+Finally, you can create *functional stateless components* (FSC).  There are certain limitations to this approach, but they're also simpler and Facebook has [stated](https://github.com/facebook/react/issues/5677) that they're planning future optimizations for components written in this way.  FSCs cannot use component lifecycle hooks or internal state (hence, stateless).  I'll demonstrate how some of the lifecycle hooks work shortly so you can make an informed decision when choosing how to implement components in your own app.  They're just implemented as a regular JavaScript function.
+
+```javascript
+function ProductCategoryRow(props) {}
+```
+
+We won't be using the first convention at all.
+
+### Stylezzz (CSS)
+
+Wouldn't it be really awesome if we could make our component display "Hey dude!" in blue instead of black?  Hell yeah!  Wouldn't it be even more awesome if we could use something better than regular CSS to write it?  Double hell yeah!
+
+We're going to use SASS to write our styles, convert SASS to CSS, locally scope our classes, bundle, inject our styles in an external style sheet, then import those styles via our "index.html" file.
+
+CSS is global by default meaning if you use a class named ".title" that makes your font blue in one place then want to use another ".title" class in a different part of your app to make the font pink you'll run into a conflict and both titles will be blue or pink, depending on order.  But some really smart guys came up with the idea of [CSS Modules](https://github.com/css-modules/css-modules) which locally scopes all CSS (via the Webpack css-loader) allowing you to use as many different ".title" classes as you want without conflict!
+
+Let's install the necessary packages
+
+```bash
+npm install --save node-sass sass-loader css-loader extract-text-webpack-plugin
+```
+
+#### Packages
+- node-sass: SASS --> CSS
+- sass-loader: use node-sass with Webpack
+- css-loader: bundle CSS and scope classes locally
+- extract-text-webpack-plugin: create a CSS file from bundled CSS
+
+We've got the packages we need, but now we need to tell Webpack to use them.  Update your "webpack.config.js" file to mirror the one below.  We've added new entries to `loaders` and `plugins`.  The new `loaders` entry will match both ".css" and ".scss" files and apply the sass-loader, then css-loader (with modules/local scoping and source maps enabled), and finally the ExtractTextPlugin loader (loaders are applied right to left).  In the `plugins` section we're telling ExtractTextPlugin to name our bundled CSS file "styles.css".
+
+```javascript
+const path = require('path');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+// const webpack = require('webpack');
+
+module.exports = {
+  devtool: 'source-map',
+
+  entry: './src/index.jsx',
+
+  module: {
+    loaders: [
+      {
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
+        loader: 'babel',
+      },
+      {
+        test: /\.(css|scss)$/,
+        loader: ExtractTextPlugin.extract('css?modules&sourceMap!sass'),
+      },
+    ],
+  },
+
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'bundle.js',
+  },
+
+  plugins: [
+    new ExtractTextPlugin('styles.css'),
+
+    new HtmlWebpackPlugin({
+      template: './src/index.html',
+      inject: 'body',
+    }),
+
+    // new webpack.optimize.UglifyJsPlugin(),
+  ],
+};
+
+```
+
+Now create a new file named "classes.scss" in the "src" directory and put the code below into it.
+
+```css
+.title {
+  color: blue;
+}
+```
+
+Finally, make the changes below to your "index.jsx" file.
+
+```javascript
+import React from 'react';
+import ReactDOM from 'react-dom';
+import classes from './classes.scss';
+
+class Test extends React.Component {
+  render() {
+    return <div className={classes.title}>Hey dude!</div>;
+  }
+}
+
+ReactDOM.render(<Test />, document.getElementById('root'));
+
+```
+
+Go ahead and fire up your dev server again and enjoy your beautiful blue font.  If you inspect the div we added the ".title" class to you'll see it has been converted to a unique identifier and source maps have been created to map those new classes back to the original classes.

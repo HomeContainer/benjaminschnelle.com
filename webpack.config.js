@@ -1,18 +1,23 @@
 const path = require('path');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const webpack = require('webpack');
+// const webpack = require('webpack');
 
 module.exports = {
   devtool: 'source-map',
 
-  entry: './src/index.js',
+  entry: './src/index.jsx',
 
   module: {
     loaders: [
       {
-        test: /\.js$/,
+        test: /\.(js|jsx)$/,
         exclude: /node_modules/,
         loader: 'babel',
+      },
+      {
+        test: /\.(css|scss)$/,
+        loader: ExtractTextPlugin.extract('css?modules&sourceMap!sass'),
       },
     ],
   },
@@ -23,11 +28,13 @@ module.exports = {
   },
 
   plugins: [
+    new ExtractTextPlugin('styles.css', { allChunks: true }),
+
     new HtmlWebpackPlugin({
       template: './src/index.html',
       inject: 'body',
     }),
 
-    new webpack.optimize.UglifyJsPlugin(),
+    // new webpack.optimize.UglifyJsPlugin(),
   ],
 };
