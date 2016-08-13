@@ -1,5 +1,6 @@
-class Dog {
-  woof = () => 'woof'
-}
+const setHTML = () => {
+  document.getElementById('root').innerHTML = 'Hey dude!';
+};
 
-export default Dog
+setHTML();
+console.trace();

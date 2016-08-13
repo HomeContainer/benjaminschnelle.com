@@ -139,7 +139,14 @@ If you're unfamiliar with hinting/linting it's just the idea of following certai
 
 ESLint makes it easy for us to enforce those rules.  ESLint + Atom makes it easy to get *realtime* feedback right in the IDE.  There are many preconfigured sets of rules available for ESLint and Airbnb provides a pretty good one so we'll use that.  If you/me/we decide we want to change something later we can do that also!
 
-Let's go get it from our handy friend NPM in addition to some other related dependencies.  Run the two commands below, which as suggested by the "eslint-config-airbnb" page, will get the package's peer dependencies then pipe them through some regex and install all of them in addition to the package itself.  Finally, we also need to install "babel-eslint" in order to properly lint certain ES6/ES7 features like class properties.  You can save NPM packages as development dependencies (`devDependencies`) or production dependencies (`dependencies`) with the `--save-dev` and `--save` arguments, respectively.
+#### Side note on NPM
+NPM packages can be saved in multiple ways, but the two we're concerned with are as development dependencies (`devDependencies`) or production dependencies (`dependencies`) with the `--save-dev` and `--save` arguments, respectively.  
+
+NPM was originally intended to be a server side development tool (for Node), but is now widely used for client side development and the use cases between the two are a little different.  In the case of server development one should be able to clone the repository from GitHub (or wherever) and run `NODE_ENV=production npm install` which will only install those packages defined in the `dependencies` section of "package.json" then run the application.  In the case of a client app it is a little different.  Here, we should be able to clone the repository, run the same installation command with NODE_ENV set to "production", bundle our application (as we'll describe later using Webpack), and finally deploy it.
+
+It is easy (for me anyway) to view the bundling step as a development concern so intuitively it makes sense to put those packages in `devDependencies`, but if we did that we wouldn't be able to bundle our app successfully when having NODE_ENV set to "production".  Therefore, if you see things being installed with `--save-dev` when you think `--save` makes more sense, it is likely for this reason.
+
+Let's go ahead and get ESLint from our handy friend NPM in addition to some other related dependencies.  Run the two commands below, which as suggested by the "eslint-config-airbnb" page, will get the package's peer dependencies then pipe them through some regex and install all of them in addition to the package itself.  Finally, we also need to install "babel-eslint" in order to properly lint certain ES6/ES7 features like class properties.  
 
 ```bash
 export PKG=eslint-config-airbnb;
