@@ -212,6 +212,15 @@ webpack --debug
 
 For now, I'm going to comment out the UglifyJsPlugin line since it's just going to add overhead during development.  Later when we address deploying our code we'll add it back.
 
+Let's go ahead and add a script to our "package.json" file to make running our dev server easier.  Update your the `scripts` section to resemble the one below.  Now your can run your dev server by just typing `npm start` from the command line.
+
+```json
+{
+  "start": "webpack-dev-server --content-base dist/",
+  "test": "echo \"Error: no test specified\" && exit 1"
+}
+```
+
 ### Moving on...let's add React
 
 Go ahead and install React and React DOM (React package for working with the DOM).

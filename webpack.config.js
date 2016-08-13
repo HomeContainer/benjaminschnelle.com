@@ -28,7 +28,7 @@ module.exports = {
   },
 
   plugins: [
-    new ExtractTextPlugin('styles.css', { allChunks: true }),
+    new ExtractTextPlugin('styles.css'),
 
     new HtmlWebpackPlugin({
       template: './src/index.html',
