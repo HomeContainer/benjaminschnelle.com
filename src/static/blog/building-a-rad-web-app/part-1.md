@@ -34,7 +34,7 @@ This post is being written from within the project we're building. Whoa.
 2. Add version control with Git and use Github as our repo host
 3. Initialize Node Package Manager (NPM)
 4. Setup ESLint
-5. Configure Webpack
+5. Add React and Configure Webpack
 6. Add our testing framework
 7. Use test driven development (TDD) to build the app (to be expanded)
 8. Setup continuous integration/continuous delivery with Codeship
@@ -139,14 +139,14 @@ If you're unfamiliar with hinting/linting it's just the idea of following certai
 
 ESLint makes it easy for us to enforce those rules.  ESLint + Atom makes it easy to get *realtime* feedback right in the IDE.  There are many preconfigured sets of rules available for ESLint and Airbnb provides a pretty good one so we'll use that.  If you/me/we decide we want to change something later we can do that also!
 
-Let's go get it from our handy friend NPM in addition to some other related dependencies.  Run the two commands below, which as suggested by the "eslint-config-airbnb" page, will get the package's peer dependencies then pipe them through some regex and install all of them in addition to the package itself.  Finally, we also need to install "babel-eslint" in order to properly lint certain ES6/ES7 features like class properties.
+Let's go get it from our handy friend NPM in addition to some other related dependencies.  Run the two commands below, which as suggested by the "eslint-config-airbnb" page, will get the package's peer dependencies then pipe them through some regex and install all of them in addition to the package itself.  Finally, we also need to install "babel-eslint" in order to properly lint certain ES6/ES7 features like class properties.  You can save NPM packages as development dependencies (`devDependencies`) or production dependencies (`dependencies`) with the `--save-dev` and `--save` arguments, respectively.
 
 ```bash
 export PKG=eslint-config-airbnb;
 npm info "$PKG" peerDependencies --json \
   | command sed 's/[\{\},]//g ; s/: /@/g' \
   | xargs npm install --save-dev "$PKG"
-npm install babel-eslint
+npm install --save-dev babel-eslint
 ```
 
 If you take a look at your `package.json` file now, there should be a new section called `devDependencies` similar to the one below.
