@@ -1,9 +1,10 @@
-import classes from './classes.scss';
+import setHTML from './setHTML';
 
-const setHTML = () => {
-  const root = document.getElementById('root');
-  root.innerHTML = 'Hey dude!';
-  root.className = classes.title;
-};
+if (module.hot) {
+  module.hot.accept('./setHTML', () => {
+    // eslint-disable-next-line
+    require('./setHTML').default();
+  });
+}
 
 setHTML();

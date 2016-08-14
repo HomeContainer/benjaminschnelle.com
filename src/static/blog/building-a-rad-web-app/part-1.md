@@ -35,7 +35,7 @@ This post is being written from within the project we're building. Whoa.
 3. Initialize Node Package Manager (NPM)
 4. Setup ESLint
 5. Configure Webpack
-6. React
+6. React, Redux, and Immutable.js
 7. Add our testing framework
 8. Use test driven development (TDD) to build the app (to be expanded)
 9. Setup continuous integration/continuous delivery with Codeship

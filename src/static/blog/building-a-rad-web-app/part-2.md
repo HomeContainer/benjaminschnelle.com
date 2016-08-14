@@ -6,7 +6,7 @@
 3. Initialize Node Package Manager (NPM)
 4. Setup ESLint
 5. Configure Webpack
-6. React
+6. React, Redux, and Immutable.js
 7. Add our testing framework
 8. Use test driven development (TDD) to build the app (to be expanded)
 9. Setup continuous integration/continuous delivery with Codeship
@@ -312,3 +312,174 @@ setHTML();
 ```
 
 Go ahead and fire up your dev server again and enjoy your beautiful blue font.  If you inspect the div we added the ".title" class to you'll see it has been converted to a unique identifier and source maps have been created to map those new classes back to the original classes.
+
+### Hot Module Replacement (HMR)
+Currently if you make changes to your source code while your development server is running you have to manually refresh your browser to see the changes.  That's entirely too much work, let's make it update automagically.
+
+HMR is a feature of Webpack that lets us inject updated modules into our running application without a page refresh.  This allows us to make changes to our running application *without* losing the application's state!  If that doesn't make any sense to you, don't worry, let's look at an example.
+
+First we'll add auto-refreshing then we'll add HMR to demonstrate the differences.  Remember how we installed `webpack-dev-server` globally earlier?  Now we need to install it locally as well, so let's go ahead and do that and save it in `devDependencies`.  In order to use auto-refreshing and HMR Webpack needs to add a little code to our bundle.
+
+```bash
+npm install --save-dev webpack-dev-server
+```
+
+Update your the `entry` property of your "webpack.config.js" file as shown below.
+
+```javascript
+{
+  // more config...
+  entry: {
+    bundle: [
+      'webpack-dev-server/client?http://localhost:8080/',
+      './src/index.js',
+    ],
+  }
+  // more config...
+}
+```
+
+Go ahead and restart your dev server, refresh your browser, then change "Hey dude!" to "Hey man!" and save your file.  Your browser should refresh itself now.  Neat!
+
+What if we had an text input on the page though?  Let's see what happens in that case.  Go ahead and update your "index.html" file as shown below.
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Benjamin Schnelle</title>
+    <meta charset="utf-8">
+  </head>
+  <body>
+    <div id="root"></div>
+    <input type="text" /> <!-- this is new -->
+  </body>
+</html>
+
+```
+
+Refresh your browser, type something in the text input, then jump back to your "index.js" file and add a few exclamation marks to "Hey dude!" and save your file.  If you're watching the browser you should see it refresh, but the value that was in the input is lost.  Bummer.  Let's fix that.
+
+HMR to the rescue!  We need to add a few config options to our "webpack.config.js" file.  Make the changes below.
+
+```javascript
+const path = require('path');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack'); // uncomment this
+
+module.exports = {
+  // new section
+  devServer: {
+    hot: true,
+  },
+
+  devtool: 'source-map',
+
+  entry: {
+    bundle: [
+      'webpack-dev-server/client?http://localhost:8080/',
+      'webpack/hot/only-dev-server', // new line
+      './src/index.js',
+    ],
+  },
+
+  module: {
+    loaders: [
+      {
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
+        loader: 'babel',
+      },
+      {
+        test: /\.(css|scss)$/,
+        loader: ExtractTextPlugin.extract('css?modules&sourceMap!sass'),
+      },
+    ],
+  },
+
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'bundle.js',
+  },
+
+  plugins: [
+    new ExtractTextPlugin('styles.css'),
+
+    new webpack.HotModuleReplacementPlugin(), // new line
+
+    new HtmlWebpackPlugin({
+      template: './src/index.html',
+      inject: 'body',
+    }),
+
+    // new webpack.optimize.UglifyJsPlugin(),
+  ],
+};
+
+```
+
+#### What's going on here?  We made 3 changes.
+- devServer: this property is for config options related to our development server...we add the hot flag so the server knows we want to use HMR
+- entry: we added `'webpack/hot/only-dev-server'` to add more client code to facilitate HMR which will *not* fallback to auto-refreshing if an HMR update fails...if you would prefer your app to auto-refresh when HMR updates fail add `'webpack/hot/dev-server'` instead
+- plugins: `new webpack.HotModuleReplacementPlugin()` required for HMR to work
+
+Right, so now we have our Webpack config updated to use HMR, but we need to explicitly enable HMR at the module level of our app.  How do we do that?  Good question.  Let's add a new file named "setHTML.js" to the root of our project and update the contents of "index.js" as shown below.
+
+```javascript
+// setHTML.js
+import classes from './classes.scss';
+
+const setHTML = () => {
+  const root = document.getElementById('root');
+  root.innerHTML = 'Hey man!';
+  root.className = classes.title;
+};
+
+export default setHTML;
+
+```
+
+```javascript
+// index.js
+import setHTML from './setHTML';
+
+if (module.hot) {
+  module.hot.accept('./setHTML', () => {
+    // eslint-disable-next-line
+    require('./setHTML').default();
+  });
+}
+
+setHTML();
+
+```
+
+As you can see, we have moved our application logic into a new file named "setHTML.js" and from that file we export our setHTML function.  Then in our "index.js" file we import that function and call it at the bottom of the file.  In the middle you'll notice an `if` statement that only fires if some `module` object has a [truthy](http://james.padolsey.com/javascript/truthy-falsey/) `hot` property on it.  Then that function uses some `require` object to load our "setHTML.js" file that we just imported, again.  It then calls a function named `default`.  What the hell.  
+
+Let's take it step by step.  First of all, the `export`/`import` statements are part of the ES6 module system (a way to break up your code and access that code between files).  Via Babel, Webpack transpiles those statements to [CommonJS](https://webpack.github.io/docs/commonjs.html) format modules (for better support).  That is where the global objects `module` and `require` come from.  `module.hot` is only defined if HMR is enabled.  The `accept` function is how to tell HMR which modules we want updated when they change, so here we're saying update our app when you detect a change in the "setHTML.js" file (or any of its children).  When you do detect a change go get the updated "setHTML.js" file and call the `default` function on it.  `import` can only be used at the top level of a module which is why we have to use `require` instead then call the `default` export from the "setHTML.js" module.  The code snippet below equates `import` to `require`.
+
+```javascript
+// otherModule.js (this is just for demonstration, we aren't using it for anything)
+const bark = 'woof';
+export { bark }
+```
+
+```javascript
+// these are the same
+import setHTML from './setHTML'; // give me the default export from the setHTML.js file
+require('./setHTML').default;
+
+// these are the same
+import { bark } from './otherModule'; // give me a named export from otherModule.js
+require('./otherModule').bark;
+```
+
+Damn Ben, that was a lot of stuff.  What are we even getting out of this?
+
+Restart your dev server and reload your application from the browser.  Type some stuff in your input now, then update your "setHTML.js" file to add a few exclamation marks to "Hey dude!" then watch the browser as you save the file.  Your changes come through *AND* your application retains its state! (input doesn't get cleared)  That's awesome!!!  
+
+Ok, maybe you don't think it's that great, but when you're working with an application state that takes a while to reach you don't want to have to fill out an entire form or walk through an entire wizard just to reach a certain point to do some debugging.
+
+#### Let's move on...
+We covered a lot here and we'll continue to update our Webpack config as we go along, but we have the major pieces in place now.  Let's head over to part 3 where we'll look at React, Redux, and Immutable.js.
