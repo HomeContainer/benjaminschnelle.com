@@ -1,46 +1,46 @@
-# In Depth Beginner's Guide to the React Ecosystem - Part 3
-
 # 6. React, Redux, and Immutable.js
+
+### As a reminder, here are the steps we're following (starting with #6 here)
+1. Create our project
+2. Add version control with Git and use Github as our repo host
+3. Initialize Node Package Manager (NPM)
+4. Setup ESLint
+5. Configure Webpack
+6. React, Redux, and Immutable.js
+7. Add our testing framework
+8. Use test driven development (TDD) to build the app (to be expanded)
+9. Setup continuous integration/continuous delivery with Codeship
 
 Per the React site, React makes it painless to create interactive UIs.  That is no understatement.  React is all *component* (you can think of them as widgets of functionality) based meaning you break your UI into separate components and *compose* your UI from those components.  I highly recommend reading [Thinking in React](https://facebook.github.io/react/docs/thinking-in-react.html) by [Pete Hunt](https://twitter.com/floydophone) for a quick overview of using React.
 
-Go ahead and install React and related packages., React DOM (React package for working with the DOM).
+Go ahead and install React and React DOM (React package for working with the DOM).
 
 ```bash
 npm install --save react react-dom
-npm install --save-dev react-hot-loader
 ```
-
-#### What did we just install?
-- react: React.js
-- react-dom: React package for working with the DOM
-- react-hot-loader: this is going to handle HMR for us so that we don't have to write our own `module.hot` code anymore
 
 Change the file extension of src/index.js to ".jsx" and replace the contents with the code below.  If you prefer you can continue to use the original ".js" file extension, but you'll need to modify your ESLint rules because the Airbnb presets we're using dictate use of ".jsx".
 
 ```javascript
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './containers/App';
+import classes from './classes.scss';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+class Test extends React.Component {
+  render() {
+    return <div className={classes.title}>Hey dude!</div>;
+  }
+}
+
+ReactDOM.render(<Test />, document.getElementById('root'));
 
 ```
 
-Assuming you updated the file extension you'll also need to make four changes to your "webpack.config.js" file.
+Assuming you updated the file extension you'll also need to make two changes to your "webpack.config.js" file.
 
 ```javascript
-const path = require('path');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const webpack = require('webpack');
-
 module.exports = {
-  devServer: {
-    hot: true,
-  },
-
-  devtool: 'source-map',
+  // more config...
 
   entry: {
     bundle: [
@@ -53,9 +53,9 @@ module.exports = {
   module: {
     loaders: [
       {
-        test: /\.(js|jsx)$/, // match .js and .jsx files
+        test: /\.(js|jsx)$/, // update to match .js and .jsx
         exclude: /node_modules/,
-        loader: 'react-hot!babel', // add react-hot-loader
+        loader: 'babel',
       },
       {
         test: /\.(css|scss)$/,
@@ -64,33 +64,8 @@ module.exports = {
     ],
   },
 
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.js',
-  },
-
-  plugins: [
-    new ExtractTextPlugin('styles.css'),
-
-    new webpack.HotModuleReplacementPlugin(),
-
-    new HtmlWebpackPlugin({
-      template: './src/index.html',
-      inject: 'body',
-    }),
-
-    // new webpack.optimize.UglifyJsPlugin(),
-  ],
-
-  // new section...this is necessary so that we can import .jsx
-  // files without explicitly providing their extensions...the
-  // empty string is required by Webpack in order to resolve imports
-  // where we DO provide the file extension
-  resolve: {
-    extensions: ['', '.js', '.jsx'],
-  },
+  // more config...
 };
-
 ```
 
 That weird looking syntax in "index.js" is JSX, it's just JavaScript in disguise.  You can read more [here](https://facebook.github.io/react/docs/jsx-in-depth.html) where they give before and after code examples.
@@ -115,7 +90,26 @@ function ProductCategoryRow(props) {}
 
 We won't be using the first convention at all.
 
-#### Back to our application
-We got off on a tangent for a little bit there.  If you looked closely at the code we put in our "index.jsx" file, we're importing `App` from a sibling folder named "containers".  There's a useful philosophy in the React community of splitting up your components into two groups: containers and presentational components (smart and dumb).  Basically, container components implement business logic (connect to Redux store...we'll get to this in detail later on) and presentational components are only concerned with rendering the UI.  Dan Abramov has a good [post](https://medium.com/@dan_abramov/smart-and-dumb-components-7ca2f9a7c7d0#.f4mqb6y14) on the concepts.
+When we replaced the contents of "index.jsx" we broke our HMR live updates.  Let's fix that.  Rather than implementing it ourselves we'll use Dan Abramov's react-hot-loader library.
 
-Go ahead and create two new folders under "src" named "containers" and "components" where we'll put our two types of components.  You can then create "App.jsx" in the "containers" folder and paste in the code below.
+```bash
+npm install --save-dev react-hot-loader
+```
+
+Update the `loaders` property of "webpack.config.js" as shown below.
+
+```javascript
+// more config
+loaders: [
+  {
+    test: /\.(js|jsx)$/,
+    exclude: /node_modules/,
+    loader: 'react-hot!babel', // updated
+  },
+  {
+    test: /\.(css|scss)$/,
+    loader: ExtractTextPlugin.extract('css?modules&sourceMap!sass'),
+  },
+]
+// more config
+```

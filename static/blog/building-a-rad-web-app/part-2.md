@@ -1,6 +1,17 @@
-# In Depth Beginner's Guide to the React Ecosystem - Part 2
+# Building a Rad Web App - Initial Setup Continued...
 
-## 5. Configure Webpack for development
+### As a reminder, here are the steps we're following (starting with #5 here)
+1. Create our project
+2. Add version control with Git and use Github as our repo host
+3. Initialize Node Package Manager (NPM)
+4. Setup ESLint
+5. Configure Webpack
+6. React, Redux, and Immutable.js
+7. Add our testing framework
+8. Use test driven development (TDD) to build the app (to be expanded)
+9. Setup continuous integration/continuous delivery with Codeship
+
+## 5. Configure Webpack
 Webpack is an amazing bundling tool written with single page applications (SPAs) like the one we're going to build with React and Redux in mind.  Webpack by itself doesn't actually do much, the real power comes from *loaders* and *plugins*.
 
 #### What will we be using Webpack for?
@@ -466,7 +477,7 @@ Restart your dev server and reload your application from the browser.  Type some
 
 Ok, maybe you don't think it's that great, but when you're working with an application state that takes a while to reach you don't want to have to fill out an entire form or walk through an entire wizard just to reach a certain point to do some debugging.
 
-Anyway, go ahead and delete the "setHTML.js" and "classes.scss" files as we're done with them.  Also, delete `<input type="text" />` from "index.html".
+Anyway, go ahead and delete the "setHTML.js" file as we're done with it.  Also, delete `<input type="text" />` from "index.html".
 
 #### Let's move on...
 We covered a lot here and we'll continue to update our Webpack config as we go along, but we have the major pieces in place now.  Let's head over to part 3 where we'll look at React, Redux, and Immutable.js.

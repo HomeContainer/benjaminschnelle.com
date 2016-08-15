@@ -14,7 +14,7 @@ module.exports = {
     bundle: [
       'webpack-dev-server/client?http://localhost:8080/',
       'webpack/hot/only-dev-server',
-      './src/index.js',
+      './src/index.jsx',
     ],
   },
 
@@ -23,7 +23,7 @@ module.exports = {
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
-        loader: 'babel',
+        loader: 'react-hot!babel',
       },
       {
         test: /\.(css|scss)$/,
@@ -49,4 +49,8 @@ module.exports = {
 
     // new webpack.optimize.UglifyJsPlugin(),
   ],
+
+  resolve: {
+    extensions: ['', '.js', '.jsx'],
+  },
 };

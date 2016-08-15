@@ -1,10 +1,12 @@
-# Building a Rad Web App - Initial Setup
+# In Depth Beginner's Guide to the React Ecosystem - Part 1
 
 My turn to do something that's been explained a thousand times before...build a web app with React, Redux and Webpack!
 
-We're going to build a simple web app to serve as my plot of land on the interwebs. It'll have generic info about me, a blog, and a place for apps so that after we hack together a unicorn simulator we'll have somewhere to put it.  We'll host it at benjaminschnelle.com (that's me!).
+We're going to build a simple web app to serve as my plot of land on the interwebs. It'll have some generic info about me, my resume, a blog, and a place for apps so that after we hack together a unicorn simulator we'll have somewhere to put it.  We'll host it at benjaminschnelle.com (that's me!).
 
-If you're just getting into development, specifically the Javascript ecosystem, it can be overwhelming.  I'm going to do my best to touch briefly on everything I do/use to at least give you an idea of what's going on.  If I forget to explain something just Google it, that's the best resource for anything, ever.
+If you're just getting into development, specifically the Javascript ecosystem, it can be overwhelming.  My goal is to provide explanations of everything I do thoroughly enough that a beginner should be able to follow along.  If I miss anything please let me know so that I can fix it and improve my writing skills.
+
+This post isn't short.  If you actually want to learn how to build modern web apps there is a lot to learn and there's no silver bullet.  When you get frustrated take a break.
 
 This post is being written from within the project we're building. Whoa.
 
@@ -29,16 +31,19 @@ This post is being written from within the project we're building. Whoa.
 - [Redux](http://redux.js.org/): data layer (state management)
 - [Codeship](https://codeship.com): continuous integration/delivery
 
-### Steps we're going to take (they'll all be elaborated on later)
+### Steps we're going to take
 1. Create our project
 2. Add version control with Git and use Github as our repo host
 3. Initialize Node Package Manager (NPM)
 4. Setup ESLint
-5. Configure Webpack
-6. React, Redux, and Immutable.js
-7. Add our testing framework
-8. Use test driven development (TDD) to build the app (to be expanded)
-9. Setup continuous integration/continuous delivery with Codeship
+5. Configure Webpack for development
+6. Configure Webpack for production
+7. React, Immutable.js, and React Router
+8. Redux
+9. Add testing setup
+10. Misc development tools
+11. Use test driven development (TDD) to build the app (to be expanded)
+12. Setup continuous integration/continuous delivery with Codeship
 
 ## Let's Boogie
 
@@ -66,12 +71,13 @@ Now that we have a basic project layout let's go ahead and open it up in an inte
 
 Once you have the project open, add the necessary directories so that your project looks like the one below.  What is important is that you have at least one directory under the "blog" directory with at least one [markdown](https://daringfireball.net/projects/markdown/) file in it with a few lines of text in that file.  You can safely ignore the "images" directory.
 
+// TODO this needs to be updated based on change from feature based to type based org
 ![Initial Directory](../../images/initial-directory.jpg)
 
 ### 2. Add version control with Git and use Github as our repo host
 To get our version control with Git/GitHub setup you'll need 2 things: Git (install locally) and a GitHub account.  Head over [here](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) for Git and [here](https://github.com/) to create a GitHub account.
 
-Once you have both, create a new repository on GitHub as described [here](https://help.github.com/articles/create-a-repo/) with whatever name tickles your fancy.  After you have your repository created grab its HTTPS URL (you can use SSH also, but you'll have to create a key) then from the project root run the commands below from your terminal (explained afterwards) plugging in your repository URL in place of mine.
+Once you have both, create a new repository on GitHub as described [here](https://help.github.com/articles/create-a-repo/) with whatever name you please.  After you have your repository created grab its HTTPS URL (you can use SSH also, but you'll have to create a key) then from the project root run the commands below in your terminal plugging in your repository URL in place of mine.
 
 ```bash
 git init
@@ -90,14 +96,14 @@ git push -u origin master
 
 If everything worked correctly you should be able to refresh the repo on GitHub and see your local project's files there now!
 
-Later we'll use GitHub to create a milestone for our project and assign tasks/issues to the milestone to track our progress towards our big 1.0.0 release.
+// TODO add milestone and issues for v0.1.0
 
 ### 3. Initialize Node Package Manager (NPM)
 Great! We have somewhere to put our application code now, but wouldn't it be great if we were able to piggy back off of all of the hard work people have been doing for years?  I agree!  So there are lots of ways we could use other people's code, but the easiest by far, that I know of, is to use NPM.  How do we get NPM?  We install Node.js which comes with NPM!  So cruise over to the [Node](https://nodejs.org/en/) site and follow the installation instructions.
 
 All done?  Awesome.
 
-Let's install stuff!  Wait, how do we do that?  Well first we need to initialize our project with NPM so that we can use it to manage our dependencies.  Run the command below.  It'll ask you a bunch of questions to which you can either accept the default (by pressing enter) or provide your own values.  If you screw something up, don't worry.  You can always change all of the values afterwards.
+Let's install stuff!  Wait, how do we do that?  Well first we need to initialize our project with NPM so that we can use it to manage our dependencies.  Run the command below.  It'll ask you a bunch of questions to which you can either accept the default (by pressing enter) or provide your own values.  If you screw something up, don't worry.  You can change all of the values afterwards.
 
 ```bash
 npm init
@@ -108,7 +114,7 @@ This command will generate a `package.json` file in the root of our project cont
 ```json
 {
   "name": "benjaminschnelle.com",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "a site about some guy",
   "main": "index.js",
   "scripts": {
@@ -127,7 +133,7 @@ This command will generate a `package.json` file in the root of our project cont
 }
 ```
 
-Since we now have our project under version control, you're free to commit anytime you see fit.  There aren't really any downsides to committing frequently and doing so gives you more flexibility if you need to rollback for any reason.  So we'll do a commit here, but going forward I won't state every time I'm making a commit.
+Since we now have our project under version control, you're free to commit anytime you see fit.  There aren't really any downsides to committing frequently and doing so gives you more flexibility if you need to rollback for any reason.  Also, smaller changes are easier for others to follow when trying to get up to speed on your project.  So we'll do a commit here, but going forward I won't state every time I'm making a commit.
 
 ```bash
 git add .
@@ -208,3 +214,5 @@ class Dog {
 
 export default Dog
 ```
+
+// TODO add summary
