@@ -1,6 +1,6 @@
 import React from 'react';
+import classes from './classes.scss';
 
 export default () => {
-  const a = 'apple';
-  return <div>My app!{a}</div>;
+  return <div className={classes.title}>My app!</div>;
 };

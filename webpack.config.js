@@ -1,3 +1,4 @@
+const autoprefixer = require('autoprefixer');
 const path = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -27,7 +28,7 @@ module.exports = {
       },
       {
         test: /\.(css|scss)$/,
-        loader: ExtractTextPlugin.extract('css?modules&sourceMap!sass'),
+        loader: ExtractTextPlugin.extract('css?modules&sourceMap&importLoaders=1!postcss!sass'),
       },
     ],
   },
@@ -49,6 +50,8 @@ module.exports = {
 
     // new webpack.optimize.UglifyJsPlugin(),
   ],
+
+  postcss: [autoprefixer],
 
   resolve: {
     extensions: ['', '.js', '.jsx'],

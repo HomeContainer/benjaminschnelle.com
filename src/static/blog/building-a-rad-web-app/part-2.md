@@ -3,13 +3,13 @@
 ## 5. Configure Webpack for development
 Webpack is an amazing bundling tool written with single page applications (SPAs) like the one we're going to build with React and Redux in mind.  Webpack by itself doesn't actually do much, the real power comes from *loaders* and *plugins*.
 
-#### What will we be using Webpack for?
+#### What will we be using Webpack for during development?
 - Development Server: Webpack has a built in development server powered by Node and [Express](https://expressjs.com/) (a web framework for Node)
  - Hot module replacement: edit our application and see the changes in realtime *without* losing the current application state! (it isn't just an automatic page refresh)
 - Loaders (put files in, transform them, get bundle out)
  - JSX/ES6/ES7 (React specific syntax and new JavaScript) --> ES5 (old, but well supported JavaScript)
  - SASS (supercharged CSS) --> regular CSS
- - Possibly others, but I'll explain them if we need them
+ - PostCSS add browser/vendor prefixes where appropriate
 - Plugins (add bundle related functionality)
  - Hot module replacement: necessary for dev server functionality above
  - Minify/Uglify our code
@@ -218,18 +218,21 @@ CSS is global by default meaning if you use a class named ".title" that makes yo
 Let's install the necessary packages
 
 ```bash
-npm install --save node-sass sass-loader css-loader extract-text-webpack-plugin
+npm install --save node-sass sass-loader postcss-loader autoprefixer css-loader extract-text-webpack-plugin
 ```
 
 #### Packages
 - node-sass: SASS --> CSS
 - sass-loader: use node-sass with Webpack
+- postcss-loader: tool to perform various transforms on CSS, we're using it to apply vendor prefixes with autoprefixer
+- autoprefixer: vendor prefixes
 - css-loader: bundle CSS and scope classes locally
 - extract-text-webpack-plugin: create a CSS file from bundled CSS
 
 We've got the packages we need, but now we need to tell Webpack to use them.  Update your "webpack.config.js" file to mirror the one below.  We've added new entries to `loaders` and `plugins`.  The new `loaders` entry will match both ".css" and ".scss" files and apply the sass-loader, then css-loader (with modules/local scoping and source maps enabled), and finally the ExtractTextPlugin loader (loaders are applied right to left).  In the `plugins` section we're telling ExtractTextPlugin to name our bundled CSS file "styles.css".
 
 ```javascript
+const autoprefixer = require('autoprefixer');
 const path = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -249,7 +252,7 @@ module.exports = {
       },
       {
         test: /\.(css|scss)$/,
-        loader: ExtractTextPlugin.extract('css?modules&sourceMap!sass'),
+        loader: ExtractTextPlugin.extract('css?modules&sourceMap&importLoaders=1!postcss!sass'), // TODO provide description of what this is doing...importLoaders is necessary to use postcss with css modules...add minimize param during production
       },
     ],
   },
@@ -269,6 +272,8 @@ module.exports = {
 
     // new webpack.optimize.UglifyJsPlugin(),
   ],
+
+  postcss: [autoprefixer],
 };
 
 ```
