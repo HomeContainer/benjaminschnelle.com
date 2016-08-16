@@ -45,11 +45,11 @@ This post is being written from within the project we're building. Whoa.
 11. Use test driven development (TDD) to build the app (to be expanded)
 12. Setup continuous integration/continuous delivery with Codeship
 
-## Let's Boogie
+### Let's Boogie
 
 I'll be doing all development from Mac OSX so if you're on a different platform your mileage may vary.  Got any questions? Just ask!
 
-### 1. Create our project
+## 1. Create our project
 Navigate to wherever you want to put your project and run the commands below.  If those commands look foreign to you they're shell ([bash](https://en.wikipedia.org/wiki/Bash_(Unix_shell)) commands entered through the terminal. Each line is explained below.
 
 ```bash
@@ -74,7 +74,7 @@ Once you have the project open, add the necessary directories so that your proje
 // TODO this needs to be updated based on change from feature based to type based org
 ![Initial Directory](../../images/initial-directory.jpg)
 
-### 2. Add version control with Git and use Github as our repo host
+## 2. Add version control with Git and use Github as our repo host
 To get our version control with Git/GitHub setup you'll need 2 things: Git (install locally) and a GitHub account.  Head over [here](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) for Git and [here](https://github.com/) to create a GitHub account.
 
 Once you have both, create a new repository on GitHub as described [here](https://help.github.com/articles/create-a-repo/) with whatever name you please.  After you have your repository created grab its HTTPS URL (you can use SSH also, but you'll have to create a key) then from the project root run the commands below in your terminal plugging in your repository URL in place of mine.
@@ -98,7 +98,7 @@ If everything worked correctly you should be able to refresh the repo on GitHub 
 
 // TODO add milestone and issues for v0.1.0
 
-### 3. Initialize Node Package Manager (NPM)
+## 3. Initialize Node Package Manager (NPM)
 Great! We have somewhere to put our application code now, but wouldn't it be great if we were able to piggy back off of all of the hard work people have been doing for years?  I agree!  So there are lots of ways we could use other people's code, but the easiest by far, that I know of, is to use NPM.  How do we get NPM?  We install Node.js which comes with NPM!  So cruise over to the [Node](https://nodejs.org/en/) site and follow the installation instructions.
 
 All done?  Awesome.
@@ -141,7 +141,7 @@ git commit -m 'initialized NPM...closes #1'
 git push origin master
 ```
 
-### 4. Setup ESLint
+## 4. Setup ESLint
 If you're unfamiliar with hinting/linting it's just the idea of following certain conventions when writing code so that things are standardized.  It's especially helpful when working on a team of developers so that you don't run into a scenario where one person is using tabs to indent and another is using spaces.  Consistency good, inconsistency bad.
 
 ESLint makes it easy for us to enforce those rules.  ESLint + Atom makes it easy to get *realtime* feedback right in the IDE.  There are many preconfigured sets of rules available for ESLint and Airbnb provides a pretty good one so we'll use that.  If you/me/we decide we want to change something later we can do that also!
