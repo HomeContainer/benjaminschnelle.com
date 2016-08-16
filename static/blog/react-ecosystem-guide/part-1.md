@@ -38,9 +38,9 @@ This post is being written from within the project we're building. Whoa.
 4. Setup ESLint
 5. Configure Webpack for development
 6. Configure Webpack for production
-7. React, Immutable.js, and React Router
-8. Redux
-9. Add testing setup
+7. React and React Router
+8. Add testing setup
+9. Redux and Immutable.js
 10. Misc development tools
 11. Use test driven development (TDD) to build the app (to be expanded)
 12. Setup continuous integration/continuous delivery with Codeship

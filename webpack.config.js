@@ -11,6 +11,7 @@ const isProduction = process.env.NODE_ENV === 'production';
 const webpackConfig = {
   devServer: {
     contentBase: './dist',
+    historyApiFallback: true,
     host,
     hot: !isProduction,
     port,
@@ -20,16 +21,16 @@ const webpackConfig = {
 
   entry: {
     app: [
-      './src/index.js',
+      './src/index.jsx',
     ],
   },
 
   module: {
     loaders: [
       {
-        test: /\.js$/,
+        test: /\.(js|jsx)$/,
         exclude: /node_modules/,
-        loader: 'babel',
+        loader: isProduction ? 'babel' : 'react-hot!babel',
       },
       {
         test: /\.(css|scss)$/,
@@ -57,6 +58,10 @@ const webpackConfig = {
   ],
 
   postcss: [autoprefixer],
+
+  resolve: {
+    extensions: ['', '.js', '.jsx'],
+  },
 };
 
 if (isProduction) {
