@@ -133,11 +133,11 @@ This command will generate a `package.json` file in the root of our project cont
 }
 ```
 
-Since we now have our project under version control, you're free to commit anytime you see fit.  There aren't really any downsides to committing frequently and doing so gives you more flexibility if you need to rollback for any reason.  Also, smaller changes are easier for others to follow when trying to get up to speed on your project.  So we'll do a commit here, but going forward I won't state every time I'm making a commit.
+Since we now have our project under version control, you're free to commit anytime you see fit.  There aren't really any downsides to committing frequently and doing so gives you more flexibility if you need to rollback for any reason.  Also, smaller changes are easier for others to follow when trying to get up to speed on your project.  Remember our issues we created that we need to complete in order to reach our first 0.1.0 milestone?  We get to close one!  You can automatically close issues using keywords (close, fix, resolve) in your commit messages.
 
 ```bash
 git add .
-git commit -m 'initialized NPM'
+git commit -m 'initialized NPM...closes #1'
 git push origin master
 ```
 
@@ -215,4 +215,13 @@ class Dog {
 export default Dog
 ```
 
-// TODO add summary
+Finally, let's commit and close our next GitHub issue.
+
+```bash
+git add .
+git commit -m 'added and configured ESLint...closes #2'
+git push origin master
+```
+
+#### Summary
+We covered a lot here and we're making solid progress.  In the next part we'll get started with Webpack, a roided out bundling tool.
