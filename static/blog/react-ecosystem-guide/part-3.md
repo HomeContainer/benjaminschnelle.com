@@ -3,7 +3,7 @@
 # 6. Configure Webpack for production
 Now that we have Webpack mostly configured for development let's go ahead and get started with our production build setup.  Later on we'll worry about deployment.
 
-
+Go ahead and delete the "setHTML.js" and "classes.scss" files as we're done with them.  Also, delete `<input type="text" />` from "index.html".
 
 # 7. React, Redux, and Immutable.js
 

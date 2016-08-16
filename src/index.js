@@ -1,5 +1,10 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './containers/App';
+import setHTML from './setHTML';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+if (module.hot) {
+  module.hot.accept('./setHTML', () => {
+    // eslint-disable-next-line
+    require('./setHTML').default();
+  });
+}
+
+setHTML();

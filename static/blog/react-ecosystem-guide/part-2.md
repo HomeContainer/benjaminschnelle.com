@@ -482,8 +482,6 @@ Restart your dev server and reload your application from the browser.  Type some
 Ok, maybe you don't think it's that great, but when you're working with application state that takes a while to reach (filling out a form/walking through a wizard) it makes developing/debugging a lot more enjoyable.
 
 #### Misc cleanup
-Go ahead and delete the "setHTML.js" and "classes.scss" files as we're done with them.  Also, delete `<input type="text" />` from "index.html".
-
 Also, update your "webpack.config.js" file as shown below.  We've added references to `HOST` and `PORT` [environment variables](https://en.wikipedia.org/wiki/Environment_variable) with defaults this way we can dynamically set our host/port combination at runtime.  Notice that we've also added `contentBase: './dist'` to `devServer`?  This means we can remove it from our `start` script in "package.json".  Go ahead and update that to `"start": "webpack-dev-server"`.
 
 ```javascript
