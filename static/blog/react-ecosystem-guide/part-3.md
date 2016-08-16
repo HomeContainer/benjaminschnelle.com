@@ -1,6 +1,11 @@
 # In Depth Beginner's Guide to the React Ecosystem - Part 3
 
-# 6. React, Redux, and Immutable.js
+# 6. Configure Webpack for production
+Now that we have Webpack mostly configured for development let's go ahead and get started with our production build setup.  Later on we'll worry about deployment.
+
+
+
+# 7. React, Redux, and Immutable.js
 
 Per the React site, React makes it painless to create interactive UIs.  That is no understatement.  React is all *component* (you can think of them as widgets of functionality) based meaning you break your UI into separate components and *compose* your UI from those components.  I highly recommend reading [Thinking in React](https://facebook.github.io/react/docs/thinking-in-react.html) by [Pete Hunt](https://twitter.com/floydophone) for a quick overview of using React.
 

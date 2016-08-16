@@ -4,7 +4,7 @@
   "description": "a site about some guy",
   "main": "index.js",
   "scripts": {
-    "start": "webpack-dev-server --content-base dist/",
+    "start": "webpack-dev-server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

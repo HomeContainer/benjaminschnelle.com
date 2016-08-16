@@ -4,27 +4,33 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
 
+const host = process.env.HOST || 'localhost';
+const port = process.env.PORT || '8080';
+
 module.exports = {
   devServer: {
+    contentBase: './dist',
+    host,
     hot: true,
+    port,
   },
 
   devtool: 'source-map',
 
   entry: {
     app: [
-      'webpack-dev-server/client?http://localhost:8080/',
+      `webpack-dev-server/client?http://${host}:${port}/`,
       'webpack/hot/only-dev-server',
-      './src/index.jsx',
+      './src/index.js',
     ],
   },
 
   module: {
     loaders: [
       {
-        test: /\.(js|jsx)$/,
+        test: /\.js$/,
         exclude: /node_modules/,
-        loader: 'react-hot!babel',
+        loader: 'babel',
       },
       {
         test: /\.(css|scss)$/,
@@ -52,8 +58,4 @@ module.exports = {
   ],
 
   postcss: [autoprefixer],
-
-  resolve: {
-    extensions: ['', '.js', '.jsx'],
-  },
 };

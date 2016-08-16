@@ -481,7 +481,75 @@ Restart your dev server and reload your application from the browser.  Type some
 
 Ok, maybe you don't think it's that great, but when you're working with application state that takes a while to reach (filling out a form/walking through a wizard) it makes developing/debugging a lot more enjoyable.
 
-Anyway, go ahead and delete the "setHTML.js" and "classes.scss" files as we're done with them.  Also, delete `<input type="text" />` from "index.html".
+#### Misc cleanup
+Go ahead and delete the "setHTML.js" and "classes.scss" files as we're done with them.  Also, delete `<input type="text" />` from "index.html".
+
+Also, update your "webpack.config.js" file as shown below.  We've added references to `HOST` and `PORT` [environment variables](https://en.wikipedia.org/wiki/Environment_variable) with defaults this way we can dynamically set our host/port combination at runtime.  Notice that we've also added `contentBase: './dist'` to `devServer`?  This means we can remove it from our `start` script in "package.json".  Go ahead and update that to `"start": "webpack-dev-server"`.
+
+```javascript
+const autoprefixer = require('autoprefixer');
+const path = require('path');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack');
+
+const host = process.env.HOST || 'localhost';
+const port = process.env.PORT || '8080';
+
+module.exports = {
+  devServer: {
+    contentBase: './dist',
+    host,
+    hot: true,
+    port,
+  },
+
+  devtool: 'source-map',
+
+  entry: {
+    app: [
+      `webpack-dev-server/client?http://${host}:${port}/`,
+      'webpack/hot/only-dev-server',
+      './src/index.js',
+    ],
+  },
+
+  module: {
+    loaders: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'babel',
+      },
+      {
+        test: /\.(css|scss)$/,
+        loader: ExtractTextPlugin.extract('css?modules&sourceMap&importLoaders=1!postcss!sass'),
+      },
+    ],
+  },
+
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: '[name]-[hash].js',
+  },
+
+  plugins: [
+    new ExtractTextPlugin('styles-[contenthash].css'),
+
+    new webpack.HotModuleReplacementPlugin(),
+
+    new HtmlWebpackPlugin({
+      template: './src/index.html',
+      inject: 'body',
+    }),
+
+    // new webpack.optimize.UglifyJsPlugin(),
+  ],
+
+  postcss: [autoprefixer],
+};
+
+```
 
 #### Summary
 We covered a lot here and we'll continue to update our Webpack config in the next section where we add our deployment config.
