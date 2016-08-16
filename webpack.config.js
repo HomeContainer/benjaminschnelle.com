@@ -6,12 +6,13 @@ const webpack = require('webpack');
 
 const host = process.env.HOST || 'localhost';
 const port = process.env.PORT || '8080';
+const isProduction = process.env.NODE_ENV === 'production';
 
-module.exports = {
+const webpackConfig = {
   devServer: {
     contentBase: './dist',
     host,
-    hot: true,
+    hot: !isProduction,
     port,
   },
 
@@ -19,8 +20,6 @@ module.exports = {
 
   entry: {
     app: [
-      `webpack-dev-server/client?http://${host}:${port}/`,
-      'webpack/hot/only-dev-server',
       './src/index.js',
     ],
   },
@@ -34,7 +33,11 @@ module.exports = {
       },
       {
         test: /\.(css|scss)$/,
-        loader: ExtractTextPlugin.extract('css?modules&sourceMap&importLoaders=1!postcss!sass'),
+        loader: ExtractTextPlugin.extract([
+          `css?modules&sourceMap&importLoaders=1${isProduction ? '&minimize' : ''}`,
+          'postcss',
+          'sass',
+        ]),
       },
     ],
   },
@@ -47,15 +50,44 @@ module.exports = {
   plugins: [
     new ExtractTextPlugin('styles-[contenthash].css'),
 
-    new webpack.HotModuleReplacementPlugin(),
-
     new HtmlWebpackPlugin({
       template: './src/index.html',
       inject: 'body',
     }),
-
-    // new webpack.optimize.UglifyJsPlugin(),
   ],
 
   postcss: [autoprefixer],
 };
+
+if (isProduction) {
+  // add optimizations
+  webpackConfig.plugins.push(
+    new webpack.optimize.DedupePlugin(),
+    new webpack.optimize.OccurrenceOrderPlugin(),
+    new webpack.optimize.UglifyJsPlugin({
+      comments: false,
+      compress: {
+        warnings: false,
+      },
+    }),
+    // create global constants at compile time...
+    // this enables minification to remove entire
+    // code blocks that are environment specific
+    new webpack.DefinePlugin({
+      'process.env': {
+        NODE_ENV: JSON.stringify('production'),
+      },
+    })
+  );
+} else {
+  // add HMR
+  webpackConfig.entry.app.unshift(
+    `webpack-dev-server/client?http://${host}:${port}/`,
+    'webpack/hot/only-dev-server'
+  );
+  webpackConfig.plugins.push(
+    new webpack.HotModuleReplacementPlugin()
+  );
+}
+
+module.exports = webpackConfig;

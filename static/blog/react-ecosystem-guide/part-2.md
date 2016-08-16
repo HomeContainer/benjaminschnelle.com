@@ -549,5 +549,13 @@ module.exports = {
 
 ```
 
+Let's commit and close our next GitHub issue.
+
+```bash
+git add .
+git commit -m 'added Webpack development config...closes #3'
+git push origin master
+```
+
 #### Summary
 We covered a lot here and we'll continue to update our Webpack config in the next section where we add our deployment config.
