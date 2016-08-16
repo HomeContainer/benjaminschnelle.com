@@ -12,7 +12,7 @@ module.exports = {
   devtool: 'source-map',
 
   entry: {
-    bundle: [
+    app: [
       'webpack-dev-server/client?http://localhost:8080/',
       'webpack/hot/only-dev-server',
       './src/index.jsx',
@@ -35,11 +35,11 @@ module.exports = {
 
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.js',
+    filename: '[name]-[hash].js',
   },
 
   plugins: [
-    new ExtractTextPlugin('styles.css'),
+    new ExtractTextPlugin('styles-[contenthash].css'),
 
     new webpack.HotModuleReplacementPlugin(),
 

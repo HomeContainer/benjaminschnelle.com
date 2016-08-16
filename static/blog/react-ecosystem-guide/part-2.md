@@ -1,29 +1,17 @@
-# Building a Rad Web App - Initial Setup Continued...
+# In Depth Beginner's Guide to the React Ecosystem - Part 2
 
-### As a reminder, here are the steps we're following (starting with #5 here)
-1. Create our project
-2. Add version control with Git and use Github as our repo host
-3. Initialize Node Package Manager (NPM)
-4. Setup ESLint
-5. Configure Webpack
-6. React, Redux, and Immutable.js
-7. Add our testing framework
-8. Use test driven development (TDD) to build the app (to be expanded)
-9. Setup continuous integration/continuous delivery with Codeship
-
-## 5. Configure Webpack
+## 5. Configure Webpack for development
 Webpack is an amazing bundling tool written with single page applications (SPAs) like the one we're going to build with React and Redux in mind.  Webpack by itself doesn't actually do much, the real power comes from *loaders* and *plugins*.
 
-#### What will we be using Webpack for?
+#### What will we be using Webpack for during development?
 - Development Server: Webpack has a built in development server powered by Node and [Express](https://expressjs.com/) (a web framework for Node)
  - Hot module replacement: edit our application and see the changes in realtime *without* losing the current application state! (it isn't just an automatic page refresh)
 - Loaders (put files in, transform them, get bundle out)
  - JSX/ES6/ES7 (React specific syntax and new JavaScript) --> ES5 (old, but well supported JavaScript)
  - SASS (supercharged CSS) --> regular CSS
- - Possibly others, but I'll explain them if we need them
+ - PostCSS add browser/vendor prefixes where appropriate
 - Plugins (add bundle related functionality)
  - Hot module replacement: necessary for dev server functionality above
- - Minify/Uglify our code
  - Dynamically create our HTML file
 
 Let's get Webpack installed and setup then create a simple script to demonstrate how it works.  Go ahead and add an "index.html" file to our "src" directory with the code below in it.  This is telling the browser we'll be using English and to use the [UTF-8](http://www.w3schools.com/charsets/ref_html_utf8.asp) character set.  The `<div id="root"></div>` tag is where we'll inject our React app.
@@ -41,7 +29,7 @@ Let's get Webpack installed and setup then create a simple script to demonstrate
 </html>
 ```
 
-Remember that "index.js" file we created in our "src" directory a while ago?  Open that puppy back up and delete its contents then paste in the code below.  We've used the [arrow function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions) ES6 feature here so we can demonstrate how Webpack turns that into ES5.
+Remember that "index.js" file we created in our "src" directory a while ago?  Open that puppy back up and delete its contents then paste in the code below.  We've used the ES6 [arrow function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions) here to demonstrate how Webpack transpiles ES6 to ES5.
 
 ```javascript
 const setHTML = () => {
@@ -61,7 +49,9 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: './src/index.js',
+  entry: {
+    app: './src/index.js'
+  },
 
   module: {
     loaders: [
@@ -75,7 +65,7 @@ module.exports = {
 
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.js',
+    filename: '[name]-[hash].js',
   },
 
   plugins: [
@@ -91,7 +81,7 @@ module.exports = {
 #### What's going on here?
 - [path](https://nodejs.org/api/path.html#path_path_resolve_path) is a Node.js library for resolving file paths
 - [HtmlWebpackPlugin](https://github.com/ampedandwired/html-webpack-plugin) lets us dynamically create/augment our HTML file
-- entry: where do we want Webpack to enter our application when bundling?
+- entry: where do we want Webpack to enter our application when bundling (use `app` as the bundle's name)?
 - module: options affecting our modules (JS/JSX/SASS/etc. files)
  - loaders: we talked about these earlier, remember?
     - test: which files do we want this loader to apply to ([RegEx](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions) based)
@@ -99,13 +89,13 @@ module.exports = {
     - loader: the actual loader to use to transform the matched files
 - output: where do we want Webpack to spit out the files it creates?
  - path: directory to put the file(s) in (must be an absolute path)
- - filename: what do want to call our file(s)? (here we're only creating a single file)
+ - filename: use the name from `entry` (app) and append a hash to it
 - plugins: also talked about these earlier
  - HtmlWebpackPlugin
    - template: starting point for our HTML file
-   - inject: add a script tag to the `body` section of our "index.html" file pointing to "bundle.js"
+   - inject: add a script tag to the `body` section of our "index.html" file pointing to our bundle file
 
-So we're looking for files with a ".js" file extension, that are *not* in the "node_modules" folder and then transforming them with the `babel` loader (we could also write it as `loader: 'babel-loader'`).  [Babel](https://babeljs.io/) is a powerful tool for transforming JavaScript and the `babel` loader is just a way to use Babel with Webpack.  In order for Babel to do any transforms we need to tell it what transforms we want applied.  This is specified with Babel plugins or presets (groups of plugins).  You can do configure Babel a few different ways: add a `"babel": {}`  section to your "package.json" file, specify it in your "webpack.config.js", or using a ".babelrc" file.  We'll use the last option, so create a file named ".babelrc" with the contents below.
+So we're looking for files with a ".js" extension, that are *not* in the "node_modules" folder and then transforming them with the `babel` loader (we could also write it as `loader: 'babel-loader'`).  [Babel](https://babeljs.io/) is a powerful tool for transforming JavaScript and the `babel` loader is just a way to use Babel with Webpack.  In order for Babel to do any transforms we need to tell it what transforms we want applied.  This is specified with Babel plugins or presets (groups of plugins).  You can configure Babel a few different ways: add a `"babel": {}`  section to your "package.json" file, specify it in your "webpack.config.js", or using a ".babelrc" file.  We'll use the last option, so create a file named ".babelrc" in the project root with the contents below.
 
 ```json
 {
@@ -124,13 +114,13 @@ npm install --save webpack babel-core babel-loader babel-preset-es2015 babel-pre
 npm install -g webpack webpack-dev-server
 ```
 
-Go ahead and run the following command from the root of your project which bundles up our application files, start the development serve, and tells the server to serve the contents of the "dist" folder.  You should now be able to open your browser and visit localhost:8080 to see your app.  If it worked correctly you should see "Hey dude!".
+Go ahead and run the following command from the root of your project which bundles up our application files, starts the development server, and tells the server to serve the contents of the "dist" folder.  You should now be able to open your browser and visit localhost:8080 to see your app.  If it worked correctly you should see "Hey dude!".
 
 ```bash
 webpack-dev-server --content-base dist/
 ```
 
-What just happened?  We started our `webpack-dev-server` which bundled up our application code into a file named "bundle.js", put that in the "dist" folder, copied our src/index.html file into the "dist" folder, and then inserted a script tag into that file to pull in "bundle.js" at runtime.  Awesome!
+What just happened?  We started our `webpack-dev-server` which bundled up our application code into a file named something like "app-42d809adf5fa9e5d6ac5.js", put that in the "dist" folder, copied our src/index.html file into the "dist" folder, and then inserted a script tag into that file to pull in the bundle at runtime.  Awesome!
 
 Hold on a minute.  I don't see a folder named "dist" in my project though.  That's because it is all done in memory!  Want to see the files with your own eyes?  Hop back over to the command line and kill the server with control + C.  Now run the command below, then jump back to your text editor after it finishes....voila, there it is!
 
@@ -138,13 +128,13 @@ Hold on a minute.  I don't see a folder named "dist" in my project though.  That
 webpack
 ```
 
-Let's get even crazier.  Go ahead and open up the "bundle.js" file in the "dist" directory.  It's pretty ugly and has 75+ ESLint errors, let's fix those first.  Create a new file in the root of your project called ".eslintignore" and paste in the text below.
+Let's get even crazier.  Go ahead and open up the "app-42d809adf5fa9e5d6ac5.js" file in the "dist" directory.  It's pretty ugly and has 75+ ESLint errors, let's fix those first.  Create a new file in the root of your project called ".eslintignore" and paste in the text below.
 
 ```
 dist
 ```
 
-This tells ESLint to ignore everything in the "dist" directory.  If it doesn't fix your errors try reopening the "bundle.js" file.  
+This tells ESLint to ignore everything in the "dist" directory.  If it doesn't fix your errors try reopening the "app-42d809adf5fa9e5d6ac5.js" file.  
 
 The first 40 lines or so are all Webpack related stuff for module caching so that we don't load modules more than once during production use.  If you scroll to the bottom you'll see our application code that just adds "Hey dude!" to a div, but look a little closer.  Our arrow function is gone and has been replaced by a regular function.  That's the ES6 --> ES5 transpilation that Webpack and Babel do for us.
 
@@ -156,7 +146,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack'); // new
 
 module.exports = {
-  entry: './src/index.js',
+  entry: {
+    app: './src/index.js'
+  },
 
   module: {
     loaders: [
@@ -170,7 +162,7 @@ module.exports = {
 
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.js',
+    filename: '[name]-[hash].js',
   },
 
   plugins: [
@@ -193,7 +185,7 @@ webpack
 
 Open up "bundle.js" again.  It's just a single line now and it's really hard to read, BUT it's really minimal which is great for performance!  So we have two problems now: during development our beautiful ES6 source code now has to be debugged in minified ES5 which is tough to say the least.  If you were to view the source code from you browser's developer tools you would see the same thing.  We can do better.
 
-Add `devtool: 'source-map',` just above the `entry` property of your "webpack.config.js".  This tells Webpack to create a source map which bridges the gap between your source code and the minified code.  Most modern browsers support source maps for debugging...I'm using Chrome, but most browsers should perform similarly.  Fire up your dev server again with `webpack-dev-server --content-base dist/`, open up your browser dev tools, then refresh the page.  If you go to the "Sources" tab of the dev tools window you should see something similar to the images below.
+Add `devtool: 'source-map',` just above the `entry` property of your "webpack.config.js" file.  This tells Webpack to create a source map which bridges the gap between your source code and the transpiled/minified code.  Most modern browsers support source maps for debugging...I'm using Chrome, but most browsers should perform similarly.  Fire up your dev server again with `webpack-dev-server --content-base dist/`, open up your browser dev tools, then refresh the page.  If you go to the "Sources" tab of the dev tools window you should see something similar to the images below.
 
 Minified
 ![Chrome Dev Tools Minified](../../images/dev-tools-minified.jpg)
@@ -207,9 +199,9 @@ If you want to build the source maps to disk you'll need to run the command belo
 webpack --debug
 ```
 
-For now, I'm going to comment out the UglifyJsPlugin line since it's just going to add overhead during development.  Later when we address deploying our code we'll add it back.
+For now, I'm going to comment out the UglifyJsPlugin line since it's just going to add overhead during development.  Later when we setup our production build we'll add it back.
 
-Let's go ahead and add a script to our "package.json" file to make running our dev server easier.  Update your the `scripts` section to resemble the one below.  Now your can run your dev server by just typing `npm start` from the command line.
+Let's go ahead and add a script to our "package.json" file to make running our dev server easier.  Update the `scripts` section to resemble the one below.  Now your can run your dev server by just typing `npm start` from the command line.
 
 ```json
 {
@@ -222,25 +214,28 @@ Let's go ahead and add a script to our "package.json" file to make running our d
 
 Wouldn't it be really awesome if we could make our div display "Hey dude!" in blue instead of black?  Hell yeah!  Wouldn't it be even more awesome if we could use something better than regular CSS to write it?  Double hell yeah!
 
-We're going to use SASS to write our styles, convert SASS to CSS, locally scope our classes, bundle, inject our styles in an external style sheet, then import those styles via our "index.html" file.
+We're going to use SASS to write our styles, convert SASS to CSS, add vendor prefixes, locally scope our classes, bundle our styles into an external style sheet, then import those styles via our "index.html" file.
 
 CSS is global by default meaning if you use a class named ".title" that makes your font blue in one place then want to use another ".title" class in a different part of your app to make the font pink you'll run into a conflict and both titles will be blue or pink, depending on order.  But some really smart guys came up with the idea of [CSS Modules](https://github.com/css-modules/css-modules) which locally scopes all CSS (via the Webpack css-loader) allowing you to use as many different ".title" classes as you want without conflict!
 
 Let's install the necessary packages
 
 ```bash
-npm install --save node-sass sass-loader css-loader extract-text-webpack-plugin
+npm install --save node-sass sass-loader postcss-loader autoprefixer css-loader extract-text-webpack-plugin
 ```
 
 #### Packages
 - node-sass: SASS --> CSS
 - sass-loader: use node-sass with Webpack
+- postcss-loader: tool to perform various transforms on CSS, we're using it to apply vendor prefixes with autoprefixer
+- autoprefixer: vendor prefixes
 - css-loader: bundle CSS and scope classes locally
 - extract-text-webpack-plugin: create a CSS file from bundled CSS
 
-We've got the packages we need, but now we need to tell Webpack to use them.  Update your "webpack.config.js" file to mirror the one below.  We've added new entries to `loaders` and `plugins`.  The new `loaders` entry will match both ".css" and ".scss" files and apply the sass-loader, then css-loader (with modules/local scoping and source maps enabled), and finally the ExtractTextPlugin loader (loaders are applied right to left).  In the `plugins` section we're telling ExtractTextPlugin to name our bundled CSS file "styles.css".
+We've got the packages we need, but now we need to tell Webpack to use them.  Update your "webpack.config.js" file to mirror the one below.  We've added new entries to `loaders` and `plugins`.  The new `loaders` entry will match both ".css" and ".scss" files and apply the sass-loader, then css-loader (with modules/local scoping and source maps enabled), and finally the ExtractTextPlugin loader (loaders are applied right to left).  In the `plugins` section we're telling ExtractTextPlugin to name our bundled CSS file "styles-ecb5dd1230609d11ec6b295438519a2d.css".
 
 ```javascript
+const autoprefixer = require('autoprefixer');
 const path = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -249,7 +244,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
   devtool: 'source-map',
 
-  entry: './src/index.js',
+  entry: {
+    app: './src/index.js'
+  },
 
   module: {
     loaders: [
@@ -260,18 +257,18 @@ module.exports = {
       },
       {
         test: /\.(css|scss)$/,
-        loader: ExtractTextPlugin.extract('css?modules&sourceMap!sass'),
+        loader: ExtractTextPlugin.extract('css?modules&sourceMap&importLoaders=1!postcss!sass'), // TODO provide description of what this is doing...importLoaders is necessary to use postcss with css modules...add minimize param during production
       },
     ],
   },
 
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.js',
+    filename: '[name]-[hash].js',
   },
 
   plugins: [
-    new ExtractTextPlugin('styles.css'),
+    new ExtractTextPlugin('styles-[contenthash].css'),
 
     new HtmlWebpackPlugin({
       template: './src/index.html',
@@ -280,6 +277,8 @@ module.exports = {
 
     // new webpack.optimize.UglifyJsPlugin(),
   ],
+
+  postcss: [autoprefixer],
 };
 
 ```
@@ -359,10 +358,11 @@ Refresh your browser, type something in the text input, then jump back to your "
 HMR to the rescue!  We need to add a few config options to our "webpack.config.js" file.  Make the changes below.
 
 ```javascript
+const autoprefixer = require('autoprefixer');
 const path = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const webpack = require('webpack'); // uncomment this
+// const webpack = require('webpack');
 
 module.exports = {
   // new section
@@ -373,7 +373,7 @@ module.exports = {
   devtool: 'source-map',
 
   entry: {
-    bundle: [
+    app: [
       'webpack-dev-server/client?http://localhost:8080/',
       'webpack/hot/only-dev-server', // new line
       './src/index.js',
@@ -389,18 +389,18 @@ module.exports = {
       },
       {
         test: /\.(css|scss)$/,
-        loader: ExtractTextPlugin.extract('css?modules&sourceMap!sass'),
+        loader: ExtractTextPlugin.extract('css?modules&sourceMap&importLoaders=1!postcss!sass'), // TODO provide description of what this is doing...importLoaders is necessary to use postcss with css modules...add minimize param during production
       },
     ],
   },
 
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.js',
+    filename: '[name]-[hash].js',
   },
 
   plugins: [
-    new ExtractTextPlugin('styles.css'),
+    new ExtractTextPlugin('styles-[contenthash].css'),
 
     new webpack.HotModuleReplacementPlugin(), // new line
 
@@ -411,6 +411,8 @@ module.exports = {
 
     // new webpack.optimize.UglifyJsPlugin(),
   ],
+
+  postcss: [autoprefixer],
 };
 
 ```
@@ -456,7 +458,7 @@ As you can see, we have moved our application logic into a new file named "setHT
 Let's take it step by step.  First of all, the `export`/`import` statements are part of the ES6 module system (a way to break up your code and access that code between files).  Via Babel, Webpack transpiles those statements to [CommonJS](https://webpack.github.io/docs/commonjs.html) format modules (for better support).  That is where the global objects `module` and `require` come from.  `module.hot` is only defined if HMR is enabled.  The `accept` function is how to tell HMR which modules we want updated when they change, so here we're saying update our app when you detect a change in the "setHTML.js" file (or any of its children).  When you do detect a change go get the updated "setHTML.js" file and call the `default` function on it.  `import` can only be used at the top level of a module which is why we have to use `require` instead then call the `default` export from the "setHTML.js" module.  The code snippet below equates `import` to `require`.
 
 ```javascript
-// otherModule.js (this is just for demonstration, we aren't using it for anything)
+// otherModule.js (this is just for demonstration)
 const bark = 'woof';
 export { bark }
 ```
@@ -477,7 +479,7 @@ Restart your dev server and reload your application from the browser.  Type some
 
 Ok, maybe you don't think it's that great, but when you're working with an application state that takes a while to reach you don't want to have to fill out an entire form or walk through an entire wizard just to reach a certain point to do some debugging.
 
-Anyway, go ahead and delete the "setHTML.js" file as we're done with it.  Also, delete `<input type="text" />` from "index.html".
+Anyway, go ahead and delete the "setHTML.js" and "classes.scss" files as we're done with them.  Also, delete `<input type="text" />` from "index.html".
 
 #### Let's move on...
 We covered a lot here and we'll continue to update our Webpack config as we go along, but we have the major pieces in place now.  Let's head over to part 3 where we'll look at React, Redux, and Immutable.js.
