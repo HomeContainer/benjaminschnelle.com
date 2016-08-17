@@ -77,6 +77,15 @@ Given our new testing context, we need to modify a few ESLint rules so that we a
 
 Here we're starting with our existing ESLint config, setting our environment to Mocha (for certain global variables), and ignoring the "no-unused-expressions" that would throw errors on some of our assertions with Chai.
 
+One final config file we need is ".istanbul.yml" at the *root* of our project as shown below.  This file tells Istanbul that the files we want to test are in our "src" directory, we want to test both ".js" and ".jsx" files, and to include all files with those extensions when determining code coverage.
+
+```yml
+instrumentation:
+    root: src
+    extensions: ['.js', '.jsx']
+    include-all-sources: true
+```
+
 Now we have all of our config files in place, we just need to create a few scripts in our "package.json" file to make testing easier.  Add the three lines below to the `scripts` sections of your "package.json".  You can delete the placeholder `test` script that was already in there.
 
 ```json
