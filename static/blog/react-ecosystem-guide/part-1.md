@@ -27,6 +27,7 @@ This post is being written from within the project we're building. Whoa.
  - [Sinon](http://sinonjs.org/): spies, stubs, and mocks (helpers that making testing easier)
  - [Enzyme](http://airbnb.io/enzyme/): Airbnb powered React specific testing utilities
  - [JSDom](https://github.com/tmpvar/jsdom): a JavaScript implementation of the Document Object Model (DOM, the browser)...this creates a fake DOM which allows us to test browser code from the command line (terminal)
+ - [Istanbul](https://github.com/gotwarlost/istanbul): code coverage...how much of our code has been tested?
 - [React](https://facebook.github.io/react/): view layer of our app (just the user interface)
 - [Redux](http://redux.js.org/): data layer (state management)
 - [Codeship](https://codeship.com): continuous integration/delivery
@@ -39,7 +40,7 @@ This post is being written from within the project we're building. Whoa.
 5. Configure Webpack for development
 6. Configure Webpack for production
 7. React and React Router
-8. Add testing setup
+8. Testing setup
 9. Redux and Immutable.js
 10. Misc development tools
 11. Use test driven development (TDD) to build the app (to be expanded)
