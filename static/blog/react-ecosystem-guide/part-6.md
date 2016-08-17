@@ -17,3 +17,236 @@ npm install --save redux react-redux react-router-redux
 - `redux`: self-explanatory
 - `react-redux`: bindings between React and Redux...remember how I said you need to `subscribe` to state changes in order to respond to them?  Well, this library provides an easy mechanism to do that.  Via a `connect` function provided by `react-redux` you're able to bind our Redux state and/or Redux action creators to component `props`.
 - `react-router-redux`: remember our router from before? It keeps track of when we navigate around our app (such as going from "/" to "/blog") which is just more of our application state.  Since we're using Redux to manage all of our application state it would probably be smart to keep the two in sync, right?  This is especially helpful using a feature of Redux called "time-travel" which allows you to undo `actions` and essentially go back in time.  If your `action` changed your route from "/" to "/blog" and you want to undo it `react-router` needs to know about it.  This library, `react-router-redux`, provides that for us.
+
+Back in the initial discussion of React we mentioned a few concepts like `props`, `state`, and `context` that we would discuss in this post.  Let's do that now.  I've now mentioned `state` twice in two different contexts (not to be confused with React `context`)!  Make the changes below.
+
+```javascript
+// components/App.jsx
+import React from 'react';
+import { Link } from 'react-router';
+
+export default class App extends React.Component {
+  static propTypes = {
+    counter: React.PropTypes.number,
+    linkMessage: React.PropTypes.string.isRequired,
+  }
+
+  constructor(props)
+
+  render() {
+    return <Link to="/blog">{this.props.linkMessage}</Link>;
+  }
+}
+
+```
+
+```javascript
+// containers/App.jsx
+import React from 'react';
+import App from '../components/App';
+
+export default class AppContainer extends React.Component {
+  render() {
+    const linkMessage = 'Go to Blog!';
+    return <App linkMessage={linkMessage} />;
+  }
+}
+
+```
+
+Here we've updated our two App components so that the container is now passing down a `linkMessage` `prop` to the presentational component which takes that `prop` and displays it.  You'll also notice in components/App.jsx that we're explicitly specifying `linkMessage` as a required string under `propTypes`.  This adds some nice type checking for us during development which can help us find bugs more quickly.
+
+If we were to change the value of `linkMessage` in our container component our presentational component would rerender (by default) and display the new value.  Let's demonstrate how that would work.
+
+```javascript
+// components/App.jsx
+import React from 'react';
+import { Link } from 'react-router';
+
+export default class App extends React.Component {
+  static propTypes = {
+    counter: React.PropTypes.number,
+    increment: React.PropTypes.func.isRequired,
+    linkMessage: React.PropTypes.string.isRequired,
+  }
+
+  render() {
+    return (
+      <div>
+        <Link to="/blog">{this.props.linkMessage}</Link>
+        <div>{this.props.counter}</div>
+        <button onClick={this.props.increment}>Increment</button>
+      </div>
+    );
+  }
+}
+
+```
+
+```javascript
+// containers/App.jsx
+import React from 'react';
+import App from '../components/App';
+
+export default class AppContainer extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { counter: 0 };
+    this.increment = this.increment.bind(this);
+  }
+
+  increment() {
+    this.setState({ counter: this.state.counter + 1 });
+  }
+
+  render() {
+    const linkMessage = 'Go to Blog!';
+    return (
+      <App
+        counter={this.state.counter}
+        increment={this.increment}
+        linkMessage={linkMessage}
+      />
+    );
+  }
+}
+
+```
+
+Dang, things just got complicated.  Let's step through our changes.  In our presentational component we have two new `props`: `increment` and `counter` which are a function and a number, respectively.  Then we're rendering the `Link` from before as well as a `div` with our `counter` number in it and finally a `button` which calls our `increment` property when clicked.
+
+Our container component has even more going on.  There's a whole new `constructor` function which is called by our `AppContainer` when it is first initialized.  This function receives a `props` argument which is just an object containing all of the properties passed into this component.  If you were to inspect the `props` object you would see it contains several nested objects that are passed in by `react-router`.  We'll look at some of those later.  Because we have explicitly created a `constructor` function we first want to call any parent constructors with the `super` keyword.  The next line is initializing our component's `state` (different from Redux state) which we'll use to track how many times our `increment` function is called (by clicking the button in our presentational component).  The final line in our constructor is binding our `increment` function to our `AppContainer` component so that when we pass it down to our `App` component it can call the function appropriately.  The `this` keyword in JavaScript can be confusing, if it is foreign to you I would suggest reading more [here](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this).
+
+Next, we have our `increment` function which calls a `setState` function that is inherited from `React.Component` (remember we're extending from that class).  `state` is a special object in React that when updated causes the component and any child components to rerender.  `setState` is how you update your `state`.  You *never* want to directly modify `state` with anything like `this.state.counter = 10;`, so anytime you want to update your `state` you'll want to create a new `state` or clone the existing state and update that.  Our `increment` function just grabs our existing `state.counter` and increments it by one each time.
+
+Finally, you can see we're passing `state.counter` and `increment` to our presentational component so that it can use them in the UI.
+
+Now what?  Well if you open up your browser to localhost:8080 again you should see a pretty ugly page with a link, a number, and an unstyled button.  If you click the button though, the number goes up by one.  Neat!
+
+Now click your link to go to "/blog" then click the link there to come back to "/".  Our number went back to zero.  Shoot, we wanted to keep our hard work.  The reason it reset is that when you navigated to "/blog" our `AppContainer` was `unmounted` which removed it from the DOM and hence any data associated with it was lost.  Then when you went back to "/" it was recreated and the `counter` was reinitialized to zero.
+
+There are situations where this is completely appropriate, but there are also situations where you want to persist your application state.  That's where Redux comes it.  Because we're going to be using Redux with React we need to first discuss `context` which can be thought of as implicit `props`.  It allows you to pass data from a parent component to a descendent, the number of levels deep doesn't matter.  This can be convenient when you don't want to explicitly pass it from component to component all the way down the chain, but it can also make it more difficult to reason about because of the fact that data is kind of "magically" available.  We'll see `context` in action shortly.
+
+#### Redux + React Redux (react-redux)
+Open up your "index.jsx" file in "src" and make the changes below.
+
+```javascript
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { createStore } from 'redux';
+import { Provider } from 'react-redux';
+import { browserHistory, Route, Router } from 'react-router';
+import App from './containers/App';
+import Blog from './containers/Blog';
+
+const reducer = (state) => state;
+const initialState = { counter: 10 };
+const store = createStore(reducer, initialState);
+
+ReactDOM.render((
+  <Provider store={store}>
+    <Router history={browserHistory}>
+      <Route path="/" component={App} />
+      <Route path="/blog" component={Blog} />
+    </Router>
+  </Provider>
+), document.getElementById('root'));
+
+```
+
+Here we've added a two imported `createStore` from `redux` and `Provider` from `react-redux`.  We're then creating a `reducer` that just returns the first argument passed to it and an `initialState` object to represent our dog Fido.  Next we call `createStore` with our `reducer` and `initialState`.  What we have done is create a Redux store with a default state of `{ counter: 10 }` and `reducer` that just returns our old state.  Later we'll make a reducer that actually does something, but I wanted to start with a simple example to show how the Redux store is used in components.
+
+Below we've wrapped our `Router` component in a `Provider` and passed our store to it as a `prop`.  Remember a little while ago when I talked about React `context`?  `context` is exactly how `react-redux` passes the `store` down the component hierarchy enabling us to extract data (our counter's value) at any depth we please.  Let's see how we would access our store.
+
+```javascript
+// ...dependencies
+export default class AppContainer extends React.Component {
+  static contextTypes = {
+    store: React.PropTypes.object,
+  }
+
+  constructor(props, context) {
+    super(props);
+    this.state = { counter: context.store.getState().counter };
+    this.increment = this.increment.bind(this);
+
+    // delete this after you have a chance to see what the context/store looks like
+    console.log('context', context);
+  }
+
+  // increment & render...
+}
+
+```
+
+What have we changed?  So we added a `contextTypes` with a `store` property that looks just like `propTypes` on our presentational component.  That's because it *is* very similar...we're just defining our `context` instead of our `props`.  In our `constructor` we've added a new argument for `context` which we're then calling `store.getState()` which returns the current state from the Redux `store`.  Finally, we're access the `counter` property on that state.  A little further down we've added a `console.log` statement so that we can inspect the `context` object, specifically the `store` property.  If you view it in your Chrome developer tools you should see an object that looks like the one below.  
+
+![Redux Store](../../images/redux-store.jpg)
+
+We're concerned with three functions exposed on the `store` object: `dispatch`, `getState`, and `subscribe`.  `dispatch` is how we tell the `store` to update the state, we already discussed `getState`, and `subscribe` is how we listen for changes in the `store`.
+
+If you look at our app now you'll notice that our `counter` starts at 10 now because that's the default value in our Redux store.  Click the button a few times and you'll see your number increment as before, then click your link to leave the page and come back again.  We're back to 10...dammit.  Well......the reason for that is we're setting our `AppContainer` `state.counter` to 10 by fetching it from the Redux store, but when we update it we're still just updating our `AppContainer`'s local state which still has the same limitations as before.  
+
+How do we update the Redux store `counter`?  Our `reducer` of course!  Time to make our `reducer` actually do something.  Update it in "index.jsx" as shown below.
+
+```javascript
+{
+  const reducer = (state, action) => {
+    if (action.type === 'INCREMENT') {
+      return { counter: state.counter + action.increment };
+    }
+    return state;
+  };
+}
+```
+
+We've added a new `action` argument to our `reducer` which the function will receive anytime we call `dispatch` with an `action` object as you'll see momentarily.  If `action.type` equals "INCREMENT" then return a new object with `counter` set to its old value plus `action.increment`, otherwise return the old `state`.
+
+Let's update our `AppContainer`'s `increment` function to dispatch an "INCREMENT" action instead of updating its local `state`.
+
+```javascript
+{
+  // ...constructor
+
+  componentWillMount() {
+    this.context.store.subscribe(() => {
+      this.setState({ counter: this.context.store.getState().counter });
+    });
+  }
+
+  increment() {
+    const action = { type: 'INCREMENT', increment: 2 };
+    this.context.store.dispatch(action);
+  }
+
+  // render...
+}
+```
+
+Here we've made two changes.  Let's look at `increment` first.  Instead of updating `AppContainer`'s local state with `setState` we're now creating an action of `type` "INCREMENT" and setting `increment` to one which will increase our counter by 2 now instead of 1.  `componentWillMount` is another component lifecycle hook allowing us to do stuff at certain times during the component's life.  In this case `constructor` and `componentWillMount` are essentially identical, but I've separated them for clarity here.  Here we have used the `subscribe` method on the `store` object so that we can respond to changes to our Redux store's `state`.  You can see we're just updating our *local* `state.counter` to the corresponding property in our Redux store.
+
+Fire up your app again if it isn't already running and increment our counter, then navigate between routes, and you should see it retain its value.  Awesome!  Increment it again after you switched routes and check the console, we have an error...shit.
+
+![setState error](../../images/setState-error.jpg)
+
+Why are we getting this and what does it mean?  Well if we read it tells us exactly what the problem is.  We're calling `setState` on an unmounted component which is a no-no.  How is this happening?  Remember earlier when I said our component is unmounted when we change routes (which is why we lose our `counter` state)?  Well that is still happening, but that listener we added to the Redux store with `subscribe` in our `componentWillMount` hook is still there long after our component unmounts.  So we need to `unsubscribe` from the store before our component unmounts.  How?
+
+```javascript
+// more stuff...
+
+componentWillMount() {
+  this.unsubscribe = this.context.store.subscribe(() => {
+    this.setState({ counter: this.context.store.getState().counter });
+  });
+}
+
+componentWillUnmount() {
+  this.unsubscribe();
+}
+
+// more stuff...
+```
+
+When we call `subscribe` it returns an `unsubscribe` object we can call to remove the listener from the store.  Simple as that.  `componentWillUnmount` is, you guessed it, another lifecycle hook.
+
+Now increment all you want and click back and forth between routes.  No errors!

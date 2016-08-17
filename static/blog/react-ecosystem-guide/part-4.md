@@ -1,8 +1,6 @@
 # In Depth Beginner's Guide to the React Ecosystem - Part 4
 
 ## 7. React and React Router
-// TODO add discussion of `props` and `state`
-
 Per the React site, React makes it painless to create interactive UIs.  That is no understatement.  React is all *component* (you can think of them as widgets of functionality) based meaning you break your UI into separate components and *compose* your UI from those components.  I highly recommend reading [Thinking in React](https://facebook.github.io/react/docs/thinking-in-react.html) by [Pete Hunt](https://twitter.com/floydophone) for a quick overview of using React.
 
 Go ahead and install React and related packages., React DOM (React package for working with the DOM).
@@ -164,7 +162,9 @@ Because `react-hot-loader` doesn't support FSCs (the next version will) go ahead
 }
 ```
 
-You app should now be error from and if you start up your server you should be able to view it in the browser.  Our first React components!
+You app should now be error free and if you start up your server you should be able to view it in the browser.  Our first React components!
+
+There are a few fundamental React concepts we've glossed over so far like `props` and `state` as well as more advanced concepts like `context`.  We'll discuss those when we reach our post on Redux so that we can compare and contrast the two.
 
 ### React Router
 For our app we want to have a landing page, a route for our blog, and a resume route.  To accomplish that with a single page application we need a router which interfaces with the browser's [history api](https://developer.mozilla.org/en-US/docs/Web/API/History).
