@@ -41,10 +41,11 @@ This post is being written from within the project we're building. Whoa.
 6. Configure Webpack for production
 7. React and React Router
 8. Testing setup
-9. Redux and Immutable.js
-10. Misc development tools
-11. Use test driven development (TDD) to build the app (to be expanded)
-12. Setup continuous integration/continuous delivery with Codeship
+9. Redux
+10. Immutable.js
+11. Misc development tools
+12. Use test driven development (TDD) to build the app (to be expanded)
+13. Setup continuous integration/continuous delivery with Codeship
 
 ### Let's Boogie
 

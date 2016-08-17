@@ -130,6 +130,9 @@ Our code coverage is looking pretty crumby at under 17%, let's take a closer loo
 
 ![Coverage Report](../../images/coverage-report.jpg)
 
+#### Misc
+We have a few more items to address before we can call it a day with Redux.  First we want all of our Redux related code grouped in a folder named "redux" in "src".  
+
 Let's commit and close our next GitHub issue.
 
 ```bash

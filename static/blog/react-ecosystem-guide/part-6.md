@@ -1,6 +1,6 @@
 # In Depth Beginner's Guide to the React Ecosystem - Part 6
 
-## 9. Redux and Immutable.js
+## 9. Redux
 React has got our UI covered, but what about application state?  How should we manage that?  [Redux](http://redux.js.org/)!
 
 Redux is an simplified implementation of [flux](http://facebook.github.io/flux/), application pattern created/used by Facebook.  Flux and Redux take approach than more traditional design patterns like MVC ([client MVC](http://stackoverflow.com/questions/33447710/mvc-vs-flux-bidirectional-vs-unidirectional)).  Many client frameworks like Ember and Angular 1 implemented two-way data binding which means if you have (for example) a `Person` model with a `firstName` property that has been wired up to an `input` and you change the value of the `input` the `firstName` property of the `Person` is updated to that new value.  Similarly, if you were to update the `firstName` property on the model directly using JavaScript your `input` would reflect the new value as well, hence two-way.  This binding can be convenient and results in less boilerplate code, but there are also performance implications in complex applications and it can make reasoning about your app more difficult.
@@ -250,3 +250,175 @@ componentWillUnmount() {
 When we call `subscribe` it returns an `unsubscribe` object we can call to remove the listener from the store.  Simple as that.  `componentWillUnmount` is, you guessed it, another lifecycle hook.
 
 Now increment all you want and click back and forth between routes.  No errors!
+
+#### React Redux connect
+If you're thinking there has to be a better way to go about getting data from the store, you would be correct.  I just wanted to show you how things are implemented manually first.
+
+`react-redux` exposes a `connect` function in addition to the `Provider` component.  Let's see how we can simplify our component using that.
+
+```javascript
+import React from 'react';
+import { connect } from 'react-redux';
+import App from '../components/App';
+
+class AppContainer extends React.Component {
+  static propTypes = {
+    counter: React.PropTypes.number.isRequired,
+    increment: React.PropTypes.func.isRequired,
+  }
+
+  render() {
+    const linkMessage = 'Go to Blog!';
+    return (
+      <App
+        counter={this.props.counter}
+        increment={this.props.increment}
+        linkMessage={linkMessage}
+      />
+    );
+  }
+}
+
+const stateToProps = (state) => ({ counter: state.counter });
+const dispatchToProps = {
+  increment: () => ({ type: 'INCREMENT', increment: 2 }),
+};
+export default connect(stateToProps, dispatchToProps)(AppContainer);
+
+```
+
+You can see we're importing `connect` from `react-redux` and we're using it at the very bottom.  `connect` is what's known as a [higher order component](https://medium.com/@franleplant/react-higher-order-components-in-depth-cf9032ee6c3e#.70hzkn6mh) which basically just wraps an existing component and augments it with new `props`.  All of the interactions we were doing with `context` are handled by `connect` for us now, we just have to tell `connect` what data we want from the `store` and what actions we want to be able to `dispatch`.  It then maps those pieces of state and action creators to `props` on our component.  
+
+`connect` accepts two main arguments `mapStateToProps` and `mapDispatchToProps` (we've abbreviated slightly).  The first is how we access data from the `store` and the `second` is how we `dispatch` actions to the store.  You can see we've created two `props`: `counter` and `increment`.  Now when we call `this.props.increment` it will update the `counter` property in Redux, then pass the updated value to our components as `this.props.counter` and we just pass that along to our presentational component for rendering.  Much more elegant.
+
+#### Misc
+Update/create the files below and then we'll discuss what we've done here.
+
+```javascript
+// src/index.jsx
+
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+import { browserHistory, Route, Router } from 'react-router';
+import { syncHistoryWithStore } from 'react-router-redux';
+import store from './redux/store';
+import App from './containers/App';
+import Blog from './containers/Blog';
+
+const history = syncHistoryWithStore(browserHistory, store);
+
+ReactDOM.render((
+  <Provider store={store}>
+    <Router history={history}>
+      <Route path="/" component={App} />
+      <Route path="/blog" component={Blog} />
+    </Router>
+  </Provider>
+), document.getElementById('root'));
+
+```
+
+```javascript
+// src/redux/modules/home/index.js
+
+// Actions
+const INCREMENT = 'benjaminschnelle.com/home/INCREMENT';
+
+// Reducer
+export default (state = { counter: 10 }, action) => {
+  if (action.type === INCREMENT) {
+    return { counter: state.counter + action.increment };
+  }
+  return state;
+};
+
+// Action Creators
+export function increment() {
+  return { type: INCREMENT, increment: 2 };
+}
+
+```
+
+```javascript
+// src/redux/reducer.js
+
+import { combineReducers } from 'redux';
+import { routerReducer } from 'react-router-redux';
+
+import home from './modules/home';
+
+export default combineReducers({
+  home,
+  routing: routerReducer,
+});
+
+```
+
+```javascript
+// src/redux/store.js
+
+import { createStore } from 'redux';
+import reducer from './reducer';
+
+export default createStore(reducer);
+
+```
+
+```javascript
+// src/containers/App.jsx
+
+import React from 'react';
+import { connect } from 'react-redux';
+import { increment } from '../redux/modules/home';
+import App from '../components/App';
+
+class AppContainer extends React.Component {
+  static propTypes = {
+    counter: React.PropTypes.number.isRequired,
+    increment: React.PropTypes.func.isRequired,
+  }
+
+  render() {
+    const linkMessage = 'Go to Blog!';
+    return (
+      <App
+        counter={this.props.counter}
+        increment={this.props.increment}
+        linkMessage={linkMessage}
+      />
+    );
+  }
+}
+
+const stateToProps = (state) => ({ counter: state.home.counter });
+const dispatchToProps = { increment };
+
+export default connect(stateToProps, dispatchToProps)(AppContainer);
+
+```
+
+In src/index.jsx we've moved our `reducer` and `store` into external files and we're now creating a `history` object.  If you remember earlier when we talked about `react-router-redux` we said we needed to sync `react-router` with `redux` which is what we're doing here.  We then pass `history` to our `Router` instead of our raw `browserHistory` object.
+
+Next we've created a new "redux" directory.  We'll put all of our Redux related code in here to keep things better organized.  
+
+Nested in this folder is another named "modules" which is where we'll keep all of our reducers (we'll combine multiple `reducer`s into a single one we pass to the `store`).  Additionally, we'll keep our action definitions (`INCREMENT`), and our action creators (`increment`).  This approach was suggested by Erik Rasmussen, which he calls [Ducks](https://github.com/erikras/ducks-modular-redux).  The reason we've nested the file in a directory ("home") is so that if the file gets unruly we can split it up into multiple files without changing our imports all over our codebase.  The action definition is scoped so that we don't run into conflicts with our action dispatching libraries.  You can also see in our `reducer` that we've moved our `initialState` here as a default argument to our reducer function of `state = { counter: 10 }`.  We also have a new action creator called `increment` that we can import anywhere in our code where we want to increment our counter (in case we wanted to do that in multiple places).
+
+The next new file is src/redux/reducer.js which is where we'll be combining all of our reducers into a single `reducer`.  You'll notice another import from `react-router-redux` of `routerReducer` which is also necessary to sync `react-router` with `redux`.  One other thing to note is that we're now putting our old reducer on a new `home` key.  The Redux `combineReducers` function is self-explanatory.
+
+In src/redux/store.js we're just creating our `store` as before using our new, combined `reducer`.
+
+Finally, we make the necessary changes to get `AppContainer` working again.  We now need to map `state.home.counter` to our `props` instead of `state.counter`.  We also import our `increment` function from our "home" "duck" rather than defining it locally.
+
+Well that took longer than I anticipated.  
+
+Let's commit and close our next GitHub issue.
+
+```bash
+git add .
+git commit -m 'added Redux...closes #8'
+git push origin master
+```
+
+#### Summary
+We've got our Redux store all setup now and ready to hold our application state.  Next we'll look at Immutable.js and the benefits it brings to the table.
