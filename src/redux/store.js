@@ -1,4 +1,10 @@
 import { createStore } from 'redux';
 import reducer from './reducer';
 
-export default createStore(reducer);
+let devTools;
+// TODO added to webpack config and .eslintrc ... update blog
+if (__DEV__) {
+  devTools = window.devToolsExtension && window.devToolsExtension();
+}
+
+export default createStore(reducer, devTools);

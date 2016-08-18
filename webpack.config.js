@@ -49,6 +49,8 @@ const webpackConfig = {
   },
 
   plugins: [
+    new webpack.DefinePlugin({ __DEV__: !isProduction }),
+
     new ExtractTextPlugin('styles-[contenthash].css'),
 
     new HtmlWebpackPlugin({

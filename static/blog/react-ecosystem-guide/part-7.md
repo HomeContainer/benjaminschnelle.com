@@ -45,3 +45,78 @@ git add .
 git commit -m 'added Immutable.js...closes #9'
 git push origin master
 ```
+
+## 11. Misc development tools
+There are two great development tools that can be installed as Chrome addons: [React Developer Tools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi?hl=en) and [Redux DevTools](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd?hl=en).  
+
+React Developer Tools should work out of the box after you install and enable them.  Redux DevTools need a small kickstart from our application though.  We need to make small changes to three files.  
+
+```javascript
+// webpack.config.js
+
+// ...else block at very bottom of file
+{
+  // ...more config
+
+  plugins: [
+    new webpack.DefinePlugin({ __DEV__: !isProduction }), // new
+
+    new ExtractTextPlugin('styles-[contenthash].css'),
+
+    new HtmlWebpackPlugin({
+      template: './src/index.html',
+      inject: 'body',
+    }),
+  ],
+
+  // more config...
+}
+
+```
+
+```javascript
+// src/redux/store.js
+
+import { createStore } from 'redux';
+import reducer from './reducer';
+
+let devTools;
+if (__DEV__) {
+  devTools = window.devToolsExtension && window.devToolsExtension();
+}
+
+export default createStore(reducer, devTools);
+
+```
+
+```javascript
+// .eslintrc
+
+{
+  "parser": "babel-eslint",
+  "env": {
+    "browser": true
+  },
+  "extends" : "airbnb",
+  "globals": {
+    "__DEV__": true, // ignore this global variable
+  },
+  "rules": {
+    // remove after upgrading to react-hot-loader 3
+    "react/prefer-stateless-function": 0,
+  }
+}
+```
+
+We're creating a global variable `__DEV__` that Webpack will evaluate at runtime and replace with `true` or `false` in our bundle.  In src/redux/store.js we enable Redux DevTools if we're currently in our development environment.  Finally, we don't want ESLint throwing an undefined variable error so we update our .eslintrc file.
+
+Let's commit and close our next GitHub issue.
+
+```bash
+git add .
+git commit -m 'added React Developer Tools and Redux DevTools...closes #9'
+git push origin master
+```
+
+#### Summary
+We're all done with our environment setup!  Now we can finally start building our actual app!  Head to the next part to see how.

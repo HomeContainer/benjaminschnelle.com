@@ -4,6 +4,9 @@
     "browser": true
   },
   "extends" : "airbnb",
+  "globals": {
+    "__DEV__": true,
+  },
   "rules": {
     // remove after upgrading to react-hot-loader 3
     "react/prefer-stateless-function": 0,
