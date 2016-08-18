@@ -58,34 +58,48 @@ We'll explore this subject more later on as we address specific concerns through
 I'll be doing all development from Mac OSX so if you're on a different platform your mileage may vary.  Have questions? Just ask!
 
 ## 1. Create our project
-Navigate to wherever you want to put your project and run the commands below.  If those commands look foreign to you they're shell ([bash](https://en.wikipedia.org/wiki/Bash_(Unix_shell)) commands entered through the terminal. Each line is explained below.
+First, a quick primer on the terminal.  You can use `command + space` to open Spotlight Search on OSX and search for "terminal". Press enter to open it up.  It should look like this.
+
+![Terminal](../../images/terminal.jpg)
+
+You can do a lot of stuff here, like start applications, run Node scripts, etc.  The scope is much too large to get into here, but if you want to learn more there are plenty of resources available like this [one](http://blog.teamtreehouse.com/introduction-to-the-mac-os-x-command-line).
+
+We will primarily be using it to create files and folders as well as run Node scripts.  To get started we need to create a directory for our application.  You can create it anywhere, I put all of my projects under a folder named "dev" under my home directory.  If you type `pwd` (print working directory) and hit enter it will tell you what the working directory is (where you "are").  When you first open your terminal you'll be in your "home" directory such as "/Users/bschnelle".  
+
+##### A few helpful commands we'll use
+- `mkdir dev`: create a new directory named "dev" (`mkdir` is the command, `dev` is an argument)
+- `cd dev`: change the current working directory to "dev"
+- `cd ..`: change the current working directory to the parent of your current working directory (go up one level)
+- `cd`: go back to your "home" directory
+- `printf`: print text to the terminal or into a file (with `>`)
+
+Navigate to wherever you want to put your project (or create a new directory for your projects) and run the commands below.  You can name your project whatever you want, I'm calling mine "benjaminschnelle.com" because that's what where I'm going to deploy the application.
 
 ```bash
 mkdir benjaminschnelle.com
 cd benjaminschnelle.com
 mkdir src
 printf "node_modules\ndist" > .gitignore
-printf "Doing stuff, with things. Ben Schnelle HQ." > README.md
+printf "benjaminschnelle.com" > README.md
 ```
 
 #### What are those commands doing?
-1. Creates a new directory (mkdir = make directory) named "benjaminschnelle.com".  
-2. Changes the working directory to the one we just created (cd = change directory).
+1. Creates a new directory named "benjaminschnelle.com".  
+2. Changes the working directory to the one we just created.
 3. Makes a directory named "src" where our source code will live.
-4. Prints two directory names, "node_modules" (where NPM installs packages) and "dist" (where Webpack will spit out its files) into a new file named ".gitignore".  We'll need this file in the next step when we add version control (Git).  It just tells Git to ignore those directories when tracking files.  
+4. Prints two directory names, "node_modules" (where NPM installs packages) and "dist" (where Webpack will spit out its files) into a new file named ".gitignore".  The `\n` is a new line (the same as pressing enter at the end of a sentence).  We'll need this file in the next step when we add version control (Git).  It just tells Git to ignore those directories when tracking files.  
 5. Creates a new file named "README.md" which is just a nice convention to follow that provides more information about your project.  GitHub will display the contents of this file by default on the homepage of your project.
 
-Now that we have a basic project layout let's go ahead and open it up in an integrated development environment (IDE - supercharged text editor).  If you don't already have one [Atom](https://atom.io/) is a great option provided by GitHub for free.  Open source rocks.
+Let's open up our project in a text editor now.  If you don't already have one [Atom](https://atom.io/) is a great option provided by GitHub for free.  Open source rocks.
 
-Once you have the project open, add the necessary directories so that your project looks like the one below.  What is important is that you have at least one directory under the "blog" directory with at least one [markdown](https://daringfireball.net/projects/markdown/) file in it with a few lines of text in that file.  You can safely ignore the "images" directory.
-
-// TODO this needs to be updated based on change from feature based to type based org
-![Initial Directory](../../images/initial-directory.jpg)
+As you follow along, if you take a look at the GitHub commits (to be discussed shortly) you'll see another folder at the root of our project named "static" that has this blog post as well as some images in it.  For now, you don't need to worry about creating this yourself, but later you'll need at least one markdown file in static/blog/react-starter-kit so we have something to display in the blog we're going to build.
 
 ## 2. Add version control with Git and use Github as our repo host
 To get our version control with Git/GitHub setup you'll need 2 things: Git (install locally) and a GitHub account.  Head over [here](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) for Git and [here](https://github.com/) to create a GitHub account.
 
-Once you have both, create a new repository on GitHub as described [here](https://help.github.com/articles/create-a-repo/) with whatever name you please.  After you have your repository created grab its HTTPS URL (you can use SSH also, but you'll have to create a key) then from the project root run the commands below in your terminal plugging in your repository URL in place of mine.
+[Git](https://git-scm.com/) is a version control system that allows us to "commit" (snapshot) our project at any point in time.  Then if we need to rollback changes or create a new branch to add a feature we can do that.  GitHub will be our repository host where we save our changes (commits).
+
+Once you have Git installed and have created a GitHub account, create a new repository on GitHub as described [here](https://help.github.com/articles/create-a-repo/) with whatever name you please.  After you have your repository created grab its HTTPS URL (you can use SSH also, but you'll have to create a key) then from the project root run the commands below in your terminal plugging in your repository URL in place of mine.  If you followed the commands above and still have the same terminal open you should already be in the root of your project ("benjaminschnelle.com").
 
 ```bash
 git init
@@ -98,11 +112,13 @@ git push -u origin master
 #### What's going on above?
 1. Initialize Git in the current directory.
 2. Stage all files (excluding those in our ".gitignore" file) so that they can be committed.
-3. Commit all of our staged files...this creates a snapshot of our project so in the future if we make changes and decide we want to rollback to how things were before we can do so.
-4. Set our remote repository to the one we just created on GitHub.  This is where we're going to push our local repo to.  That way if we spill water on our laptop or want to share the repo with someone else it can just be cloned locally from GitHub.  I would encourage you to read more [here](https://git-scm.com/), they do a much better job explaining the benefits than I ever could.
+3. Commit all of our staged files...described above.
+4. Set our remote repository to the one we just created on GitHub.  This is where we're going to push our local repo to.  That way if we spill water on our laptop or want to share the repo with someone else it can just be cloned/downloaded from GitHub.
 5. Push our local repository to the master branch on GitHub and set the upstream repository to our GitHub repo.  You'll be prompted for your GitHub credentials when this command is run.
 
-If everything worked correctly you should be able to refresh the repo on GitHub and see your local project's files there now!
+If everything worked correctly you should be able to refresh the repo on GitHub and see your local project's files!
+
+GitHub has some tools that make managing a project pretty nice.  You can create milestones as longer term goals and then add issues/features to your milestone as "todo" items.  Once all your issues have been completed your milestone can be considered complete and closed out.
 
 // TODO add milestone and issues for v0.1.0
 
