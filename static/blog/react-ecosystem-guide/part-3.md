@@ -1,4 +1,4 @@
-# In Depth Beginner's Guide to the React Ecosystem - Part 3
+# React Ecosystem Starter Kit Walkthrough: Beginner's Guide - Part 3
 
 ## 6. Configure Webpack for production
 Now that we have Webpack mostly configured for development let's go ahead and get started with our production build setup.  Later on we'll worry about deployment.

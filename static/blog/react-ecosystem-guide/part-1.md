@@ -1,24 +1,35 @@
-# In Depth Beginner's Guide to the React Ecosystem - Part 1
+Welcome to our first multipart post!  We'll be describing in detail how you would go about creating a starter kit for building a client side single page application (SPA) from scratch, using the generally agreed upon toolbox found in the React.js ecosystem.
 
-My turn to do something that's been explained a thousand times before...build a web app with React, Redux and Webpack!
+##### I'm really new to programming.  I don't know:
+- HTML (how a web page is structured)
+ - Brief intro: [w3schools](http://www.w3schools.com/html/default.asp)
+ - In depth: [Mozilla Developer Network (MDN)](https://developer.mozilla.org/en-US/Learn/HTML)
+- CSS (how a web page is styled...font colors, etc.)
+ - Brief intro: [w3schools](http://www.w3schools.com/css/default.asp)
+ - In depth: [MDN](https://developer.mozilla.org/en-US/Learn/CSS)
+- JavaScript (how a web page is dynamic...this is a loaded term)
+ - Brief intro: [w3schools](http://www.w3schools.com/js/default.asp)
+ - In depth: [MDN](https://developer.mozilla.org/en-US/Learn/JavaScript)
+ - Free book: [Eloquent JavaScript](http://eloquentjavascript.net/)
+ - Node.js: [Extensive list of resources](http://stackoverflow.com/a/5511507/2482993)
 
-We're going to build a simple web app to serve as my plot of land on the interwebs. It'll have some generic info about me, my resume, a blog, and a place for apps so that after we hack together a unicorn simulator we'll have somewhere to put it.  We'll host it at benjaminschnelle.com (that's me!).
+JS was originally created for the browser and for many years that's the only place it worked.  Then a really sharp cat named Ryan Dahl ported JS to the server and thus gave the world Node.  It operates similarly to JS in the browser, just in a different environment so it allows you to do things you cannot do in the browser and vice versa.  For example, you can read files from your filesystem or create a web server with Node, but you cannot perform browser specific functionality with it.
 
-If you're just getting into development, specifically the Javascript ecosystem, it can be overwhelming.  My goal is to provide explanations of everything I do thoroughly enough that a beginner should be able to follow along.  If I miss anything please let me know so that I can fix it and improve my writing skills.
+I'll do my best to point out when our JavaScript is running on the client (browser) or server (Node) as it can be easy to get confused when our project operates in both contexts.
 
-This post isn't short.  If you actually want to learn how to build modern web apps there is a lot to learn and there's no silver bullet.  When you get frustrated take a break.
+##### What's a Single Page Application (SPA)?
+Traditionally with web applications, anytime you navigate from one route to another (e.g. https://benjaminschnelle.com --> https://benjaminschnelle.com/blog) you would make a new request to the server which would send you back a new HTML page for that route and thus your browser would throw away the first page and load the new one.  This creates a full page refresh which causes a flicker on the screen.
 
-This post is being written from within the project we're building. Whoa.
+In general SPAs make for a better user experience as the application feels more *native*.  Typically they take advantage of the [HTML5 browser history](https://developer.mozilla.org/en-US/docs/Web/API/History_API) [API (Application Programming Interface)](https://en.wikipedia.org/wiki/Application_programming_interface) which allows the user to navigate around using JavaScript (think the back and forward buttons in your browser).  In order to fetch data such as blog posts or user profile information we would make [HTTP (Hypertext Transfer Protocol)](https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol) requests to a remote server which would send data back in some agreed upon format, [JSON (JavaScript Object Notation)](http://www.json.org/) being the most common these days, which the JavaScript running in the browser would then use to update the UI.
 
-![Inception](../../images/inception.jpg)
+We'll explore this subject more later on as we address specific concerns throughout our journey.
 
-### What's in our toolbox?
+##### What's in our toolbox?
 - [Markdown](https://github.com/adam-p/markdown-here/wiki): a neat way to write nicely formatted HTML using only text
 - [Git](https://git-scm.com/): version control
 - [GitHub](https://github.com/): our Git repository (where our source code lives) host
 - [Node](https://nodejs.org/en/): server side Javascript runtime
-- [NPM](https://www.npmjs.com/): Node's package manager (fuggin' amazing)
- - [Checkout](http://www.modulecounts.com/) how quickly NPM has overtaken other package managers over the last few years
+- [NPM](https://www.npmjs.com/): Node's package manager
 - [ESLint](http://eslint.org/): make sure we write consistent, well-formatted code
 - [Webpack](https://webpack.github.io/): module bundler which takes many files and combines them into one or more files...WARNING: docs are no bueno, but this is an absolutely amazing tool
 - Testing
@@ -30,9 +41,8 @@ This post is being written from within the project we're building. Whoa.
  - [Istanbul](https://github.com/gotwarlost/istanbul): code coverage...how much of our code has been tested?
 - [React](https://facebook.github.io/react/): view layer of our app (just the user interface)
 - [Redux](http://redux.js.org/): data layer (state management)
-- [Codeship](https://codeship.com): continuous integration/delivery
 
-### Steps we're going to take
+##### Steps we're going to take
 1. Create our project
 2. Add version control with Git and use Github as our repo host
 3. Initialize Node Package Manager (NPM)
@@ -44,12 +54,8 @@ This post is being written from within the project we're building. Whoa.
 9. Redux
 10. Immutable.js
 11. Misc development tools
-12. Use test driven development (TDD) to build the app (to be expanded)
-13. Setup continuous integration/continuous delivery with Codeship
 
-### Let's Boogie
-
-I'll be doing all development from Mac OSX so if you're on a different platform your mileage may vary.  Got any questions? Just ask!
+I'll be doing all development from Mac OSX so if you're on a different platform your mileage may vary.  Have questions? Just ask!
 
 ## 1. Create our project
 Navigate to wherever you want to put your project and run the commands below.  If those commands look foreign to you they're shell ([bash](https://en.wikipedia.org/wiki/Bash_(Unix_shell)) commands entered through the terminal. Each line is explained below.

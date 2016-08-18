@@ -1,4 +1,4 @@
-# In Depth Beginner's Guide to the React Ecosystem - Part 2
+# React Ecosystem Starter Kit Walkthrough: Beginner's Guide - Part 2
 
 ## 5. Configure Webpack for development
 Webpack is an amazing bundling tool written with single page applications (SPAs) like the one we're going to build with React and Redux in mind.  Webpack by itself doesn't actually do much, the real power comes from *loaders* and *plugins*.

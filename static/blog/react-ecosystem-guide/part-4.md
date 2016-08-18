@@ -1,4 +1,4 @@
-# In Depth Beginner's Guide to the React Ecosystem - Part 4
+# React Ecosystem Starter Kit Walkthrough: Beginner's Guide - Part 4
 
 ## 7. React and React Router
 Per the React site, React makes it painless to create interactive UIs.  That is no understatement.  React is all *component* (you can think of them as widgets of functionality) based meaning you break your UI into separate components and *compose* your UI from those components.  I highly recommend reading [Thinking in React](https://facebook.github.io/react/docs/thinking-in-react.html) by [Pete Hunt](https://twitter.com/floydophone) for a quick overview of using React.

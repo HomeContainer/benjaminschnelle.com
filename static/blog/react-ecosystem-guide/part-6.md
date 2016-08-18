@@ -1,4 +1,4 @@
-# In Depth Beginner's Guide to the React Ecosystem - Part 6
+# React Ecosystem Starter Kit Walkthrough: Beginner's Guide - Part 6
 
 ## 9. Redux
 React has got our UI covered, but what about application state?  How should we manage that?  [Redux](http://redux.js.org/)!

@@ -1,4 +1,4 @@
-# In Depth Beginner's Guide to the React Ecosystem - Part 7
+# React Ecosystem Starter Kit Walkthrough: Beginner's Guide - Part 7
 
 ## 10. Immutable.js
 If you remember from the last post, I mentioned that with Redux best practice is to never modify existing state, but to always return a new object.  Redux is written under the assumption that the `state` object passed to your `reducer` will never be modified (it is immutable) so if you do modify it you'll likely break something.
@@ -119,4 +119,4 @@ git push origin master
 ```
 
 #### Summary
-We're all done with our environment setup!  Now we can finally start building our actual app!  Head to the next part to see how.
+We're all done with our environment setup!  Stay tuned for our next series where we'll start building out our application.

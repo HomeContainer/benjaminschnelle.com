@@ -1,4 +1,4 @@
-# In Depth Beginner's Guide to the React Ecosystem - Part 5
+# React Ecosystem Starter Kit Walkthrough: Beginner's Guide - Part 5
 
 ## 8. Testing setup
 Why write tests for our application?  Isn't it just doubling our work?  Please take a moment to read [this](http://stackoverflow.com/a/67500/2482993) stackoverflow answer.  It isn't long and perfectly hits on the benefits.  Convinced?  Me too.
