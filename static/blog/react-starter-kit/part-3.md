@@ -1,6 +1,9 @@
 # React Ecosystem Starter Kit Walkthrough: Beginner's Guide - Part 3
 
 ## 6. Configure Webpack for production
+
+// TODO add linting to build script
+
 Now that we have Webpack mostly configured for development let's go ahead and get started with our production build setup.  Later on we'll worry about deployment.
 
 If you're new to development you generally add certain features or fixes during development, then when you're ready to release them to users (production) you apply optimizations to make the user's experience as good as possible.  This includes minifying/uglifying our code (as we saw in the last part) among others.

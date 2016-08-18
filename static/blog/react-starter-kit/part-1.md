@@ -73,24 +73,24 @@ We will primarily be using it to create files and folders as well as run Node sc
 - `cd`: go back to your "home" directory
 - `printf`: print text to the terminal or into a file (with `>`)
 
-Navigate to wherever you want to put your project (or create a new directory for your projects) and run the commands below.  You can name your project whatever you want, I'm calling mine "benjaminschnelle.com" because that's what where I'm going to deploy the application.
+Navigate to wherever you want to put your project (or create a new directory for your projects) and run the commands below.
 
 ```bash
-mkdir benjaminschnelle.com
-cd benjaminschnelle.com
+mkdir react-starter-kit
+cd react-starter-kit
 mkdir src
 printf "node_modules\ndist" > .gitignore
-printf "benjaminschnelle.com" > README.md
+printf "React ecosystem starter kit" > README.md
 ```
 
 #### What are those commands doing?
-1. Creates a new directory named "benjaminschnelle.com".  
+1. Creates a new directory named "react-starter-kit".  
 2. Changes the working directory to the one we just created.
 3. Makes a directory named "src" where our source code will live.
 4. Prints two directory names, "node_modules" (where NPM installs packages) and "dist" (where Webpack will spit out its files) into a new file named ".gitignore".  The `\n` is a new line (the same as pressing enter at the end of a sentence).  We'll need this file in the next step when we add version control (Git).  It just tells Git to ignore those directories when tracking files.  
 5. Creates a new file named "README.md" which is just a nice convention to follow that provides more information about your project.  GitHub will display the contents of this file by default on the homepage of your project.
 
-Let's open up our project in a text editor now.  If you don't already have one [Atom](https://atom.io/) is a great option provided by GitHub for free.  Open source rocks.
+Let's open up our project in a text editor now.  If you don't already have one [Atom](https://atom.io/) is an awesome option provided by GitHub for free.  Open source rocks.
 
 As you follow along, if you take a look at the GitHub commits (to be discussed shortly) you'll see another folder at the root of our project named "static" that has this blog post as well as some images in it.  For now, you don't need to worry about creating this yourself, but later you'll need at least one markdown file in static/blog/react-starter-kit so we have something to display in the blog we're going to build.
 
@@ -99,13 +99,13 @@ To get our version control with Git/GitHub setup you'll need 2 things: Git (inst
 
 [Git](https://git-scm.com/) is a version control system that allows us to "commit" (snapshot) our project at any point in time.  Then if we need to rollback changes or create a new branch to add a feature we can do that.  GitHub will be our repository host where we save our changes (commits).
 
-Once you have Git installed and have created a GitHub account, create a new repository on GitHub as described [here](https://help.github.com/articles/create-a-repo/) with whatever name you please.  After you have your repository created grab its HTTPS URL (you can use SSH also, but you'll have to create a key) then from the project root run the commands below in your terminal plugging in your repository URL in place of mine.  If you followed the commands above and still have the same terminal open you should already be in the root of your project ("benjaminschnelle.com").
+Once you have Git installed and have created a GitHub account, create a new repository on GitHub as described [here](https://help.github.com/articles/create-a-repo/) with whatever name you please.  After you have your repository created grab its HTTPS URL (you can use SSH also, but you'll have to create a key) then from the project root run the commands below in your terminal plugging in your repository URL in place of mine.  If you followed the commands above and still have the same terminal open you should already be in the root of your project (the "react-starter-kit" directory).
 
 ```bash
 git init
 git add .
 git commit -m 'initial commit'
-git remote add origin https://github.com/bschnelle/benjaminschnelle.com.git
+git remote add origin https://github.com/bschnelle/react-starter-kit.git
 git push -u origin master
 ```
 
@@ -120,10 +120,38 @@ If everything worked correctly you should be able to refresh the repo on GitHub 
 
 GitHub has some tools that make managing a project pretty nice.  You can create milestones as longer term goals and then add issues/features to your milestone as "todo" items.  Once all your issues have been completed your milestone can be considered complete and closed out.
 
-// TODO add milestone and issues for v0.1.0
+From your repository on GitHub click the "Issues" tab and you should see a "Milestones" button as shown below.  Click that button.
+
+![GitHub Issues](../../images/github-issues.jpg)
+
+You should now see a blank page with a "New milestone" button on the righthand side.  Create a new milestone with a title of "0.1.0 - Initial Release" which is going to be our first release of the starter kit.  If you want to give it a due date you can do that as well.
+
+Once you've created the milestone, you should be redirected to a page listing all your milestones in the project (at this point we'll only have the one we just created).  Click the milestone title which will take you to that milestone's homepage where it will inform you that there are currently no issues assigned to the milestone.  Let's change that.
+
+Click the "New Issue" button on the right to create your first issue.  In the title type "Initialize Node Package Manager (NPM)" which is our next step from the list earlier in this post.  You can leave the description blank and submit the new issue.
+
+You'll be taken to the page for the issue you just created where the full issue history will be shown with any comments or changes.  On the right will be the "New Issue" button again.  Create new issues for all of the items in the list below, but make sure you add the "0.1.0 - Initial Release" milestone to each one you create.  You're able to add the issue to a milestone on the righthand side of the issue creation screen.
+
+##### Issues
+- Setup ESLint
+- Configure Webpack for development
+- Configure Webpack for production
+- React and React Router
+- Testing setup
+- Redux
+- Immutable.js
+- Misc development tools
+
+When you're finished return to the overview screen for our new milestone.  It should look similar to the one below and you should have 9 open issues.
+
+![GitHub 0.1.0 Milestone](../../images/github-0.1.0-milestone.jpg)
+
+Now we have a tool to guide our work and track our progress.
 
 ## 3. Initialize Node Package Manager (NPM)
-Great! We have somewhere to put our application code now, but wouldn't it be great if we were able to piggy back off of all of the hard work people have been doing for years?  I agree!  So there are lots of ways we could use other people's code, but the easiest by far, that I know of, is to use NPM.  How do we get NPM?  We install Node.js which comes with NPM!  So cruise over to the [Node](https://nodejs.org/en/) site and follow the installation instructions.
+NPM is *the* JavaScript package manager.  What's a package manager?  It's a way for people to *package* up code and share it with others.  Thousands of individuals and businesses give away their hard work everyday in an effort to advance progress in whatever form it may take.
+
+We'll use NPM to download packages (from the terminal) for various reasons during our time together.  So how do we get NPM?  We install Node.js which comes with NPM!  So cruise over to the [Node](https://nodejs.org/en/download/) site and follow the download/installation instructions.
 
 All done?  Awesome.
 
@@ -133,31 +161,33 @@ Let's install stuff!  Wait, how do we do that?  Well first we need to initialize
 npm init
 ```
 
-This command will generate a `package.json` file in the root of our project containing our answers to the questions asked.  This file is magical.  It is how we'll manage all of our dependencies.  You can either edit it manually or the NPM command line interface (CLI) will edit it for you if you tell it to.  We'll see how to do that shortly.  Here's what I got after I answered some of the questions.
+This command will generate a "package.json" file in the root of our project containing our answers to the questions asked and some other stuff.  This file is magical.  It is how we'll manage all of our dependencies.  You can either edit it manually or the NPM command line interface (CLI) will edit it for you when you run certain commands.  We'll see how to do that shortly.  Here's what I got after I answered some of the questions.
 
 ```json
 {
-  "name": "benjaminschnelle.com",
+  "name": "react-starter-kit",
   "version": "0.0.1",
-  "description": "a site about some guy",
+  "description": "jumpstart a react based application",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bschnelle/benjaminschnelle.com.git"
+    "url": "git+https://github.com/bschnelle/react-starter-kit.git"
   },
   "author": "Benjamin Schnelle <benjamin.schnelle@gmail.com> (https://github.com/bschnelle)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/bschnelle/benjaminschnelle.com/issues"
+    "url": "https://github.com/bschnelle/react-starter-kit/issues"
   },
-  "homepage": "https://github.com/bschnelle/benjaminschnelle.com#readme"
+  "homepage": "https://github.com/bschnelle/react-starter-kit#readme"
 }
 ```
 
-Since we now have our project under version control, you're free to commit anytime you see fit.  There aren't really any downsides to committing frequently and doing so gives you more flexibility if you need to rollback for any reason.  Also, smaller changes are easier for others to follow when trying to get up to speed on your project.  Remember our issues we created that we need to complete in order to reach our first 0.1.0 milestone?  We get to close one!  You can automatically close issues using keywords (close, fix, resolve) in your commit messages.
+Since we now have our project under version control, you're free to commit anytime you see fit.  There aren't really any downsides to committing frequently and doing so gives you more flexibility if you need to rollback for any reason.  Also, smaller changes make it easier for others to follow when trying to get up to speed on your project.  
+
+Remember our issues we created that we need to complete in order to reach our first 0.1.0 milestone?  We get to close one!  You can automatically close issues using keywords (close, fix, resolve) in your commit messages.  Assuming you created your issues in the same order as the list above and didn't delete/recreate any your issue numbers should match mine, but double check them just in case.  You can get the issue number by visiting the issue page on GitHub.
 
 ```bash
 git add .
@@ -166,21 +196,31 @@ git push origin master
 ```
 
 ## 4. Setup ESLint
-If you're unfamiliar with hinting/linting it's just the idea of following certain conventions when writing code so that things are standardized.  It's especially helpful when working on a team of developers so that you don't run into a scenario where one person is using tabs to indent and another is using spaces.  Consistency good, inconsistency bad.
+If you're unfamiliar with hinting/linting it's just the idea of following certain conventions when writing code so that things are standardized and good practices are followed.  It's especially helpful when working on a team of developers so that you don't run into a scenario where one person is using tabs to indent and another is using spaces (for example).  Consistency good, inconsistency bad.
 
-ESLint makes it easy for us to enforce those rules.  ESLint + Atom makes it easy to get *realtime* feedback right in the IDE.  There are many preconfigured sets of rules available for ESLint and Airbnb provides a pretty good one so we'll use that.  If you/me/we decide we want to change something later we can do that also!
+ESLint makes it easy for us to enforce those rules.  ESLint + Atom makes it easy to get *realtime* feedback right in our editor.  There are many preconfigured sets of rules available for ESLint and Airbnb provides a pretty good one so we'll use that.  If you/me/we decide we want to change something later we can do that also!
 
-#### Side note on NPM
-NPM packages can be saved in multiple ways, but the two we're concerned with are as development dependencies (`devDependencies`) or production dependencies (`dependencies`) with the `--save-dev` and `--save` arguments, respectively.  
+> #### Side note on NPM
+> NPM packages can be saved in multiple ways, but the two we're concerned with are as `devDependencies` (development) or `dependencies` (production) with the `--save-dev` and `--save` arguments, respectively.  
 
-NPM was originally intended to be a server side development tool (for Node), but is now widely used for client side development and the use cases between the two are a little different.  In the case of server development one should be able to clone the repository from GitHub (or wherever) and run `NODE_ENV=production npm install` which will only install those packages defined in the `dependencies` section of "package.json" then run the application.  In the case of a client app it is a little different.  Here, we should be able to clone the repository, run the same installation command with NODE_ENV set to "production", bundle our application (as we'll describe later using Webpack), and finally deploy it.
+> NPM was originally intended to be a server side development tool (for Node), but is now widely used for client side development and the use cases between the two are a little different.  In the case of server development one should be able to clone the repository from GitHub (or wherever) and run `NODE_ENV=production npm install` (NODE_ENV is a common [environment variable](https://en.wikipedia.org/wiki/Environment_variable) used in Node to dictate how things should behave) which will only install those packages defined in the `dependencies` section of "package.json" then run the application.  In the case of a client app it is a little different.  Here, we should be able to clone the repository, run the same installation command with NODE_ENV set to "production", bundle our application (as we'll describe later using Webpack), and finally deploy it.
 
-It is easy (for me anyway) to view the bundling step as a development concern so intuitively it makes sense to put those packages in `devDependencies`, but if we did that we wouldn't be able to bundle our app successfully when having NODE_ENV set to "production".  Therefore, if you see things being installed with `--save-dev` when you think `--save` makes more sense, it is likely for this reason.
+> It is easy to view the bundling step as a development concern so intuitively it makes sense to put those packages in `devDependencies`, but if we did that we wouldn't be able to bundle our app successfully when having NODE_ENV set to "production".  Therefore, if you see things being installed with `--save` when you think `--save-dev` makes more sense, it is likely for this reason.
 
-Let's go ahead and get ESLint from our handy friend NPM in addition to some other related dependencies.  Run the two commands below, which as suggested by the "eslint-config-airbnb" page, will get the package's peer dependencies then pipe them through some regex and install all of them in addition to the package itself.  Finally, we also need to install "babel-eslint" in order to properly lint certain ES6/ES7 features like class properties.  
+Let's go ahead and get ESLint from our handy friend NPM in addition to some other related dependencies.  Run the two commands below, which as suggested by the `eslint-config-airbnb` installation page, will get the package's `peerDependencies` then pipe them through some regex and install all of them in addition to the package itself.  Finally, we also need to install `babel-eslint` in order to properly lint certain ES6/ES7 features like class properties.
+
+##### New Terms
+- `peerDependencies`: a way for a package to tell *your* project (the parent) that it needs another package in order to work, but that package is *not* automatically installed.  Therefore if you don't include it in your project's dependencies NPM will throw a warning and the package you installed probably won't work correctly.
+- Regex: [regular expressions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp) are a way to match strings against rules
+- ES6/ES7: JavaScript (ES = ECMAScript = JavaScript) is always being improved upon and the improvements are only defined in a specification and left up to the community to implement the features.  That means all of the individual browsers and Node.js need implement any new features on their own.  This is why you'll often run into situations where a feature will be supported in one browser, but not another.  ES6 and ES7 are the two newest versions of JavaScript.  Because neither of them have wide support yet we write our code using ES6/ES7 and turn it into ES5 (with Babel) so that we can be reasonably confident it will run in most people's browsers.
 
 ```bash
+# put eslint-config-airbnb in a variable named PKG
 export PKG=eslint-config-airbnb;
+# return the peerDependencies of eslint-config-airbnb as JSON
+# convert each of the peerDependencies to an installable string format
+# install each of the peerDependencies
+# install babel-eslint
 npm info "$PKG" peerDependencies --json \
   | command sed 's/[\{\},]//g ; s/: /@/g' \
   | xargs npm install --save-dev "$PKG"
@@ -200,7 +240,7 @@ If you take a look at your `package.json` file now, there should be a new sectio
 }
 ```
 
-Now that we have our packages installed we need to tell ESLint to use the Airbnb rules when linting.  To do that we need to add a new file in the root of our project named ".eslintrc".  Make your file look like the one below which tells ESLint we want to use "babel-eslint" as our parser, we'll be writing code for the browser so ignore browser global variables, and use the "eslint-config-airbnb" rules.
+Now that we have our packages installed we need to tell ESLint to use the Airbnb rules when linting.  To do that we need to add a new file in the root of our project named ".eslintrc".  Make your file look like the one below which tells ESLint we want to use `babel-eslint` as our parser, we'll be writing code for the browser so ignore browser global variables, and use the `eslint-config-airbnb` rules.
 
 ```json
 {
@@ -212,7 +252,7 @@ Now that we have our packages installed we need to tell ESLint to use the Airbnb
 }
 ```
 
-At this point we could add a linting script to our `package.json` file, but we'll hold off on that until a little later.
+At this point we could add a linting script to our "package.json" file, but we'll hold off on that until a little later.
 
 #### But wait, how do we make it work with Atom?
 Oh, remember how I said Atom is awesome?  It has its own package manager to install plugins for the editor to add all sorts of functionality.  ESLint is one of those packages.  Surprise.
@@ -223,20 +263,16 @@ If you installed Atom earlier you already have APM (Atom Package Manager) instal
 apm install linter-eslint
 ```
 
-That was eerily similar to how we install NPM packages right?  That's because APM is built on top of NPM.
+That was eerily similar to how we install NPM packages.  That's because APM is built on top of NPM.
 
 Ok, one more thing to get it working in Atom.  From the Atom menu click Preferences which should open up a new tab.  Click the Packages link on the lefthand side of the tab, then search for "linter-eslint" and enable the package.  It should look like the image below after it has been enabled.
 
 ![Atom linter-eslint](../../images/atom-linter-eslint.jpg)
 
-Go ahead and create an `index.js` file in the "src" folder and paste in the code below.  If ESLint is setup correctly you should get an error telling you that line 5 is missing a newline then when you fix that it'll say it's missing a semicolon.  We'll need this file later (with different contents) so you can keep it around if you please.
+Go ahead and create an `index.js` file in the "src" folder and paste in the code below.  If ESLint is setup correctly you should get an error telling you that line 1 is missing a newline then when you fix that it'll say it's missing a semicolon.  We'll need this file later (with different contents) so you can keep it around if you please.
 
 ```javascript
-class Dog {
-  woof = () => 'woof'
-}
-
-export default Dog
+export default 'Hello!'
 ```
 
 Finally, let's commit and close our next GitHub issue.
