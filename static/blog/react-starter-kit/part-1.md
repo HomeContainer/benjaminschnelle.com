@@ -83,7 +83,7 @@ printf "node_modules\ndist" > .gitignore
 printf "React ecosystem starter kit" > README.md
 ```
 
-#### What are those commands doing?
+##### What are those commands doing?
 1. Creates a new directory named "react-starter-kit".  
 2. Changes the working directory to the one we just created.
 3. Makes a directory named "src" where our source code will live.
@@ -109,7 +109,7 @@ git remote add origin https://github.com/bschnelle/react-starter-kit.git
 git push -u origin master
 ```
 
-#### What's going on above?
+##### What's going on above?
 1. Initialize Git in the current directory.
 2. Stage all files (excluding those in our ".gitignore" file) so that they can be committed.
 3. Commit all of our staged files...described above.
