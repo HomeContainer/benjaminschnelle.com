@@ -411,7 +411,7 @@ In src/redux/store.js we're just creating our `store` as before using our new, c
 
 Finally, we make the necessary changes to get `AppContainer` working again.  We now need to map `state.home.counter` to our `props` instead of `state.counter`.  We also import our `increment` action creator from our "home" "Duck" rather than defining it locally.
 
-...Well that took longer than I anticipated.  
+...Well that took longer than I anticipated.
 
 Let's commit and close our next GitHub issue.
 
