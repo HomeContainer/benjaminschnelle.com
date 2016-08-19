@@ -4,7 +4,8 @@
   "description": "a site about some guy",
   "main": "index.js",
   "scripts": {
-    "build": "rimraf dist && NODE_ENV=production webpack",
+    "build": "npm run lint && rimraf dist && NODE_ENV=production webpack",
+    "lint": "eslint --ext .js --ext .jsx src test",
     "start": "webpack-dev-server",
     "test": "mocha",
     "test:cover": "istanbul cover _mocha",

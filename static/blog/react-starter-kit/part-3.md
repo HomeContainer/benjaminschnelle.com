@@ -1,9 +1,4 @@
-# React Ecosystem Starter Kit Walkthrough: Beginner's Guide - Part 3
-
 ## 6. Configure Webpack for production
-
-// TODO add linting to build script
-
 Now that we have Webpack mostly configured for development let's go ahead and get started with our production build setup.  Later on we'll worry about deployment.
 
 If you're new to development you generally add certain features or fixes during development, then when you're ready to release them to users (production) you apply optimizations to make the user's experience as good as possible.  This includes minifying/uglifying our code (as we saw in the last part) among others.
@@ -116,11 +111,18 @@ For our build script we're going to install the `rimraf` library which will make
 npm install --save rimraf
 ```
 
-Now let's add a script to our "package.json" file to do our builds.  Add `"build": "rimraf dist && NODE_ENV=production webpack",` to the top of the `scripts` section.  Now this can be executed with `npm run build`, notice you must include the keyword `run`.  Why?  Well the reason you *didn't* have to use it with `npm start` is because `start` is a default NPM script.  Any custom scripts need the `run` keyword.  If it's easier for you to just always use the keyword you can do that as well (i.e. `npm run start`).
+Now let's add two new lines to the top of the `scripts` section of our "package.json".  We can now create our production bundle with `npm run build`, notice you must include the keyword `run`.  Why?  Well the reason you *didn't* have to use it with `npm start` is because `start` is a default NPM script.  Any custom scripts need the `run` keyword.  If it's easier for you to just always use the keyword you can do that as well (i.e. `npm run start`).
 
-So what is our build script doing?  First it runs `rimraf dist` which cleans out the "dist" folder, then it runs `NODE_ENV=production webpack` (you can run multiple command by joining them with `&&`) which sets our `NODE_ENV` variable to "production" which is how we tell our app we're in production mode.  `NODE_ENV` is a ubiquitous environment variable in the Node ecosystem that is used for all sorts of things.
+```json
+{
+  "build": "npm run lint && rimraf dist && NODE_ENV=production webpack",
+  "lint": "eslint --ext .js --ext .jsx src test",
+}
+```
 
-If you run the `build` script now and inspect the contents of the "dist" folder you'll see everything has been nicely minimized for optimal distribution to our users!  Great!
+So what is our build script doing?  First it runs our new `lint` script which runs ESLint against our ".js" and ".jsx" files in our "src" and "test" directories.  Next, it runs `rimraf dist` which cleans out the "dist" folder (you can run multiple commands sequentially by joining them with `&&`).  Finally it runs `NODE_ENV=production webpack` which sets our `NODE_ENV` variable to "production" which is how we tell our app we're in production mode.  `NODE_ENV` is a ubiquitous environment variable in the Node ecosystem that is used for all sorts of things.
+
+If you run the `build` script now and inspect the contents of the "dist" folder you'll see everything has been nicely minified/uglified for optimal distribution to our users!  Great!
 
 Let's commit and close our next GitHub issue.
 
