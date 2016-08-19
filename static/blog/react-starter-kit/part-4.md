@@ -1,16 +1,14 @@
-# React Ecosystem Starter Kit Walkthrough: Beginner's Guide - Part 4
-
 ## 7. React and React Router
-Per the React site, React makes it painless to create interactive UIs.  That is no understatement.  React is all *component* (you can think of them as widgets of functionality) based meaning you break your UI into separate components and *compose* your UI from those components.  I highly recommend reading [Thinking in React](https://facebook.github.io/react/docs/thinking-in-react.html) by [Pete Hunt](https://twitter.com/floydophone) for a quick overview of using React.
+Per the React site, React makes it painless to create interactive UIs.  That is no understatement.  React is all *component* based (you can think of them as widgets of functionality) meaning you break your UI into separate components and *compose* your UI from those pieces.  I highly recommend reading [Thinking in React](https://facebook.github.io/react/docs/thinking-in-react.html) by [Pete Hunt](https://twitter.com/floydophone) for a quick overview of using React.
 
-Go ahead and install React and related packages., React DOM (React package for working with the DOM).
+Go ahead and install React and related packages.
 
 ```bash
 npm install --save react react-dom
 npm install --save-dev react-hot-loader
 ```
 
-#### What did we just install?
+##### What did we just install?
 - react: React.js
 - react-dom: React package for working with the DOM
 - react-hot-loader: this is going to handle HMR for us so that we don't have to write our own `module.hot` code anymore
@@ -28,7 +26,9 @@ ReactDOM.render(<App />, document.getElementById('root'));
 
 ```
 
-Assuming you updated the file extension you'll also need to make four changes to your "webpack.config.js" file.
+Here we're using `react-dom` to render our `App` component into the "root" `div`.
+
+The changes below need to be made to "webpack.config.js" as well.
 
 ```javascript
 // ...dependencies
@@ -96,7 +96,7 @@ const webpackConfig = {
 
 ```
 
-That weird looking syntax in "index.js" is JSX, it's just JavaScript in disguise.  You can read more [here](https://facebook.github.io/react/docs/jsx-in-depth.html) where they give before and after code examples.
+That weird looking syntax in "index.jsx" is JSX, it's just JavaScript in disguise.  You can read more [here](https://facebook.github.io/react/docs/jsx-in-depth.html) where they give before and after code examples.
 
 If you looked closely at the code we put in our "index.jsx" file, we're importing `App` from a sibling folder named "containers".  There's a useful philosophy in the React community of splitting up your components into two groups: containers and presentational components (smart and dumb).  Basically, container components implement business logic (connect to Redux store...we'll get to this in detail later on) and presentational components are only concerned with rendering the UI.  Dan Abramov has a good [post](https://medium.com/@dan_abramov/smart-and-dumb-components-7ca2f9a7c7d0#.f4mqb6y14) on the concepts.
 
@@ -129,7 +129,7 @@ export default class App extends React.Component {
 
 ```
 
-You'll notice ESLint complaining about preferring pure functions now.  In React you can create your components a few different ways, if you read through [Thinking in React](https://facebook.github.io/react/docs/thinking-in-react.html) you would have seen components written by calling `createClass` (as of this writing anyway).  
+You'll notice ESLint complaining about preferring pure functions now.  In React you can create your components a few different ways, if you read through [Thinking in React](https://facebook.github.io/react/docs/thinking-in-react.html) you would have seen components written by calling `createClass` (as of this writing anyway).
 
 ```javascript
 var ProductCategoryRow = React.createClass({})
@@ -149,7 +149,7 @@ function ProductCategoryRow(props) {}
 
 We won't be using the first convention at all.  
 
-Because `react-hot-loader` doesn't support FSCs (the next version will) go ahead and add the section below to your ".eslintrc" file to change that rule.  Later when we upgrade to the next version of `react-hot-loader` we'll remove the rule.
+Because `react-hot-loader` doesn't support FSCs (the next version will) go ahead and add the section below to your ".eslintrc" file to change that rule.  Later when we upgrade to the next version of `react-hot-loader` (or remove it entirely) we'll remove the rule and update our components to use FSCs where possible.
 
 ```javascript
 {
@@ -162,12 +162,12 @@ Because `react-hot-loader` doesn't support FSCs (the next version will) go ahead
 }
 ```
 
-You app should now be error free and if you start up your server you should be able to view it in the browser.  Our first React components!
+Your app should now be error free and if you start up your server you should be able to view it in the browser.  Our first React components!
 
 There are a few fundamental React concepts we've glossed over so far like `props` and `state` as well as more advanced concepts like `context`.  We'll discuss those when we reach our post on Redux so that we can compare and contrast the two.
 
-### React Router
-For our app we want to have a landing page, a route for our blog, and a resume route.  To accomplish that with a single page application we need a router which interfaces with the browser's [history api](https://developer.mozilla.org/en-US/docs/Web/API/History).
+#### React Router
+To make our app more interesting and useful we need to add a router which enables us to change paths within our app (e.g., my.site.com --> my.site.com/blog).  React Router interfaces with the HTML5 [history api](https://developer.mozilla.org/en-US/docs/Web/API/History) which works flawlessly with single page apps.
 
 Let's get the library.
 
@@ -191,12 +191,12 @@ ReactDOM.render((
 
 ```
 
-#### What's going on here?
+##### What's going on here?
 - React Router imports
- - `browserHistory`: use the HTML5 history api for our browser history
+ - `browserHistory`: use the HTML5 history api for the router's history
  - `Route`: an individual React route component
- - `Router`: our router which controls/maintains our navigation and history
-- We've replaced `App` with `Router` and nested a `Route` inside.  Here's we're telling React to render a `Router` that uses `browserHistory` and create a single `Route` at path `"/"` (which is just our root route (localhost:8080/)).
+ - `Router`: our React router component which controls/maintains our navigation and history
+- We've replaced `App` with `Router` and nested a `Route` inside.  Here we're telling React to render a `Router` that uses `browserHistory` and create a single `Route` at path `"/"` (which is just our root route).
 
 You should be able to refresh your browser and still see "Hello from App!", nothing *looks* different, but it *is*.  Let's add another route to demonstrate.  Below our existing route add `<Route path="/blog" component={Blog} />` and add `import Blog from './containers/Blog';` below your `App` import.  Finally, create the components below.
 
@@ -225,7 +225,7 @@ export default class Blog extends React.Component {
 
 ```
 
-Restart your server and visit "localhost:8080/blog".  Did you get a "Cannot GET /blog" error?  Me too.  The reason this is happening is that we don't have a file in our "dist" directory named "blog".  What we want is for our server to always serve our "index.html" file when it doesn't find what it is looking for (an HTTP 404 error).  Webpack has got our back!  Add `historyApiFallback: true,` to the `devServer` section of your "webpack.config.js" file, restart your server, then visit "localhost:8080/blog" again.  It works!
+Restart your server and visit "localhost:8080/blog".  Did you get a "Cannot GET /blog" error?  Me too.  The reason this is happening is that we don't have a file in our "dist" directory named "blog".  What we want is for our server to always serve our "index.html" file when it doesn't find what it is looking for (an HTTP 404 error).  Webpack has this covered!  Add `historyApiFallback: true,` to the `devServer` section of your "webpack.config.js" file, restart your server, then visit "localhost:8080/blog" again.  It works!
 
 If you visit localhost:8080 you'll continue to get "Hello from App!".  Wouldn't it be even better if we could navigate between our routes without having to manually change the URL?  Let's do that.
 
@@ -260,9 +260,9 @@ Let's commit and close our next GitHub issue.
 
 ```bash
 git add .
-git commit -m 'added React and React Router...closes #5 and closes #6'
+git commit -m 'added React and React Router...closes #5'
 git push origin master
 ```
 
 #### Summary
-We now have React and React Router setup so we can create components for each piece of functionality and organize our app into multiple routes for our various purposes.  We'll add our resume route a little later.  In the next section we'll look get our testing setup in place so we can build the rest of our app using a [Test Driven Development (TDD)](https://en.wikipedia.org/wiki/Test-driven_development) approach.
+We now have React and React Router setup so we can create components for each piece of functionality and organize our app into multiple routes for our various purposes.  In the next section we'll look get our testing setup in place so we can take a [Test Driven Development (TDD)](https://en.wikipedia.org/wiki/Test-driven_development) approach when we use our starter kit as our application basis later.
