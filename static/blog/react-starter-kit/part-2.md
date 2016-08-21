@@ -528,7 +528,8 @@ Let's do a little spring cleaning in our app.  First create a new directory and 
 ```javascript
 module.exports = {
   host: process.env.HOST || 'localhost',
-  port: process.env.PORT || '8080'
+  port: process.env.PORT || '8080',
+  production: process.env.NODE_ENV === 'production'
 };
 ```
 
@@ -548,7 +549,6 @@ const config = require('./config');
 module.exports = {
   devServer: {
     contentBase: './dist',
-    historyApiFallback: true,
     host: config.host,
     hot: !config.production,
     port: config.port
