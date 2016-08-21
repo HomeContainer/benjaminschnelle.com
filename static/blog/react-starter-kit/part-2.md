@@ -1,5 +1,7 @@
+In the last part we created our project, added it to source control with Git and GitHub, initialized NPM for dependency management, and added ESLint so we can write well-formatted code.
+
 ## 5. Configure Webpack for development
-Webpack is an amazing bundling tool written with SPAs like the one we're going to build with React and Redux in mind.  Webpack by itself doesn't actually do much, the real power comes from *loaders* and *plugins*.
+Webpack is an amazing bundling tool written with SPAs in mind.  tWebpack by itself doesn't actually do much, the real power comes from *loaders* and *plugins*.
 
 > #### What's a bundling tool?  
 Writing all of our application code in separate *modules* makes development much more efficient and enjoyable, but when we actually deploy our code we want to optimize it as much as possible.  Reducing the number of files via bundling is a part of the optimization process.  Webpack enables us to do that.
