@@ -12,6 +12,13 @@ Update your "webpack.config.js" file again as shown below.
 const webpackConfig = {
   // ...more config
 
+  entry: {
+    app: [
+      // remove lines here
+      './src/index.js',
+    ],
+  },
+
   module: {
     loaders: [
       {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from 'react-dom';
-import { AppContainer as HotLoader } from 'react-hot-loader'; // eslint-disable-line
+import { AppContainer } from 'react-hot-loader'; // eslint-disable-line
 import { browserHistory, Router } from 'react-router';
 import { Provider } from 'react-redux';
 import { syncHistoryWithStore } from 'react-router-redux';
@@ -21,6 +21,6 @@ render(App, MOUNT_NODE);
 
 if (module.hot) {
   module.hot.accept('./routes/routes', () => {
-    render(<HotLoader>{App}</HotLoader>, MOUNT_NODE);
+    render(<AppContainer>{App}</AppContainer>, MOUNT_NODE);
   });
 }

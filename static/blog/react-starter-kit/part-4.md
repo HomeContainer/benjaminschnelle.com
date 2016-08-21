@@ -1,3 +1,5 @@
+To recap, we have our project under source control with Git/GitHub, we're managing our dependencies with NPM, ESLint is configured to ensure code consistency, and Webpack is configured for development and production.
+
 ## 7. React and React Router
 Per the React site, React makes it painless to create interactive UIs.  That is no understatement.  React is all *component* based (you can think of them as widgets of functionality) meaning you break your UI into separate components and *compose* your UI from those pieces.  I highly recommend reading [Thinking in React](https://facebook.github.io/react/docs/thinking-in-react.html) by [Pete Hunt](https://twitter.com/floydophone) for a quick overview of using React.
 
@@ -5,17 +7,15 @@ Go ahead and install React and related packages.
 
 ```bash
 npm install --save react react-dom
-npm install --save-dev react-hot-loader
+npm install --save-dev react-hot-loader@3.0.0-beta.2
 ```
 
 ##### What did we just install?
-- react: React.js
-- react-dom: React package for working with the DOM
-- react-hot-loader: this is going to handle HMR for us so that we don't have to write our own `module.hot` code anymore
+- `react`: React.js
+- `react-dom`: React package for working with the DOM
+- `react-hot-loader`: HMR with React in mind...we're using a beta version for compatibility with functional stateless components
 
-Go ahead and delete the "setHTML.js" and "classes.scss" files as we're done with them.  Also, delete `<input type="text" />` from "index.html".
-
-Change the file extension of src/index.js to ".jsx" and replace the contents with the code below.  If you prefer you can continue to use the original ".js" file extension, but you'll need to modify your ESLint rules because the Airbnb presets we're using dictate use of ".jsx".
+Update "index.js" as shown below.
 
 ```javascript
 import React from 'react';
