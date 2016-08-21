@@ -5,10 +5,10 @@
   },
   "extends" : "airbnb",
   "globals": {
-    "__DEV__": true,
+    "__DEV__": true
   },
   "rules": {
-    // remove after upgrading to react-hot-loader 3
-    "react/prefer-stateless-function": 0,
+    "comma-dangle": 0,
+    "react/jsx-filename-extension": 0
   }
 }

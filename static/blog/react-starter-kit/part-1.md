@@ -1,6 +1,8 @@
-Welcome to our first multipart post!  We'll be describing in detail how you would go about creating a starter kit for building a client side single page application (SPA) from scratch, using the generally agreed upon toolbox found in the React.js ecosystem.
+Welcome to our first multipart post!  We'll be describing in detail how you would go about creating a starter kit for building a client side single page application (SPA) from scratch.  We'll be using lots of different tools found in the React.js ecosystem.
 
-##### I'm really new to programming.  I don't know:
+If you're brand new to programming I would strongly suggest taking time to learn the fundamentals before jumping into the React ecosystem.  We'll be here with arms wide open when you get back.
+
+##### Fundamentals
 - HTML (how a web page is structured)
  - Brief intro: [w3schools](http://www.w3schools.com/html/default.asp)
  - In depth: [Mozilla Developer Network (MDN)](https://developer.mozilla.org/en-US/Learn/HTML)
@@ -13,6 +15,26 @@ Welcome to our first multipart post!  We'll be describing in detail how you woul
  - Free book: [Eloquent JavaScript](http://eloquentjavascript.net/)
  - Node.js: [Extensive list of resources](http://stackoverflow.com/a/5511507/2482993)
 
+Have a pretty good handle on the stuff in the list above now?  Awesome let's keep on keepin' on.
+
+##### What's in our toolbox?
+- [Markdown](https://github.com/adam-p/markdown-here/wiki): a neat way to write nicely formatted HTML using only text (this is how I'm writing the post you're reading)
+- [Git](https://git-scm.com/): version control
+- [GitHub](https://github.com/): our Git repository (where our source code lives) host
+- [Node](https://nodejs.org/en/): server side Javascript runtime
+- [NPM](https://www.npmjs.com/): Node's package manager
+- [ESLint](http://eslint.org/): make sure we write consistent, well-formatted code
+- [Webpack](https://webpack.github.io/): module bundler which takes many files and combines them into one or more files...WARNING: docs are no bueno, but this is an absolutely amazing tool
+- Testing
+  - [Mocha](https://mochajs.org/): testing framework/test runner
+  - [Chai](http://chaijs.com/): test assertions (does this equal that?)
+  - [Sinon](http://sinonjs.org/): spies, stubs, and mocks (helpers that making testing easier)
+  - [Enzyme](http://airbnb.io/enzyme/): Airbnb powered React specific testing utilities
+  - [JSDom](https://github.com/tmpvar/jsdom): a JavaScript implementation of the Document Object Model (DOM, the browser)...this creates a fake DOM which allows us to test browser code from the command line (terminal)
+  - [Istanbul](https://github.com/gotwarlost/istanbul): code coverage...how much of our code has been tested?
+- [React](https://facebook.github.io/react/): view layer of our app (just the user interface)
+- [Redux](http://redux.js.org/): data layer (state management)
+
 JS was originally created for the browser and for many years that's the only place it worked.  Then a really sharp cat named Ryan Dahl ported JS to the server and thus gave the world Node.  It operates similarly to JS in the browser, just in a different environment so it allows you to do things you cannot do in the browser and vice versa.  For example, you can read files from your filesystem or create a web server with Node, but you cannot perform browser specific functionality with it.
 
 I'll do my best to point out when our JavaScript is running on the client (browser) or server (Node) as it can be easy to get confused when our project operates in both contexts.
@@ -23,24 +45,6 @@ Traditionally with web applications, anytime you navigate from one route to anot
 In general SPAs make for a better user experience as the application feels more *native*.  Typically they take advantage of the [HTML5 browser history](https://developer.mozilla.org/en-US/docs/Web/API/History_API) [API (Application Programming Interface)](https://en.wikipedia.org/wiki/Application_programming_interface) which allows the user to navigate around using JavaScript (think the back and forward buttons in your browser).  In order to fetch data such as blog posts or user profile information we would make [HTTP (Hypertext Transfer Protocol)](https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol) requests to a remote server which would send data back in some agreed upon format, [JSON (JavaScript Object Notation)](http://www.json.org/) being the most common these days, which the JavaScript running in the browser would then use to update the UI.
 
 We'll explore this subject more later on as we address specific concerns throughout our journey.
-
-##### What's in our toolbox?
-- [Markdown](https://github.com/adam-p/markdown-here/wiki): a neat way to write nicely formatted HTML using only text
-- [Git](https://git-scm.com/): version control
-- [GitHub](https://github.com/): our Git repository (where our source code lives) host
-- [Node](https://nodejs.org/en/): server side Javascript runtime
-- [NPM](https://www.npmjs.com/): Node's package manager
-- [ESLint](http://eslint.org/): make sure we write consistent, well-formatted code
-- [Webpack](https://webpack.github.io/): module bundler which takes many files and combines them into one or more files...WARNING: docs are no bueno, but this is an absolutely amazing tool
-- Testing
- - [Mocha](https://mochajs.org/): testing framework/test runner
- - [Chai](http://chaijs.com/): test assertions (does this equal that?)
- - [Sinon](http://sinonjs.org/): spies, stubs, and mocks (helpers that making testing easier)
- - [Enzyme](http://airbnb.io/enzyme/): Airbnb powered React specific testing utilities
- - [JSDom](https://github.com/tmpvar/jsdom): a JavaScript implementation of the Document Object Model (DOM, the browser)...this creates a fake DOM which allows us to test browser code from the command line (terminal)
- - [Istanbul](https://github.com/gotwarlost/istanbul): code coverage...how much of our code has been tested?
-- [React](https://facebook.github.io/react/): view layer of our app (just the user interface)
-- [Redux](http://redux.js.org/): data layer (state management)
 
 ##### Steps we're going to take
 1. Create our project
@@ -62,9 +66,9 @@ First, a quick primer on the terminal.  You can use `command + space` to open Sp
 
 ![Terminal](../../images/terminal.jpg)
 
-You can do a lot of stuff here, like start applications, run Node scripts, etc.  The scope is much too large to get into here, but if you want to learn more there are plenty of resources available like this [one](http://blog.teamtreehouse.com/introduction-to-the-mac-os-x-command-line).
+The terminal is just another way to interact with your computer.  You can do a lot of stuff here, like start applications, run Node scripts, etc.  The scope is much too large to get into here, but if you want to learn more there are plenty of resources available like this [one](http://blog.teamtreehouse.com/introduction-to-the-mac-os-x-command-line).
 
-We will primarily be using it to create files and folders as well as run Node scripts.  To get started we need to create a directory for our application.  You can create it anywhere, I put all of my projects under a folder named "dev" under my home directory.  If you type `pwd` (print working directory) and hit enter it will tell you what the working directory is (where you "are").  When you first open your terminal you'll be in your "home" directory such as "/Users/bschnelle".  
+We will primarily be using it to create files and folders as well as run Node scripts.  To get started we need to create a directory for our application.  You can create it anywhere, but I like to put all of my projects under a folder named "dev" under my home directory.  If you type `pwd` (print working directory) and hit enter it will tell you what the working directory is (where you "are").  When you first open your terminal you'll be in your "home" directory such as "/Users/bschnelle".  
 
 ##### A few helpful commands we'll use
 - `mkdir dev`: create a new directory named "dev" (`mkdir` is the command, `dev` is an argument)
@@ -133,6 +137,7 @@ Click the "New Issue" button on the right to create your first issue.  In the ti
 You'll be taken to the page for the issue you just created where the full issue history will be shown with any comments or changes.  On the right will be the "New Issue" button again.  Create new issues for all of the items in the list below, but make sure you add the "0.1.0 - Initial Release" milestone to each one you create.  You're able to add the issue to a milestone on the righthand side of the issue creation screen.
 
 ##### Issues
+- Initialize Node Package Manager (NPM)
 - Setup ESLint
 - Configure Webpack for development
 - Configure Webpack for production
@@ -240,7 +245,7 @@ If you take a look at your `package.json` file now, there should be a new sectio
 }
 ```
 
-Now that we have our packages installed we need to tell ESLint to use the Airbnb rules when linting.  To do that we need to add a new file in the root of our project named ".eslintrc".  Make your file look like the one below which tells ESLint we want to use `babel-eslint` as our parser, we'll be writing code for the browser so ignore browser global variables, and use the `eslint-config-airbnb` rules.
+Now that we have our packages installed we need to tell ESLint to use the Airbnb rules when linting.  To do that we need to add a new file in the root of our project named ".eslintrc".  Make your file look like the one below which tells ESLint we want to use `babel-eslint` as our parser (this is so we can write really new JavaScript), we'll be writing code for the browser so ignore browser global variables, use the `eslint-config-airbnb` rules, and override a couple default rules (disable commas at the end of every line and ".jsx" file extensions).
 
 ```json
 {
@@ -248,11 +253,15 @@ Now that we have our packages installed we need to tell ESLint to use the Airbnb
   "env": {
     "browser": true
   },
-  "extends" : "airbnb"
+  "extends" : "airbnb",
+  "rules": {
+    "comma-dangle": 0,
+    "react/jsx-filename-extension": 0
+  }
 }
 ```
 
-At this point we could add a linting script to our "package.json" file, but we'll hold off on that until a little later.
+At this point we could add a linting script to our "package.json" file to tell us if the code we have written is out of compliance with our rules, but we'll hold off on that until a little later.
 
 #### But wait, how do we make it work with Atom?
 Oh, remember how I said Atom is awesome?  It has its own package manager to install plugins for the editor to add all sorts of functionality.  ESLint is one of those packages.  Surprise.

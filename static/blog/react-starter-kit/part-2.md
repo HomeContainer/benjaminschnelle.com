@@ -1,25 +1,29 @@
 ## 5. Configure Webpack for development
 Webpack is an amazing bundling tool written with SPAs like the one we're going to build with React and Redux in mind.  Webpack by itself doesn't actually do much, the real power comes from *loaders* and *plugins*.
 
+> #### What's a bundling tool?  
+Writing all of our application code in separate *modules* makes development much more efficient and enjoyable, but when we actually deploy our code we want to optimize it as much as possible.  Reducing the number of files via bundling is a part of the optimization process.  Webpack enables us to do that.
+
 ##### What will we be using Webpack for during development?
 - Web Server: Webpack has an installable development server, `webpack-dev-server`, powered by Node and [Express](https://expressjs.com/) (a web framework for Node)
- - Hot module replacement: edit our application and see the changes in realtime *without* losing the current application state! (it isn't just an automatic page refresh)
+  - Hot module replacement: edit our application and see the changes in realtime *without* losing the current application state! (it isn't just an automatic page refresh)
 - Loaders: put files in, transform them, get bundle(s) out
- - `babel-loader`: JSX/ES6/ES7 (React specific syntax and new JavaScript)--> ES5 (old, but well supported JavaScript)
- - `postcss-loader`: add browser/vendor prefixes where appropriate (PostCSS does more, but this is what we'll be using it for)
- - `sass-loader`: SASS (supercharged CSS) --> regular CSS
+  - `babel-loader`: JSX/ES6/ES7 (React specific syntax and new JavaScript)--> ES5 (old, but well supported JavaScript)
+  - `postcss-loader`: add browser/vendor prefixes where appropriate (PostCSS does more, but this is what we'll be using it for)
+  - `sass-loader`: SASS (supercharged CSS) --> regular CSS
+  - `react-hot-loader`: enables us to use HMR with React
 - Plugins: add bundle related functionality
- - `ExtractTextPlugin`: created CSS bundle
- - `HotModuleReplacementPlugin`: necessary for dev server HMR
- - `HtmlWebpackPlugin`: dynamically create our HTML
+  - `ExtractTextPlugin`: created CSS bundle
+  - `HotModuleReplacementPlugin`: necessary for dev server HMR
+  - `HtmlWebpackPlugin`: dynamically create our HTML
 
-Let's get Webpack installed and setup then create a simple script to demonstrate how it works.  Go ahead and create an "index.html" file to our "src" directory with the code below.  This is telling the browser we'll be using English (`lang="en"`) and to use the [UTF-8](http://www.w3schools.com/charsets/ref_html_utf8.asp) character set (`charset="utf-8"`).  The `<div id="root"></div>` tag is where we'll inject our React app later.
+To get started create an "index.html" file in your "src" directory with the code below.  This is telling the browser we'll be using English (`lang="en"`) and to use the [UTF-8](http://www.w3schools.com/charsets/ref_html_utf8.asp) character set (`charset="utf-8"`).  The `<div id="root"></div>` tag is where we'll inject our React app later.
 
 ```html
 <!doctype html>
 <html lang="en">
   <head>
-    <title>Benjamin Schnelle</title>
+    <title>React Starter Kit!</title>
     <meta charset="utf-8">
   </head>
   <body>
@@ -39,7 +43,7 @@ setHTML();
 
 ```
 
-Ok, so now we have an HTML file that doesn't reference any JavaScript files and a JavaScript file that sets the inner html of our "root" `div` element.  How do we wire the two up?  Well we could just add a script tag to our "index.html" file to pull it in, but that doesn't give us much flexibility.  Using the `HtmlWebpackPlugin` we can have Webpack dynamically inject `script` and `link` tags for us and also have a hash appended to the name for cache busting (prevent the browser from using a cached file)!
+Ok, so now we have an HTML file that doesn't reference any JavaScript files and a JavaScript file that sets the inner html of our "root" `div` element.  How do we wire the two up?  Well we could just add a `script` tag to our "index.html" file to pull it in, but that doesn't give us much flexibility.  Using the `HtmlWebpackPlugin` we can have Webpack dynamically inject `script` and `link` tags for us and also have a hash appended to the name for cache busting (prevent the browser from using a cached file).
 
 Let's setup Webpack now.  Create a new file in the root of your project named "webpack.config.js" with the code below.
 
@@ -57,22 +61,22 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        loader: 'babel',
-      },
-    ],
+        loader: 'babel'
+      }
+    ]
   },
 
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: '[name]-[hash].js',
+    filename: '[name]-[hash].js'
   },
 
   plugins: [
     new HtmlWebpackPlugin({
       template: './src/index.html',
-      inject: 'body',
-    }),
-  ],
+      inject: 'body'
+    })
+  ]
 };
 
 ```
@@ -80,11 +84,11 @@ module.exports = {
 ##### What's going on here?
 - [HtmlWebpackPlugin](https://github.com/ampedandwired/html-webpack-plugin) lets us dynamically create/augment our HTML file
 - [path](https://nodejs.org/api/path.html#path_path_resolve_path) is a Node.js library for resolving file paths
-- `module.exports`: [CommonJS](https://webpack.github.io/docs/commonjs.html) style modules.  As we'll see a little later, we can use Babel to transpile ES6/ES7 modules into CommonJS modules which are supported by ES5.
+- `module.exports`: [CommonJS](https://webpack.github.io/docs/commonjs.html) style modules.  Webpack is a Node utility and Node uses CommonJS as their module system.
   - `entry`: tell Webpack where to enter our application when bundling (use `app` as the bundle's name)
   - `module`: options affecting our modules (JS/JSX/SASS/etc.)
    - `loaders`
-      - `test`: which files do we want this loader to apply to using ([RegEx](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions) based)
+      - `test`: which files do we want this loader to apply to ([RegEx](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions) based)
       - `exclude`: ignore files that match this RegEx
       - `loader`: the actual loader to use to transform the matched files
   - `output`: where do we want Webpack to spit out the files it creates?
@@ -99,7 +103,7 @@ So we're looking for files with a ".js" extension, that are *not* in the "node_m
 
 ```json
 {
-  "presets": [ "es2015", "react", "stage-0" ]
+  "presets": ["es2015", "react", "stage-0"]
 }
 ```
 
@@ -111,9 +115,11 @@ So we're looking for files with a ".js" extension, that are *not* in the "node_m
 We're using a bunch of packages that we haven't yet installed, let's do that now.  You'll see webpack installed twice, once locally, then again globally (with the `-g` option).  We need it installed locally because we'll need to use the package directly a little later and we need it and `webpack-dev-server` installed globally so that we can use them from the command line.
 
 ```bash
-npm install --save webpack babel-core babel-loader babel-preset-es2015 babel-preset-react babel-preset-stage-0
-npm install -g webpack webpack-dev-server
+npm install --save webpack@2.1.0-beta.21 babel-core babel-loader babel-preset-es2015 babel-preset-react babel-preset-stage-0
+npm install -g webpack@2.1.0-beta.21 webpack-dev-server@2.1.0-beta.0
 ```
+
+> We're installing specific versions of `webpack@2.1.0-beta.21` and `webpack-dev-server@2.1.0-beta.0` because we want to be able to take advantage of new features that are currently still in beta.  We'll touch on this more a little later.
 
 Go ahead and run the following command from the root of your project then open your browser and visit <host>:<port> (e.g. localhost:8080) to see your app.  If it worked correctly you should see "Hey dude!".
 
@@ -121,9 +127,9 @@ Go ahead and run the following command from the root of your project then open y
 webpack-dev-server --content-base dist/
 ```
 
-What just happened?  We started our `webpack-dev-server` which bundled up our application code into a file named something like "app-42d809adf5fa9e5d6ac5.js", put that in the "dist" folder, copied our src/index.html file into the "dist" folder, and then inserted a script tag into the `body` tag to load our bundle.  Awesome!
+What just happened?  We started our `webpack-dev-server` which bundled up our application code into a file named something like "app-42d809adf5fa9e5d6ac5.js", put that in the "dist" folder, copied our src/index.html file into the "dist" folder, and then inserted a script tag into the `body` tag to load our bundle.  `--content-base dist/` is telling our server to serve the contents of the "dist" folder.  Awesome!
 
-Hold on a minute.  I don't see a folder named "dist" in my project though.  That's because it is all done in memory!  Want to see the files with your own eyes?  Hop back over to the command line and kill the server with `control + C`.  Now run the command below, then jump back to your text editor after it finishes....voila, there it is!
+Hold on a minute.  I don't see a folder named "dist" in my project though.  That's because it is all done in memory!  Want to see the files with your own eyes?  Hop back over to the command line and kill the server with `control + C`.  Now run the command below and then jump back to your text editor after it finishes....voila, there it is!
 
 ```bash
 webpack
@@ -137,7 +143,8 @@ dist
 
 This tells ESLint to ignore everything in the "dist" directory.  If it doesn't fix your errors try reopening the file.  
 
-The first 40 lines or so are all Webpack related stuff for module caching so that we don't load modules more than once.  If you scroll to the bottom you'll see our application code that just adds "Hey dude!" to a div, but look a little closer.  Our arrow function is gone and has been replaced by a regular function.  That's the ES6 --> ES5 transpilation that Babel does for us.
+#### What's going on in our bundle?
+The first 40 lines or so are all Webpack related stuff for module caching so that we don't load modules more than once.  If you scroll to the bottom you'll see our application code that just adds "Hey dude!" to a div.  If you look close you'll see that our arrow function is gone and has been replaced by a regular function.  That's the ES6 --> ES5 transpilation that Babel does for us.
 
 Pretty cool, but what about all those comments and whitespace?  We don't want to send all that crap to our users because they don't need it and it's only going to make their downloads take longer.  Let's get rid of it.  Update your "webpack.config.js" file to look like the one below.
 
@@ -156,23 +163,23 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        loader: 'babel',
-      },
-    ],
+        loader: 'babel'
+      }
+    ]
   },
 
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: '[name]-[hash].js',
+    filename: '[name]-[hash].js'
   },
 
   plugins: [
     new HtmlWebpackPlugin({
       template: './src/index.html',
-      inject: 'body',
+      inject: 'body'
     }),
 
-    new webpack.optimize.UglifyJsPlugin(), // new
+    new webpack.optimize.UglifyJsPlugin() // new
   ],
 };
 
@@ -477,6 +484,10 @@ Damn Ben, that was a lot of stuff.  What are we even getting out of this?
 Restart your dev server and reload your application from the browser.  Type some stuff in your input, then update your "setHTML.js" file to add/remove a few exclamation marks to "Hey man!" then watch the browser as you save the file.  Your changes come through *AND* your application retains its state! (input doesn't get cleared)  That's awesome!!!  
 
 Ok, maybe you don't think it's that great, but when you're working with application state that takes a while to reach (filling out a form/walking through a wizard) it makes developing/debugging a lot more enjoyable.
+
+// TODO add section on config and update webpack.config.js
+// TODO add section on config and update webpack.config.js
+// TODO add section on config and update webpack.config.js
 
 #### Misc cleanup
 Also, update your "webpack.config.js" file as shown below.  We've added references to `HOST` and `PORT` [environment variables](https://en.wikipedia.org/wiki/Environment_variable) with defaults so we can dynamically set our host/port combination at runtime.  Notice that we've also added `contentBase: './dist'` to `devServer`.  This means we can remove it from our `start` script in "package.json".  Go ahead and update that to `"start": "webpack-dev-server"`.

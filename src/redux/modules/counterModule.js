@@ -2,9 +2,9 @@
 const INCREMENT = 'benjaminschnelle.com/home/INCREMENT';
 
 // Reducer
-export default (state = { counter: 10 }, action) => {
+export default (state = { count: 10 }, action) => {
   if (action.type === INCREMENT) {
-    return { counter: state.counter + action.increment };
+    return { count: state.count + action.increment };
   }
   return state;
 };
