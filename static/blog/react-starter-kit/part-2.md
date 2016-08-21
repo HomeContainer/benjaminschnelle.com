@@ -204,7 +204,7 @@ Delete the contents of the "dist" directory then run `webpack` again to rebuild 
 Open up "app-42d809adf5fa9e5d6ac5.js" again (it'll have a new hash now).  It's just a single line now and it's really hard to read, BUT it's really minimal which is great for performance!  So we have two problems now: during development our beautiful ES6 source code now has to be debugged in minified ES5 which is tough to say the least.  If you were to view the source code from your browser's [developer tools](https://developer.chrome.com/devtools) (open with `option + command + i` on OSX) you would see the same thing.  We can do better.
 
 #### Source maps
-Add `devtool: 'source-map',` just above the `entry` property of your "webpack.config.js" file.  This tells Webpack to create a source map which bridges the gap between your source code and the transpiled/uglified code.  Most modern browsers support source maps for debugging...I'm using Chrome, but most browsers should perform similarly.  Fire up your dev server again with `webpack-dev-server -d --content-base dist/`, (note the new `-d` option for to enable debugging) open up your browser dev tools, then refresh the page.  If you go to the "Sources" tab of the dev tools window you should see something similar to the images below.
+Add `devtool: 'source-map',` just above the `entry` property of your "webpack.config.js" file.  This tells Webpack to create a source map which bridges the gap between your source code and the transpiled/uglified code.  Most modern browsers support source maps for debugging...I'm using Chrome, but most browsers should perform similarly.  Fire up your dev server again with `webpack-dev-server --debug --content-base dist/`, (note the new `--debug` option) open up your browser dev tools, then refresh the page.  If you go to the "Sources" tab of the dev tools window you should see something similar to the images below.
 
 Minified
 ![Chrome Dev Tools Minified](../../images/dev-tools-minified.jpg)
@@ -215,7 +215,7 @@ Original via source maps
 If you want to build the source maps to disk you'll need to run the command below.
 
 ```bash
-webpack -d
+webpack --debug
 ```
 
 #### Convenience scripts
@@ -233,7 +233,7 @@ npm install --save rimraf
 {
   "build": "npm run lint && rimraf dist && NODE_ENV=production webpack",
   "lint": "eslint src test",
-  "start": "webpack-dev-server -d --content-base dist/",
+  "start": "webpack-dev-server --debug --content-base dist/",
   "test": "echo \"Error: no test specified\" && exit 1"
 }
 ```
@@ -281,7 +281,9 @@ For now, I'm going to comment out the `UglifyJsPlugin` line since it's just goin
 
 #### Stylezzz (CSS)
 
-Wouldn't it be really awesome if we could make our div display "Hey dude!" in blue instead of black?  Hell yeah!  Wouldn't it be even more awesome if we could use something better than regular CSS to write it?  Double hell yeah!
+Wouldn't it be really awesome if we could make our div display "Hey dude!" in blue instead of black?  Hell yeah!  Wouldn't it be even more awesome if we could use something better than regular CSS to write it?
+
+![Oh Yeah!](http://i.imgur.com/ZCjDCtN.gif)
 
 We're going to use SASS to write our styles, compile SASS to CSS, add vendor prefixes, locally scope our classes, bundle our styles into an external style sheet, then import those styles via our "index.html" file.  [SASS](http://sass-lang.com/) makes writing CSS much more enjoyable and has some nice built in features like variables and functions.
 
@@ -290,7 +292,7 @@ CSS is global by default meaning if you use a class named ".title" that makes yo
 Let's install the necessary packages
 
 ```bash
-npm install --save node-sass sass-loader postcss-loader autoprefixer css-loader extract-text-webpack-plugin
+npm install --save node-sass sass-loader postcss-loader autoprefixer css-loader extract-text-webpack-plugin@2.0.0-beta.3
 ```
 
 ##### Packages
@@ -301,7 +303,9 @@ npm install --save node-sass sass-loader postcss-loader autoprefixer css-loader 
 - `css-loader`: bundle CSS and scope classes locally
 - `extract-text-webpack-plugin`: create a CSS file from bundled CSS
 
-We've got the packages we need, but now we need to tell Webpack to use them.  Update your "webpack.config.js" file to mirror the one below.  We've added new entries to `loaders` and `plugins`.  The new `loaders` entry will match both ".css" and ".scss" files and apply our loaders from right to left ending with `ExtractTextPlugin.extract`.  We're passing three options to our `css-loader`: `modules` enables CSS Modules (local scoping), `sourceMap` creates a source map for our compiled SASS, and finally `importLoaders=1` is a requirement to use `css-loader` with `postcss-loader`.
+We've got the packages we need, but now we need to tell Webpack to use them.  Update your "webpack.config.js" file to mirror the one below.  We've added new entries to `loaders` and `plugins`.  
+
+The new `loaders` entry will match both ".css" and ".scss" files and apply our loaders from right to left ending with `ExtractTextPlugin.extract`.  We're passing three options to our `css-loader`: `modules` enables CSS Modules (local scoping), `sourceMap` creates a source map for our compiled SASS, and finally `importLoaders=1` is a requirement to use `css-loader` with `postcss-loader`.
 
 In the `plugins` section we're telling ExtractTextPlugin to name our bundled CSS file something like  "styles-ecb5dd1230609d11ec6b295438519a2d.css".
 
@@ -362,7 +366,7 @@ Now create a new file named "classes.scss" in the "src" directory and put the co
 }
 ```
 
-Finally, make the changes below to your "index.js" file to add our ".title" class.
+Finally, make the changes below to your "setHTML.js" file to add our ".title" class.
 
 ```javascript
 import classes from './classes.scss';
@@ -373,7 +377,7 @@ const setHTML = () => {
   root.className = classes.title;
 };
 
-setHTML();
+export default setHTML;
 
 ```
 
@@ -387,7 +391,7 @@ HMR is a feature of Webpack that lets us inject updated modules into our running
 First we'll add auto-refreshing then we'll add HMR to demonstrate the differences.  Remember how we installed `webpack-dev-server` globally earlier?  Now we need to install it locally as well, so let's go ahead and do that and save it in `devDependencies`.  In order to use auto-refreshing and HMR Webpack needs to add a little code to our bundle.
 
 ```bash
-npm install --save-dev webpack-dev-server
+npm install --save-dev webpack-dev-server@2.1.0-beta.0
 ```
 
 Update the `entry` property of your "webpack.config.js" file as shown below.
@@ -396,11 +400,11 @@ Update the `entry` property of your "webpack.config.js" file as shown below.
 {
   // more config...
   entry: {
-    bundle: [
-      'webpack-dev-server/client?http://localhost:8080/',
-      './src/index.js',
+    app: [
+      'webpack-dev-server/client?http://localhost:8080',
+      './src/index.js'
     ],
-  }
+  },
   // more config...
 }
 ```
@@ -424,7 +428,7 @@ What if we had a text input on the page though?  Let's see what happens in that 
 
 ```
 
-Restart your server, refresh your browser, type something in the text input, then jump back to your "index.js" file and add a few exclamation marks to "Hey man!" and save your file.  If you're watching the browser you should see it refresh, but the value that was in the input is lost.  Bummer.  Let's fix that.
+Restart your server, refresh your browser, type something in the text input, then jump back to your "index.js" file and add a few exclamation marks to "Hey man!" and save your file.  If you're watching the browser you should see it refresh, but the value that was in the input is lost.  Bummer.
 
 HMR to the rescue!  We need to add a few config options to our "webpack.config.js" file.  Make the changes below.
 
@@ -433,7 +437,7 @@ const autoprefixer = require('autoprefixer');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
-const webpack = require('webpack');
+const webpack = require('webpack'); // uncomment
 
 module.exports = {
   // new section
@@ -445,7 +449,7 @@ module.exports = {
 
   entry: {
     app: [
-      'webpack-dev-server/client?http://localhost:8080/',
+      'webpack-dev-server/client?http://localhost:8080',
       'webpack/hot/only-dev-server', // new line
       './src/index.js',
     ],
@@ -488,74 +492,50 @@ module.exports = {
 
 ```
 
-##### What's going on here?  We made 3 changes.
+##### What's going on here?  We made 4 changes.
+- `webpack`: uncomment webpack import
 - `devServer`: this property is for config options related to our development server...we add the `hot` flag so the server knows we want to use HMR
 - `entry`: we added `'webpack/hot/only-dev-server'` to add more client code to facilitate HMR which will *not* fallback to auto-refreshing if an HMR update fails...if you would prefer your app to auto-refresh when HMR updates fail add `'webpack/hot/dev-server'` instead
 - `plugins`: `new webpack.HotModuleReplacementPlugin()` required for HMR to work
 
-Right, so now we have our Webpack config updated to use HMR, but we need to explicitly enable HMR at the module level of our app.  How do we do that?  Good question.  Let's add a new file named "setHTML.js" to the root of our project and update the contents of "index.js" as shown below.
-
-```javascript
-// setHTML.js
-import classes from './classes.scss';
-
-const setHTML = () => {
-  const root = document.getElementById('root');
-  root.innerHTML = 'Hey man!';
-  root.className = classes.title;
-};
-
-export default setHTML;
-
-```
+Right, so now we have our Webpack config updated to use HMR, but we need to explicitly enable HMR at the module level of our app.  Let's update the contents of "index.js" as shown below.
 
 ```javascript
 // index.js
 import setHTML from './setHTML';
 
 if (module.hot) {
-  module.hot.accept('./setHTML', () => {
-    // eslint-disable-next-line
-    require('./setHTML').default();
-  });
+  module.hot.accept('./setHTML', () => setHTML());
 }
 
 setHTML();
 
 ```
 
-As you can see, we have moved our application logic into a new file named "setHTML.js" and from that file we export our `setHTML` function.  Then in our "index.js" file we import that function and call it at the bottom of the file.  In the middle you'll notice an `if` statement that only fires if some `module` object has a [truthy](http://james.padolsey.com/javascript/truthy-falsey/) `hot` property on it.  Then that function uses some `require` object to load our "setHTML.js" file that we just imported, again.  It then calls a function named `default`.  What the hell.
+As you can see, we've added an `if` block that only fires if some `module` object has a [truthy](http://james.padolsey.com/javascript/truthy-falsey/) `hot` property on it.  It than calls an `accept` function with the path to our `setHTML` file and a function that calls it.
 
-Let's take it step by step.  First of all, the `export`/`import` statements are part of the ES6 module system (a way to break up your code and access that code between files).  Via Babel, Webpack transpiles those statements to [CommonJS](https://webpack.github.io/docs/commonjs.html) format modules (for better support).  That is where the global objects `module` and `require` come from.  `module.hot` is only defined if HMR is enabled.  The `accept` function is how we tell HMR which modules we want updated when they change, so here we're saying update our app when you detect a change in the "setHTML.js" file (or any of its children).  When you do detect a change go get the updated "setHTML.js" file and call the `default` function on it.  `import` can only be used at the top level of a module which is why we have to use `require` instead and then call the `default` export from the "setHTML.js" module.  The code snippet below equates `import` to `require`.
-
-```javascript
-// otherModule.js (this is just for demonstration)
-const bark = 'woof';
-export { bark }
-```
-
-```javascript
-// these are the same
-import setHTML from './setHTML'; // give me the default export from the setHTML.js file
-require('./setHTML').default;
-
-// these are the same
-import { bark } from './otherModule'; // give me a named export from otherModule.js
-require('./otherModule').bark;
-```
+Let's take it step by step.  Via Babel, Webpack transpiles our ES6 modules into ones currently supported by browsers which is where the global object `module` comes from.  `module.hot` is only defined if HMR is enabled.  The `accept` function is how we tell HMR which modules we want updated when they change, so here we're saying update our app when you detect a change in the "setHTML.js" file (or any of its children).  When you do detect a change call `setHTML` again.
 
 Damn Ben, that was a lot of stuff.  What are we even getting out of this?
 
-Restart your dev server and reload your application from the browser.  Type some stuff in your input, then update your "setHTML.js" file to add/remove a few exclamation marks to "Hey man!" then watch the browser as you save the file.  Your changes come through *AND* your application retains its state! (input doesn't get cleared)  That's awesome!!!  
+Restart your dev server and reload your application from the browser.  Type some stuff in the input, then update your "setHTML.js" file to add/remove a few exclamation marks to "Hey man!" then watch the browser as you save the file.  Your changes come through *AND* your application retains its state! (input doesn't get cleared)  👍 👍 👍
 
 Ok, maybe you don't think it's that great, but when you're working with application state that takes a while to reach (filling out a form/walking through a wizard) it makes developing/debugging a lot more enjoyable.
 
-// TODO add section on config and update webpack.config.js
-// TODO add section on config and update webpack.config.js
-// TODO add section on config and update webpack.config.js
-
 #### Misc cleanup
-Also, update your "webpack.config.js" file as shown below.  We've added references to `HOST` and `PORT` [environment variables](https://en.wikipedia.org/wiki/Environment_variable) with defaults so we can dynamically set our host/port combination at runtime.  Notice that we've also added `contentBase: './dist'` to `devServer`.  This means we can remove it from our `start` script in "package.json".  Go ahead and update that to `"start": "webpack-dev-server"`.
+Let's do a little spring cleaning in our app.  First create a new directory and file in config/index.js.  We'll use this file to store global config options. `process.env` is a global Node.js object to object information related to the currently executing Node process.  We're concerned with the `env` property which includes the user's environment variables.  Here we're getting a reference to your [environment variables](https://en.wikipedia.org/wiki/Environment_variable) `HOST` and `PORT` which we'll use to determine where to run your dev server.  If they're not provided we'll fallback to "localhost:8080" which is what we've been using thus far.
+
+```javascript
+module.exports = {
+  host: process.env.HOST || 'localhost',
+  port: process.env.PORT || '8080'
+};
+```
+
+> #### Transmission Control Protocol (TCP) and Internet Protocol (IP)
+Oversimplification: in [TCP/IP](https://en.wikipedia.org/wiki/Internet_protocol_suite) a *host* is a unique computer on a network and a *port* is a unique process (e.g., a web server) on that host.
+
+Update "webpack.config.js" as shown below.  Notice that we've added several options to `devServer` including ones we were specifying in our `start` script.  This means we can update it to `"start": "webpack-dev-server"`.
 
 ```javascript
 const autoprefixer = require('autoprefixer');
@@ -563,23 +543,22 @@ const path = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
-
-const host = process.env.HOST || 'localhost';
-const port = process.env.PORT || '8080';
+const config = require('./config');
 
 module.exports = {
   devServer: {
     contentBase: './dist',
-    host,
-    hot: true,
-    port,
+    historyApiFallback: true,
+    host: config.host,
+    hot: !config.production,
+    port: config.port
   },
 
   devtool: 'source-map',
 
   entry: {
     app: [
-      `webpack-dev-server/client?http://${host}:${port}/`,
+      `webpack-dev-server/client?http://${config.host}:${config.port}`,
       'webpack/hot/only-dev-server',
       './src/index.js',
     ],
