@@ -70,6 +70,8 @@ Use `command + space` to open Spotlight Search on OSX and search for "terminal".
 
 We will primarily be using the terminal to create files and folders as well as run Node scripts.  To get started we need to create a directory for our application.  You can create it anywhere, but I like to put all of my projects in a folder named "dev" under my home directory.  If you type `pwd` (print working directory) and hit enter the output will tell you what the working directory is (where you "are").  When you first open your terminal you'll be in your "home" directory such as "/Users/bschnelle".
 
+Read through the list below to understand what the commands that follow are doing, then run them from your terminal (one at a time) to create your application directory and first app file.
+
 ##### What are those commands below doing?
 1. Creates a new directory (`mkdir` = make directory) named "dev".
 2. Changes the working directory (`cd` = change directory) to "/Users/bschnelle/dev".
@@ -95,12 +97,22 @@ To get our version control with Git/GitHub setup you'll need 2 things: Git (inst
 
 [Git](https://git-scm.com/) is a version control system that allows us to "commit" (snapshot) our project at any point in time.  Then if we need to rollback changes or create a new branch to add a feature we can do that.  GitHub will be our repository host where our project will live.
 
-Once you have Git installed and have created a GitHub account, create a new repository on GitHub as described [here](https://help.github.com/articles/create-a-repo/) with whatever name you please.  After you have your repository created grab its HTTPS URL (you can use SSH also, but you'll have to create a key) then from the project root run the commands below in your terminal plugging in your repository URL in place of mine.  If you followed the commands above and still have the same terminal open you should already be in the root of your project (the "react-starter-kit" directory).
+Once you have Git installed and have created a GitHub account, go to your GitHub page and follow the steps below.
+
+##### Create a GitHub repository
+1. Click the ➕ (plus) sign in the top right then select "New repository"
+2. Type 'react-starter-kit' in the "Repository name" field
+3. Click the "Create repository" button
+4. From the screen you're redirected to make sure 'HTTPS' is selected, then click the button on the right to copy your repository URL.  See the image below.
+
+![GitHub Repo](../../images/github-repository.jpg)
+
+Now that you've created a repository it's time to link it to our local project we created a moment ago.  From the project root ("react-starter-kit" directory) run the commands below in your terminal plugging in your repository URL (the value you just copied) in place of mine.
 
 ```bash
 printf "node_modules\ndist" > .gitignore
 git init
-git add .
+git add --all
 git commit -m 'initial commit'
 git remote add origin https://github.com/bschnelle/react-starter-kit.git
 git push -u origin master
@@ -113,10 +125,14 @@ git push -u origin master
 4. Commit all of our staged files...described above.
 5. Set our remote repository to the one we just created on GitHub.  This is where we're going to push our local repo to.  That way if we spill water on our laptop or want to share the repo with someone else it can just be cloned/downloaded from GitHub.
 6. Push our local repository to the master branch on GitHub and set the upstream repository to our GitHub repo.  You'll be prompted for your GitHub credentials when this command is run.
+  - When typing in your password it doesn't look like you're typing anything, but you actually are!
 
-You should now be able to refresh the repo on GitHub and see your local project's files! 😺
+> #### Running into issues?
+> WARNING: the command below will delete **EVERYTHING** in the directory you target so be *careful*!
 
-> If any of the terms above were unfamiliar to you, they're all described in the [Git](https://git-scm.com/) docs page linked earlier.
+> If you think something got messed up and want to start all over with the Git process (from `git init`) run `rm -rf .git` from your project directory.  
+
+You should now be able to refresh the repo on GitHub and see your local project's files!
 
 #### Project Management
 GitHub has some nice tools that make managing a project easier.  You can create milestones as longer term goals and then add issues to your milestone as "todo" items.  Once all your issues have been completed your milestone can be considered complete and closed out.
@@ -131,7 +147,7 @@ Once you've created the milestone, you should be redirected to a page listing al
 
 Click the "New Issue" button on the right to create your first issue.  In the title type "Initialize Node Package Manager (NPM)" which is our next step from the list earlier in this post.  You can leave the description blank and submit the new issue.
 
-You'll be taken to the page for the issue you just created where the full issue history will be shown with any comments or changes.  On the right will be the "New Issue" button again.  Create new issues for all of the items in the list below, but make sure you add the "0.1.0 - Initial Release" milestone to each one you create.  You're able to add the issue to a milestone on the righthand side of the issue creation screen.
+You'll be taken to the page for the issue you just created where the full issue history will be shown with any comments or changes.  On the right will be the "New Issue" button again.  Create new issues for all of the items in the list below, but make sure you add the "0.1.0 - Initial Release" milestone to each one - there is an option to do so on the righthand side of the issue creation screen.
 
 ##### Issues
 - Setup ESLint
@@ -195,7 +211,7 @@ Since we now have our project under version control, you're free to commit anyti
 Remember our GitHub issues we need to knock out to reach our first 0.1.0 milestone?  We get to close one!  You can automatically close issues using keywords (close, fix, resolve) in your commit messages.  Assuming you created your issues in the same order as the list above and didn't delete/recreate any our issue numbers should match, but double check them just in case.  You can get the issue number by visiting the issue page on GitHub.
 
 ```bash
-git add .
+git add . ## a period is a shortcut for --all
 git commit -m 'initialized NPM...closes #1'
 git push origin master
 ```
