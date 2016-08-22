@@ -68,29 +68,27 @@ Use `command + space` to open Spotlight Search on OSX and search for "terminal".
 
 ![Terminal](../../images/terminal.jpg)
 
-We will primarily be using the terminal to create files and folders as well as run Node scripts.  To get started we need to create a directory for our application.  You can create it anywhere, but I like to put all of my projects under a folder named "dev" under my home directory.  If you type `pwd` (print working directory) and hit enter the output will tell you what the working directory is (where you "are").  When you first open your terminal you'll be in your "home" directory such as "/Users/bschnelle".
+We will primarily be using the terminal to create files and folders as well as run Node scripts.  To get started we need to create a directory for our application.  You can create it anywhere, but I like to put all of my projects in a folder named "dev" under my home directory.  If you type `pwd` (print working directory) and hit enter the output will tell you what the working directory is (where you "are").  When you first open your terminal you'll be in your "home" directory such as "/Users/bschnelle".
 
-##### A few helpful commands we'll use
-- `mkdir dev`: create a new directory named "dev" (`mkdir` is the command, `dev` is an argument) 📁
-- `cd dev`: change the current working directory to "dev"
-- `cd ..`: change the current working directory to the parent of your current working directory (go up one level)
-- `cd`: go back to your "home" directory 🏠
-- `printf`: print text to the terminal or into a file (with `>`)
-
-Navigate to wherever you want to put your project (or create a new directory for your projects) and run the commands below.
+##### What are those commands below doing?
+1. Creates a new directory (`mkdir` = make directory) named "dev".
+2. Changes the working directory (`cd` = change directory) to "/Users/bschnelle/dev".
+3. Create another new directory named "react-starter-kit" inside the "dev" directory.
+4. Changes the working directory to "/Users/bschnelle/dev/react-starter-kit".
+5. Makes a directory named "src" where our source code will live.
+6. Prints "React ecosystem starter kit" into a new file named "README.md" which is just a nice convention to follow that provides more information about your project.  GitHub will display the contents of this file by default on the homepage of your project.
+  - `printf` prints text to the terminal or into a file (with `>`)
 
 ```bash
+mkdir dev
+cd dev
 mkdir react-starter-kit
 cd react-starter-kit
 mkdir src
 printf "React ecosystem starter kit" > README.md
 ```
 
-##### What are those commands doing?
-1. Creates a new directory named "react-starter-kit".  
-2. Changes the working directory to the one we just created.
-3. Makes a directory named "src" where our source code will live.
-4. Prints "React ecosystem starter kit" into a new file named "README.md" which is just a nice convention to follow that provides more information about your project.  GitHub will display the contents of this file by default on the homepage of your project.
+We now have enough to add our project to version control!  Read on to learn more.
 
 ## 2. Add version control with Git and use Github as our repo host
 To get our version control with Git/GitHub setup you'll need 2 things: Git (installed locally) and a GitHub account.  Head over [here](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) for Git and [here](https://github.com/) to create a GitHub account.

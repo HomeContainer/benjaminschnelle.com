@@ -15,156 +15,173 @@ npm install --save-dev react-hot-loader@3.0.0-beta.2
 - `react-dom`: React package for working with the DOM
 - `react-hot-loader`: HMR with React in mind...we're using a beta version for compatibility with functional stateless components
 
-Update "index.js" as shown below.
+We'll start by making the necessary config changes to get `react-hot-loader` working, then we'll create our first React component.
+
+Update the very bottom of your "webpack.config.js" file as shown below.
 
 ```javascript
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './containers/App';
-
-ReactDOM.render(<App />, document.getElementById('root'));
-
-```
-
-Here we're using `react-dom` to render our `App` component into the "root" `div`.
-
-The changes below need to be made to "webpack.config.js" as well.
-
-```javascript
-// ...dependencies
-
-const webpackConfig = {
-  devServer: {
-    contentBase: './dist',
-    host,
-    hot: !isProduction,
-    port,
-  },
-
-  devtool: 'source-map',
-
-  entry: {
-    app: [
-      './src/index.jsx', // update file extension
-    ],
-  },
-
-  module: {
-    loaders: [
-      {
-        test: /\.(js|jsx)$/, // match .js and .jsx files
-        exclude: /node_modules/,
-        loader: isProduction ? 'babel' : 'react-hot!babel', // add react-hot-loader
-      },
-      {
-        test: /\.(css|scss)$/,
-        loader: ExtractTextPlugin.extract([
-          `css?modules&sourceMap&importLoaders=1${isProduction ? '&minimize' : ''}`,
-          'postcss',
-          'sass',
-        ]),
-      },
-    ],
-  },
-
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: '[name]-[hash].js',
-  },
-
-  plugins: [
-    new ExtractTextPlugin('styles-[contenthash].css'),
-
-    new HtmlWebpackPlugin({
-      template: './src/index.html',
-      inject: 'body',
-    }),
-  ],
-
-  postcss: [autoprefixer],
-
-  // new section...this is necessary so that we can import .jsx
-  // files without explicitly providing their extensions...the
-  // empty string is required by Webpack in order to resolve imports
-  // where we DO provide the file extension
-  resolve: {
-    extensions: ['', '.js', '.jsx'],
-  },
-};
-
-// more config....
-
-```
-
-That weird looking syntax in "index.jsx" is JSX, it's just JavaScript in disguise.  You can read more [here](https://facebook.github.io/react/docs/jsx-in-depth.html) where they give before and after code examples.
-
-If you looked closely at the code we put in our "index.jsx" file, we're importing `App` from a sibling folder named "containers".  There's a useful philosophy in the React community of splitting up your components into two groups: containers and presentational components (smart and dumb).  Basically, container components implement business logic (connect to Redux store...we'll get to this in detail later on) and presentational components are only concerned with rendering the UI.  Dan Abramov has a good [post](https://medium.com/@dan_abramov/smart-and-dumb-components-7ca2f9a7c7d0#.f4mqb6y14) on the concepts.
-
-Create two new folders under "src" named "containers" and "components" where we'll put our two types of components.  You can then create "App.jsx" in the "containers" folder and paste in the code below.  We'll follow a convention of appending "Container" to our container names to avoid naming collisions with their related presentational components.
-
-Now create "App.jsx" under containers.
-
-```javascript
-import React from 'react';
-import App from '../components/App';
-
-export default class AppContainer extends React.Component {
-  render() {
-    return <App />;
-  }
+// ...more config
+{
+  // add HMR
+  webpackConfig.entry.app.unshift(
+    'react-hot-loader/patch', // this is new
+    `webpack-dev-server/client?http://${config.host}:${config.port}`,
+    'webpack/hot/only-dev-server'
+  );
+  webpackConfig.plugins.push(
+    new webpack.HotModuleReplacementPlugin()
+  );
 }
+```
+
+Add a new `plugins` section to your ".babelrc" to enable `react-hot-loader`.
+
+```json
+{
+  "presets": [["es2015", { "modules": false }], "react", "stage-0"],
+  "plugins": ["react-hot-loader/babel"]
+}
+```
+
+Update your "index.js" file as shown below.
+
+```javascript
+import React from 'react';
+import { render } from 'react-dom';
+import HomeContainer from './containers/HomeContainer';
+
+const MOUNT_NODE = document.getElementById('root');
+const App = (
+  <HomeContainer />
+);
+
+render(App, MOUNT_NODE);
 
 ```
 
-Also, create "App.jsx" under components.
+That weird looking syntax (`<HomeContainer />`) is JSX, it's just JavaScript in disguise.  You can read more [here](https://facebook.github.io/react/docs/jsx-in-depth.html) where they give before and after code examples.
+
+##### What's going on here?
+- `React`: required to be in scope when using JSX
+- `render`: a function provided by the `react-dom` library which is used to inject our root component into the DOM
+- `HomeContainer`: the first React component we'll build momentarily
+- `MOUNT_NODE`: reference to our "root" `div`
+- `App`: our application...we'll be adding to this a little later
+- `render()`: render our app into the DOM
+
+#### Container vs. Presentational
+If you looked closely at the `HomeContainer` import it is referencing our component in a sibling folder named "containers".  There's a useful philosophy in the React community of splitting up your components into two groups: containers and presentational components (smart and dumb).
+
+Basically, container components implement business logic (connect to Redux store...we'll get to this in detail later on) and presentational components are only concerned with rendering the UI.  Dan Abramov has a good [post](https://medium.com/@dan_abramov/smart-and-dumb-components-7ca2f9a7c7d0#.f4mqb6y14) on the concepts.
+
+Next, create two new folders under "src" named "containers" and "components" where we'll put our two types of components.  You can then create "HomeContainer.js" in the "containers" folder and paste in the code below.  We'll follow a convention of appending "Container" to our container component names for clarity and to avoid naming collisions with our presentational components.
+
+We'll create our first presentational component a little later, for now this will work as a starting point.
 
 ```javascript
 import React from 'react';
 
-export default class App extends React.Component {
-  render() {
-    return <div>Hello from App!</div>;
-  }
-}
+const HomeContainer = () => (
+  <div>Hello from Home!</div>
+);
+
+export default HomeContainer;
 
 ```
 
-You'll notice ESLint complaining about preferring pure functions now.  In React you can create your components a few different ways, if you read through [Thinking in React](https://facebook.github.io/react/docs/thinking-in-react.html) you would have seen components written by calling `createClass` (as of this writing anyway).
+#### Ways to Create Components
+If you read through [Thinking in React](https://facebook.github.io/react/docs/thinking-in-react.html) you would have seen components written by calling `React.createClass` (as of this writing anyway) rather than how we're doing it above.  There are actually three way to create components in React, the first of which follows.
 
 ```javascript
-var ProductCategoryRow = React.createClass({})
+var HomeContainer = React.createClass({})
 ```
 
 The second way you can create components is using [ES6 classes](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes).
 
 ```javascript
-class ProductCategoryRow extends React.Component {}
+class HomeContainer extends React.Component {}
 ```
 
 Finally, you can create *functional stateless components* (FSC).  There are certain limitations to this approach, but they're also simpler and Facebook has [stated](https://github.com/facebook/react/issues/5677) that they're planning future optimizations for components written in this way.  FSCs cannot use component lifecycle hooks or internal state (hence, stateless).  I'll demonstrate how some of the lifecycle hooks work shortly so you can make an informed decision when choosing how to implement components in your own app.  They're just implemented as a regular JavaScript function.
 
 ```javascript
-function ProductCategoryRow(props) {}
+function HomeContainer() {}
+// or
+const HomeContainer = () => {}
 ```
 
-We won't be using the first convention at all.  
-
-Because `react-hot-loader` doesn't support FSCs (the next version will) go ahead and add the section below to your ".eslintrc" file to change that rule.  Later when we upgrade to the next version of `react-hot-loader` (or remove it entirely) we'll remove the rule and update our components to use FSCs where possible.
+#### React Hot Loader
+When we updated our "index.js" file earlier we broken HMR.  Make the changes below to fix it.
 
 ```javascript
-{
-  // more config
+import React from 'react';
+import { render } from 'react-dom';
+import { AppContainer } from 'react-hot-loader'; // eslint-disable-line
+import HomeContainer from './containers/HomeContainer';
 
-  "rules": {
-    // remove after upgrading to react-hot-loader 3
-    "react/prefer-stateless-function": 0,
-  }
+const MOUNT_NODE = document.getElementById('root');
+const App = (
+  <HomeContainer />
+);
+
+render(App, MOUNT_NODE);
+
+if (module.hot) {
+  module.hot.accept('./containers/HomeContainer', () => {
+    render(<AppContainer>{App}</AppContainer>, MOUNT_NODE);
+  });
 }
+
 ```
 
-Your app should now be error free and if you start up your server you should be able to view it in the browser.  Our first React components!
+The only big difference between how we were using HMR before and using it with `react-hot-loader` is the use of `AppContainer` when applying updates.  This component hasn't received documentation yet nor have I dug into the code thoroughly to explain it.  For now, just know its use is required by `react-hot-loader`.
 
-There are a few fundamental React concepts we've glossed over so far like `props` and `state` as well as more advanced concepts like `context`.  We'll discuss those when we reach our post on Redux so that we can compare and contrast the two.
+We're overriding ESLint on line 3 to avoid a rule that we otherwise want applied.
+
+#### Props
+React enables you to pass data from parent components to child components via a `props` object.  Let's demonstrate that and also create our first presentational component.  Update/create the components below.
+
+```javascript
+// containers/HomeContainer.js
+import React from 'react';
+import Home from '../components/Home/Home';
+
+const HomeContainer = () => (
+  <Home message="Hello from HomeContainer!" />
+);
+
+export default HomeContainer;
+
+```
+
+```javascript
+// components/Home/Home.js
+import React from 'react';
+
+const HomeContainer = (props) => (
+  <div>
+    <div>Hello from Home!</div>
+    <div>{props.message}</div>
+  </div>
+);
+
+HomeContainer.propTypes = {
+  message: React.PropTypes.string.isRequired
+};
+
+export default HomeContainer;
+
+```
+
+##### HomeContainer
+- We're importing our `Home` presentational component from components/Home...the reason we've nested it inside a "Home" directory is because we'll be SASS files a little later.
+- When we render the `Home` component, we're passing a `message` property to it of "Hello from HomeContainer"
+
+##### Home
+- We're rendering output similar to what we had before in `HomeContainer`, but we're also now rendering the message passed in from `HomeContainer` in `<div>{props.message}</div>`.  React will interpolate `props.message` replacing it with "Hello from HomeContainer" in the rendered output.
+- Further down we're explicitly telling our component what `props` to expect.  Adding static typing and making `props` required can improve debugging during development.
+
+If you fire up your dev server you should be able to see your first React component in action!  Not very exciting, but we *are* using React now.
 
 #### React Router
 To make our app more interesting and useful we need to add a router which enables us to change paths within our app (e.g., my.site.com --> my.site.com/blog).  React Router interfaces with the HTML5 [history api](https://developer.mozilla.org/en-US/docs/Web/API/History) which works flawlessly with single page apps.
