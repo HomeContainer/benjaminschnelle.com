@@ -1,9 +1,9 @@
 Welcome to our first multipart post!  We'll be describing in detail how you would go about creating a starter kit for building a client side single page application (SPA) from scratch.  We'll be using lots of different tools found in the React.js ecosystem.
 
 > #### What's a Single Page Application (SPA)?
-Traditionally with web applications, anytime you navigate from one route to another (e.g. https://benjaminschnelle.com --> https://benjaminschnelle.com/blog) you would make a new request to the server which would send you back a new HTML page for that route and thus your browser would throw away the first page and load the new one.  This creates a full page refresh which causes a flicker on the screen.
+Traditionally web applications fetch a new HTML page anytime the user changes routes (e.g. https://benjaminschnelle.com --> https://benjaminschnelle.com/blog).  This creates a full page refresh which causes a flicker on the screen.
 
-> With SPAs the page is only loaded once, then as you navigate around the browser fetches any new data it needs asynchronously behind the scenes and then updates the page when the request completes.  The data fetching (think blog posts or user profile information) is typically done via an [HTTP (Hypertext Transfer Protocol)](https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol) request to a remote server which would send data back in some agreed upon format, [JSON (JavaScript Object Notation)](http://www.json.org/) being the most common these days.
+> With SPAs the page is only loaded once, then as you navigate around the browser fetches any new data it needs behind the scenes, asynchronously, and then updates the page when the request completes.  The data fetching (think blog posts or user profile information) is typically done via an [HTTP (Hypertext Transfer Protocol)](https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol) request to a remote server which would send data back in some agreed upon format, [JSON (JavaScript Object Notation)](http://www.json.org/) being the most common these days.
 
 > In general SPAs make for a better user experience as the application feels more *native*.
 
@@ -100,10 +100,10 @@ To get our version control with Git/GitHub setup you'll need 2 things: Git (inst
 Once you have Git installed and have created a GitHub account, go to your GitHub page and follow the steps below.
 
 ##### Create a GitHub repository
-1. Click the ➕ (plus) sign in the top right then select "New repository"
+1. Click the ➕ (plus) sign at the top right then select "New repository"
 2. Type 'react-starter-kit' in the "Repository name" field
 3. Click the "Create repository" button
-4. From the screen you're redirected to make sure 'HTTPS' is selected, then click the button on the right to copy your repository URL.  See the image below.
+4. From the screen you're redirected to make sure 'HTTPS' is selected, then click the button on the right to copy your repository URL.
 
 ![GitHub Repo](../../images/github-repository.jpg)
 
