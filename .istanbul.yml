@@ -1,4 +1,4 @@
 instrumentation:
-    root: src
-    extensions: ['.js', '.jsx']
-    include-all-sources: true
+  root: src
+  include-all-sources: true
+  excludes: ['*.spec.js']
