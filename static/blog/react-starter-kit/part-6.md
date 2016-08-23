@@ -1,11 +1,15 @@
+Last time we saw how to setup our testing environment and couple different ways to organize our tests.  This time we'll get into our state management with Redux.
+
 ## 9. Redux
 React has got our UI covered, but what about application [state](http://stackoverflow.com/a/8102731/2482993)?  How should we manage that?  [Redux](http://redux.js.org/)!
 
-Redux is a simplified implementation of the [Flux](http://facebook.github.io/flux/), application pattern created/used by Facebook.  Flux and Redux take a different approach than more traditional design patterns like MVC ([client MVC](http://stackoverflow.com/questions/33447710/mvc-vs-flux-bidirectional-vs-unidirectional)).
+Redux is a simplified implementation of the [Flux](http://facebook.github.io/flux/) application pattern created/used by Facebook.  Flux and Redux take a different approach than more traditional design patterns like MVC ([client MVC](http://stackoverflow.com/questions/33447710/mvc-vs-flux-bidirectional-vs-unidirectional)).
 
-Many client frameworks like Ember and Angular 1 implemented two-way data binding which means if you have (for example) a `Person` model with a `firstName` property that has been wired up to an `input` and you change the value of the `input` the `firstName` property of the `Person` is updated to that new value.  Similarly, if you were to update the `firstName` property on the model directly using JavaScript your `input` would reflect the new value as well, hence two-way.  This binding can be convenient and results in less boilerplate code, but there are also performance implications in complex applications and it can make reasoning about your app more difficult.
+Many client frameworks like Ember and Angular 1 implement two-way data binding which means if you have, for example, a `Person` model with a `firstName` property that has been wired up to an `input` and you change the value of the `input` the `firstName` property of the `Person` is updated to that new value.  Similarly, if you were to update the `firstName` property on the model directly using JavaScript your `input` would reflect the new value as well, hence two-way.  This type of binding can be convenient and results in less boilerplate code, but there are also performance implications in complex applications and it can make reasoning about your app more difficult.
 
-Redux takes a different approach (borrowing from Flux concepts) which makes it easier to reason about.  In Redux all state is maintained by a central `store` and your application can `subscribe` to changes so that anytime your state is changed in the `store` your application is notified and can respond accordingly.  So how do you actually change the data in the `store`?  You `dispatch` an `action` via the `store` which updates the state via a `reducer` which is a *pure* function (a function that doesn't have side effects...if you call it with the same arguments over and over it will always return the same value) that takes the old state + your `action` and returns the next state.  All data flow is one-way, meaning those changes you made to that `input` wouldn't update our `Person` unless you explicitly dispatch an `action` to do so.  We'll see how this all works below in the context of React, **BUT** you do **NOT** have to use Redux with React.  It can be used entirely on its own or with any other view library or you can write your own views using raw HTML and JavaScript.
+Redux takes a different approach (borrowing from Flux concepts) which makes it easier to reason about.  In Redux all state is maintained by a central `store` and your application can `subscribe` to changes so that anytime your state is changed in the `store` your application is notified and can respond accordingly.  So how do you actually change the data in the `store`?  You `dispatch` an `action` via the `store` which updates the state using a `reducer` which is a *pure* function (a function that doesn't have side effects...if you call it with the same arguments over and over it will always return the same value) that takes the old state + your `action` and returns the next state.  All data flow is one-way, meaning those changes you made to that `input` wouldn't update our `Person` unless you explicitly dispatch an `action` to do so.  
+
+We'll see how this all works below in the context of React, **BUT** you do not *have* to use Redux with React.  It can be used entirely on its own, with any other view library, or you can write your own views using raw HTML and JavaScript.
 
 Let's install the libraries we'll need.
 
@@ -16,111 +20,240 @@ npm install --save redux react-redux react-router-redux
 ##### What are those?
 - `redux`: self-explanatory
 - `react-redux`: bindings between React and Redux...remember how I said you need to `subscribe` to state changes in order to respond to them?  Well, this library provides an easy mechanism to do that for React components.  Via a `connect` function provided by `react-redux` you're able to bind Redux state and/or Redux action creators to component `props` (explained shortly).
-- `react-router-redux`: remember our router from before? It keeps track of when we navigate around our app (such as going from "/" to "/blog") which is just part of our application state.  Since we're using Redux to manage all of our application state it would probably be smart to keep the two in sync, right?  This is especially helpful using a feature of Redux called "time-travel" which allows you to undo `actions` and essentially go back in time (we'll see this in practice in the next part).  If your `action` changed your route from "/" to "/blog" and you want to undo it `react-router` needs to know about it.  This library, `react-router-redux`, provides that for us.
+- `react-router-redux`: remember our router from before? It keeps track of when we navigate around our app (such as going from "/" to "/blog") which is just part of our application state.  Since we're using Redux to manage all of our application state it would probably be smart to keep the two in sync, right?  This is especially helpful using a feature of Redux called "time-travel" which allows you to undo `actions` and essentially go back in time (we'll see this a little later).  If your `action` changed your route from "/" to "/blog" and you want to undo it `react-router` needs to know about it.  This library, `react-router-redux`, provides that for us.
 
-Back in the initial discussion of React we mentioned a few concepts like `props`, `state`, and `context` that we would discuss in this post.  Let's do that now.  I've now mentioned `state` twice in two different contexts (not to be confused with React `context`)!  Make the changes below.
+Back in the initial discussion of React I mentioned we would cover the concepts of `state` and `context` in this post.  Let's do that now.  I've now mentioned `state` twice in two different contexts (not to be confused with React `context`)!
+
+#### Component State
+In React you can store data that changes over time as component `state`.  Anytime a change is made to your component's `state` the component rerenders and the UI is updated to reflect those changes.  Let's demonstrate how that would work.
+
+We're going to create a new "Counter" route with corresponding container and presentational components.  In these component we'll add a button that can be clicked to increment a counter as well as a link to go from our "Counter" route back to our "Home" route.  The counter will be maintained by the container component and the current counter value will be passed to the presentational component for display.  
+
+#### Test Driven Development (TDD) - Counter
+As mentioned in the last post, we're going to build our components using a TDD approach going forward.  Let's start by writing the tests for our "Counter" presentational component.
 
 ```javascript
-// components/App.jsx
+// components/Counter/Counter.spec.js
 import React from 'react';
+import { expect } from 'chai';
+import { shallow } from 'enzyme';
+import { Link } from 'react-router';
+import Counter from './Counter';
+
+describe('Counter', () => {
+  it('renders an h2, Link, button, and div', () => {
+    const count = 10;
+    const increment = () => {};
+    const wrapper = shallow(<Counter count={count} increment={increment} />);
+
+    expect(wrapper.containsAllMatchingElements([
+      <h2>Hello from Counter!</h2>,
+      <Link to="/">Go Home!</Link>,
+      <button>Increment</button>,
+      <div>{count}</div>
+    ])).to.be.true;
+  });
+});
+
+```
+
+Our first test is checking if the `Counter` component render the right elements/components.  Here we're checking that an `h2`, `Link`, `button`, and `div`.  We're also checking that `props.count` is rendering into the `div`.  We pass the `increment` function to `Counter` because we want that property to be required and if we didn't pass anything our test would throw an error due to a missing required property (after we create our component).
+
+We also want our component to call `props.increment` whenever the button is clicked so let's add one more test to verify that.
+
+```javascript
+// components/Counter/Counter.spec.js
+import React from 'react';
+import { expect } from 'chai';
+import sinon from 'sinon'; // new import
+import { shallow } from 'enzyme';
+import { Link } from 'react-router';
+import Counter from './Counter';
+
+describe('Counter', () => {
+  // ...other test
+
+  it('clicking the button calls props.increment', () => {
+    const count = 10;
+    const increment = sinon.stub();
+    const wrapper = shallow(<Counter count={count} increment={increment} />);
+    wrapper.find('button').simulate('click');
+
+    expect(increment).to.have.been.calledOnce;
+  });
+});
+
+```
+
+In this test we're using `sinon` to create a `stub` function for `increment`.  This allows us to check whether or not `increment` was called, how many times, with what values, etc.  After we shallow render `Counter` we simulate a `click` event on the `button`, then check if `increment` was called once.  
+
+> Remember `sinon-chai` from earlier?  If we hadn't included that, we would have had to write our test like this instead `expect(increment.calledOnce).to.be.true`.  This works, it just doesn't read as well.
+
+If you run your tests now, they'll both fail.  Let's create our component and add the necessary features to get make those lights go green!  Create the component as shown here.
+
+```javascript
+// components/Counter/Counter.js
+import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 
-export default class App extends React.Component {
-  static propTypes = {
-    linkMessage: React.PropTypes.string.isRequired,
-  }
+const Counter = (props) => (
+  <div>
+    <h2>Hello from Counter!</h2>
+    <Link to="/">Go Home!</Link>
+    <button onClick={props.increment}>Increment</button>
+    <div>{props.count}</div>
+  </div>
+);
 
-  render() {
-    return <Link to="/blog">{this.props.linkMessage}</Link>;
-  }
-}
+Counter.propTypes = {
+  count: PropTypes.number,
+  increment: PropTypes.func.isRequired
+};
 
-```
-
-```javascript
-// containers/App.jsx
-import React from 'react';
-import App from '../components/App';
-
-export default class AppContainer extends React.Component {
-  render() {
-    const linkMessage = 'Go to Blog!';
-    return <App linkMessage={linkMessage} />;
-  }
-}
+export default Counter;
 
 ```
 
-Here we've updated our two App components so that the container is now passing down `props.linkMessage` to the presentational component which displays it.  You'll also notice in components/App.jsx that we're explicitly specifying `linkMessage` as a required string under `propTypes`.  This adds some nice type checking for us during development which can help us find bugs more quickly.
+This component fulfills our requirements of displaying an `h2`, `Link` to "/", a `button` that calls `props.increment` `onClick`, and displays `props.count` in a `div`.  If you had your tests running in development mode with `npm run test:dev` they should all be passing now!
 
-If we were to change the value of `linkMessage` in our container component our presentational component would rerender (by default) and display the new value.  Let's demonstrate how that would work.
+#### Test Driven Development (TDD) - CounterContainer
+Next we want to test our `CounterContainer`.  It should be initialized with `state.count` set to zero, it should have an `increment` function that increases `count` by one every time the function is called, and it should pass both `state.count` and `increment` to `Counter`.
+
+Gnarly, let's add our tests now.  Also, note that we are now nesting our containers under a directory ("Counter" in this case) since they will have a sibling ".spec.js" file.
 
 ```javascript
-// components/App.jsx
+// containers/Counter/CounterContainer.spec.js
 import React from 'react';
-import { Link } from 'react-router';
+import { expect } from 'chai';
+import { shallow } from 'enzyme';
+import CounterContainer from './CounterContainer';
+import Counter from '../../components/Counter/Counter';
 
-export default class App extends React.Component {
-  static propTypes = {
-    counter: React.PropTypes.number,
-    increment: React.PropTypes.func.isRequired,
-    linkMessage: React.PropTypes.string.isRequired,
-  }
+describe('CounterContainer', () => {
+  it('is initialized with state.count set to zero', () => {
+    const wrapper = shallow(<CounterContainer />);
+    expect(wrapper.state('count')).to.equal(0);
+  });
 
-  render() {
-    return (
-      <div>
-        <Link to="/blog">{this.props.linkMessage}</Link>
-        <div>{this.props.counter}</div>
-        <button onClick={this.props.increment}>Increment</button>
-      </div>
-    );
-  }
-}
+  it('has an increment function that increases state.count by one when called', () => {
+    const wrapper = shallow(<CounterContainer />);
+    wrapper.instance().increment();
+    expect(wrapper.state('count')).to.equal(1);
+  });
+
+  it('passes state.count and increment as props to Counter', () => {
+    const wrapper = shallow(<CounterContainer />);
+    expect(typeof wrapper.prop('count')).to.equal('number');
+    expect(typeof wrapper.prop('increment')).to.equal('function');
+    expect(wrapper.type()).to.equal(Counter);
+  });
+});
 
 ```
 
-```javascript
-// containers/App.jsx
-import React from 'react';
-import App from '../components/App';
+We have three tests that verify our component requirements we stated a moment ago.  In the first test we call `wrapper.state('count')` to get the initial value and verify it is zero.  The second test calls `wrapper.instance().increment()`, then we verify that `state.count` is one rather than zero.  Finally, we test the `props` of `wrapper` to ensure it receive both `count` and `increment` then we verify that the rendered component is of type `Counter`.
 
-export default class AppContainer extends React.Component {
+> #### Why did we call `instance` in our second test?
+The `wrapper` object is just that, a wrapper *around* our component.  So if we want to access the component itself we first need to call `instance`.
+
+Let's create our component and make our tests pass now!
+
+```javascript
+// containers/Counter/CounterContainer.js
+import React, { Component } from 'react';
+import Counter from '../../components/Counter/Counter';
+
+class CounterContainer extends Component {
   constructor(props) {
     super(props);
-    this.state = { counter: 0 };
-    this.increment = this.increment.bind(this);
+    this.state = { count: 0 };
   }
 
   increment() {
-    this.setState({ counter: this.state.counter + 1 });
+    this.setState({ count: this.state.count + 1 });
   }
 
   render() {
-    const linkMessage = 'Go to Blog!';
-    return (
-      <App
-        counter={this.state.counter}
-        increment={this.increment}
-        linkMessage={linkMessage}
-      />
-    );
+    return <Counter count={this.state.count} increment={this.increment} />;
   }
+}
+
+export default CounterContainer;
+
+```
+
+##### What's going on here?
+- `constructor`: called when the class is instantiated to *construct* the instance.  We first call `super` which calls the parent class' constructor (`React.Component`).  Next we set our initial `state` to an object with one key of `count` equal to zero.  Here the `props` object would be any properties passed into `CounterContainer` by the component that rendered it.  The final line in our constructor is binding our `increment` function to our `CounterContainer` component so that when we pass it down to our `Counter` the function can still be called.
+- `increment`: calls `setState`, a function inherited from `React.Component` that is used to update our component's `state`.  You **never** want to directly modify `state` with anything like `this.state.count = 10;`, so anytime you need to update `state` you'll want to create a new object or clone the existing one and update that.  React is written under the assumption that existing `state` is never modified.
+- `render`: covered previously.
+
+> The `this` keyword in JavaScript can be confusing, if it is foreign to you I would suggest reading more [here](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this).
+
+#### Running our App
+Start your dev server and open up your browser to localhost:8080/counter - you should see a pretty ugly page with a header, link, butt, and a number.  If you click the button the number goes up by one.  Neat!
+
+Now click the "Go Home!" link...shoot, now we're stuck on our Home route.  Let's fix that and do a little spring cleaning at the same time.  First let's get rid of our Blog route and components.  In "index.js" delete the `BlogContainer` import line and the "/blog" `Route`.
+
+Next, move containers/HomeContainer.js into containers/Home/HomeContainer.js.  Finally, update the files shown below.
+
+```javascript
+// components/Home/Home.js
+import React from 'react';
+import { Link } from 'react-router';
+
+const Home = () => (
+  <div>
+    <div>Hello from Home!</div>
+    <Link to="/counter">Go to Counter!</Link>
+  </div>
+);
+
+export default Home;
+
+```
+
+```javascript
+// containers/Home/HomeContainer.js
+import React from 'react';
+import Home from '../../components/Home/Home';
+
+const HomeContainer = () => (
+  <Home />
+);
+
+export default HomeContainer;
+
+```
+
+```javascript
+import React from 'react';
+import { render } from 'react-dom';
+import { AppContainer } from 'react-hot-loader'; // eslint-disable-line
+import { browserHistory, Route, Router } from 'react-router';
+import HomeContainer from './containers/Home/HomeContainer';
+import CounterContainer from './containers/Counter/CounterContainer';
+
+const MOUNT_NODE = document.getElementById('root');
+const App = (
+  <Router history={browserHistory}>
+    <Route path="/" component={HomeContainer} />
+    <Route path="/counter" component={CounterContainer} />
+  </Router>
+);
+
+render(App, MOUNT_NODE);
+
+if (module.hot) {
+  module.hot.accept('./containers/Home/HomeContainer', () => {
+    render(<AppContainer>{App}</AppContainer>, MOUNT_NODE);
+  });
 }
 
 ```
 
-Dang, things just got complicated.  Let's step through our changes.  In our presentational component we have two new `propTypes`: `increment` and `counter` which are a function and a number, respectively.  Then we're rendering the `Link` from before as well as a `div` with our `counter` number in it and finally a `button` which calls our `increment` property when clicked.
 
-Our container component has even more going on.  There's a whole new `constructor` function which is called by our `AppContainer` when it is first initialized.  This function receives a `props` argument which is just an object containing all of the properties passed into this component.  If you were to inspect the `props` object you would see it contains several nested objects that are passed in by `react-router`.  We'll look at some of those later.  Because we have explicitly created a `constructor` function we first want to call any parent constructors with the `super` keyword (remember we're extending from `React.Component`).  The next line is initializing our component's local `state` (different from Redux state) which we'll use to track how many times our `increment` function is called (by clicking the button in our presentational component).  The final line in our constructor is binding our `increment` function to our `AppContainer` component so that when we pass it down to our `App` component it can call the function appropriately.  The `this` keyword in JavaScript can be confusing, if it is foreign to you I would suggest reading more [here](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this).
 
-Next, we have our `increment` function which calls a `setState` function that is inherited from `React.Component`.  `state` is a special object in React that when updated causes the component and any child components to rerender.  `setState` is how you update your `state`.  You **never** want to directly modify `state` with anything like `this.state.counter = 10;`, so anytime you want to update your `state` you'll want to create a new `state` or clone the existing state and update that.  Our `increment` function just grabs our existing `state.counter` and increments it by one each time.
-
-Finally, you can see we're passing `state.counter` and `increment` to our presentational component so that it can use them in the UI.
-
-Now what?  Well if you open up your browser to localhost:8080 again you should see a pretty ugly page with a link, a number, and a button.  If you click the button though, the number goes up by one.  Neat!
-
-Now click your link to go to "/blog" then click the link there to come back to "/".  Our number went back to zero.  Shoot, we wanted to keep our hard work.  The reason it reset is that when you navigated to "/blog" our `AppContainer` was `unmounted` which removed it from the DOM and hence any data associated with it was lost.  Then when you went back to "/" it was recreated and the `counter` was reinitialized to zero.
+Our number went back to zero.  Shoot, we wanted to keep our hard work.  The reason it reset is that when you navigated to "/blog" our `AppContainer` was `unmounted` which removed it from the DOM and hence any data associated with it was lost.  Then when you went back to "/" it was recreated and the `counter` was reinitialized to zero.
 
 There are situations where this is completely appropriate, but there are also situations where you want to persist your application state.  That's where Redux comes in.  Because we're going to be using Redux with React we need to first discuss `context` which can be thought of as implicit `props`.  It allows you to pass data from a parent component to a descendent, the number of levels deep doesn't matter.  This can be convenient when you don't want to explicitly pass it from component to component through `props` all the way down the chain, but it can also make it more difficult to reason about because of the fact that data is "magically" available.  We'll see `context` in action shortly.
 

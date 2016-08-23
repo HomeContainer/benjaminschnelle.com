@@ -122,5 +122,9 @@ git push origin master
 
 Since that was the last issue of our milestone, we can confidently it as well.  Hop over to GitHub, navigate to your milestone, and close that old thing.
 
+
+// TODO routes based reorganization
+
+
 #### Summary
 That's it!  We now have a functional starter kit with a lot of great tools to make building apps a pleasure!  Thanks for reading and stay tuned for the next post where we'll get started on our first app (this site you're reading this from).

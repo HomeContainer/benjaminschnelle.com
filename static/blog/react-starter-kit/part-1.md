@@ -58,6 +58,7 @@ JS was originally created for the browser and for many years that's the only pla
 9. Redux
 10. Immutable.js
 11. Misc development tools
+12. Reorganization
 
 I'll be doing all development from Mac OSX so if you're on a different platform your mileage may vary.  Have questions? Just ask!
 
@@ -178,7 +179,7 @@ Let's install stuff!  Wait, how do we do that?  Well first we need to initialize
 npm init
 ```
 
-This command will generate a "package.json" file in the root of our project containing our answers to the questions asked and some other stuff.  This file is magical.  It is how we'll manage all of our dependencies.  You can either edit it manually or the NPM command line interface (CLI) will edit it for you when you run certain commands.  We'll see how to do that shortly.  Open up your project in a text editor and see how your file compares with mine (I answered some of the questions so our files might be a little different).
+This command will generate a "package.json" file in the root of our project containing our answers to the questions asked and some other stuff.  This file is magical.  It is how we'll manage all of our dependencies.  You can either edit it manually or the NPM command line interface (CLI) will edit it for you when you run certain commands.  We'll see how to do that shortly.  Open up your project (react-starter-kit) in a text editor and see how your file compares with mine (I answered some of the questions so our files might be a little different).
 
 > #### Text Editor
 If you don't already have a text editor GitHub has an option source one named [Atom](https://atom.io/).  It is awesome.
@@ -209,6 +210,8 @@ If you don't already have a text editor GitHub has an option source one named [A
 Since we now have our project under version control, you're free to commit anytime you see fit.  There aren't really any downsides to committing frequently and doing so gives you more flexibility if you need to rollback for any reason.  Also, smaller changes make it easier for others to follow when trying to get up to speed on your project.  
 
 Remember our GitHub issues we need to knock out to reach our first 0.1.0 milestone?  We get to close one!  You can automatically close issues using keywords (close, fix, resolve) in your commit messages.  Assuming you created your issues in the same order as the list above and didn't delete/recreate any our issue numbers should match, but double check them just in case.  You can get the issue number by visiting the issue page on GitHub.
+
+Go ahead and run the commands below to commit your changes and automatically close issue #1 on GitHub.
 
 ```bash
 git add . ## a period is a shortcut for --all
@@ -267,6 +270,9 @@ If you take a look at your `package.json` file now, there should be a new sectio
   "eslint-plugin-react": "^6.1.2"
 }
 ```
+
+#### You've been working hard, here's a cat GIF
+![Cat GIF](http://i.imgur.com/aTmjaSp.gif)
 
 Now that we have our packages installed we need to tell ESLint to use the Airbnb rules when linting.  To do that we need to add a new file in the root of our project named ".eslintrc".  Make your file look like the one below which tells ESLint we want to use `babel-eslint` as our parser (this is so we can write really new JavaScript), we'll be writing code for the browser so ignore browser global variables, use the `eslint-config-airbnb` rules, and override a couple default rules (disable commas at the end of every line and ".jsx" file extensions).
 
