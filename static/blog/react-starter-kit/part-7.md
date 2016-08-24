@@ -1,3 +1,5 @@
+In the last part we looked add Redux and added it to our project.  It was a pretty intense read, but this one is much short.
+
 ## 10. Immutable.js
 If you remember from the last post, I mentioned that with Redux best practice is to never modify existing state, but to always return a new object.  Redux is written under the assumption that the `state` object passed to your `reducer` will never be mutated (it is immutable) so if you do modify it you'll likely break something.
 
