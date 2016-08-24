@@ -15,8 +15,8 @@ const webpackConfig = {
   entry: {
     app: [
       // remove lines here
-      './src/index.js',
-    ],
+      './src/index.js'
+    ]
   },
 
   module: {
@@ -25,19 +25,6 @@ const webpackConfig = {
         test: /\.js$/,
         exclude: /node_modules/,
         loader: 'babel'
-      },
-      {
-        test: /\.(css|scss)$/,
-        // here we've just broken our loaders into individual
-        // lines rather than concatenating them with "!"...
-        // we've also conditionally added the "minimize" param
-        // to css-loader during our production build to reduce
-        // the size of our CSS file
-        loader: ExtractTextPlugin.extract([
-          `css?modules&sourceMap&importLoaders=1${config.production ? '&minimize' : ''}`, // ES6 template string
-          'postcss',
-          'sass'
-        ])
       }
     ]
   },
@@ -48,8 +35,6 @@ const webpackConfig = {
   },
 
   plugins: [
-    new ExtractTextPlugin('styles-[contenthash].css'),
-
     new HtmlWebpackPlugin({
       template: './src/index.html',
       inject: 'body'
@@ -61,8 +46,18 @@ const webpackConfig = {
 
 // new section to apply config based on our environment (dev or prod)
 if (config.production) {
+  // add css loader
+  webpackConfig.module.loaders.push({
+    test: /\.(css|scss)$/,
+    loader: ExtractTextPlugin.extract([
+      'css?modules&sourceMap&importLoaders=1&minimize',
+      'postcss',
+      'sass'
+    ])
+  });
   // add optimizations
   webpackConfig.plugins.push(
+    new ExtractTextPlugin('styles-[contenthash].css'),
     new webpack.optimize.DedupePlugin(), // remove duplicate code
     new webpack.optimize.OccurrenceOrderPlugin(), // webpack optimization
     new webpack.optimize.UglifyJsPlugin({
@@ -76,11 +71,21 @@ if (config.production) {
     // entire environment specific code blocks (React.js)
     new webpack.DefinePlugin({
       'process.env': {
-        NODE_ENV: JSON.stringify('production'),
+        NODE_ENV: JSON.stringify('production')
       }
     })
   );
 } else {
+  // add css loader
+  webpackConfig.module.loaders.push({
+    test: /\.(css|scss)$/,
+    loaders: [
+      'style',
+      'css?modules&sourceMap&importLoaders=1',
+      'postcss',
+      'sass'
+    ]
+  });
   // add HMR
   webpackConfig.entry.app.unshift(
     `webpack-dev-server/client?http://${config.host}:${config.port}`,
@@ -95,9 +100,6 @@ if (config.production) {
 module.exports = webpackConfig;
 
 ```
-
-> #### What was that fancy string in ExtractTextPlugin?
-That was an ES6 [template literal](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals) that can be used to build a string with embedded expression interpolation.
 
 If you'll remember from our last post we already created a `build` script in our "package.json".
 

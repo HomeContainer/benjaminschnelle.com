@@ -292,7 +292,7 @@ CSS is global by default meaning if you use a class named ".title" that makes yo
 Let's install the necessary packages
 
 ```bash
-npm install --save node-sass sass-loader postcss-loader autoprefixer css-loader extract-text-webpack-plugin@2.0.0-beta.3
+npm install --save node-sass sass-loader postcss-loader autoprefixer css-loader extract-text-webpack-plugin@2.0.0-beta.3 style-loader
 ```
 
 ##### Packages
@@ -302,6 +302,7 @@ npm install --save node-sass sass-loader postcss-loader autoprefixer css-loader 
 - `autoprefixer`: vendor prefixes
 - `css-loader`: bundle CSS and scope classes locally
 - `extract-text-webpack-plugin`: create a CSS file from bundled CSS
+- `style-loader`: inject CSS into `<style>` tag in our HTML
 
 We've got the packages we need, but now we need to tell Webpack to use them.  Update your "webpack.config.js" file to mirror the one below.  We've added new entries to `loaders` and `plugins`.  
 
@@ -328,18 +329,22 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        loader: 'babel',
+        loader: 'babel'
       },
       {
         test: /\.(css|scss)$/,
-        loader: ExtractTextPlugin.extract('css?modules&sourceMap&importLoaders=1!postcss!sass'),
-      },
-    ],
+        loader: ExtractTextPlugin.extract([
+          'css?modules&sourceMap&importLoaders=1&minimize',
+          'postcss',
+          'sass'
+        ])
+      }
+    ]
   },
 
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: '[name]-[hash].js',
+    filename: '[name]-[hash].js'
   },
 
   plugins: [
@@ -347,13 +352,13 @@ module.exports = {
 
     new HtmlWebpackPlugin({
       template: './src/index.html',
-      inject: 'body',
-    }),
+      inject: 'body'
+    })
 
     // new webpack.optimize.UglifyJsPlugin(),
   ],
 
-  postcss: [autoprefixer], // new
+  postcss: [autoprefixer] // new
 };
 
 ```
@@ -451,7 +456,7 @@ module.exports = {
     app: [
       'webpack-dev-server/client?http://localhost:8080',
       'webpack/hot/only-dev-server', // new line
-      './src/index.js',
+      './src/index.js'
     ],
   },
 
@@ -460,34 +465,40 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        loader: 'babel',
+        loader: 'babel'
       },
       {
         test: /\.(css|scss)$/,
-        loader: ExtractTextPlugin.extract('css?modules&sourceMap&importLoaders=1!postcss!sass'),
+        // updated
+        loaders: [
+          'style',
+          'css?modules&sourceMap&importLoaders=1',
+          'postcss',
+          'sass'
+        ]
       },
     ],
   },
 
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: '[name]-[hash].js',
+    filename: '[name]-[hash].js'
   },
 
   plugins: [
-    new ExtractTextPlugin('styles-[contenthash].css'),
+    // removed
 
     new webpack.HotModuleReplacementPlugin(), // new line
 
     new HtmlWebpackPlugin({
       template: './src/index.html',
-      inject: 'body',
-    }),
+      inject: 'body'
+    })
 
     // new webpack.optimize.UglifyJsPlugin(),
   ],
 
-  postcss: [autoprefixer],
+  postcss: [autoprefixer]
 };
 
 ```
@@ -496,7 +507,8 @@ module.exports = {
 - `webpack`: uncomment webpack import
 - `devServer`: this property is for config options related to our development server...we add the `hot` flag so the server knows we want to use HMR
 - `entry`: we added `'webpack/hot/only-dev-server'` to add more client code to facilitate HMR which will *not* fallback to auto-refreshing if an HMR update fails...if you would prefer your app to auto-refresh when HMR updates fail add `'webpack/hot/dev-server'` instead
-- `plugins`: `new webpack.HotModuleReplacementPlugin()` required for HMR to work
+- `module`: we updated the `loaders` key for our CSS file because `ExtractTextPlugin` doesn't work with HMR, but `style-loader` does so we'll add the former back when we configure our production build.
+- `plugins`: `new webpack.HotModuleReplacementPlugin()` required for HMR to work and removed `ExtractTextPlugin` as noted above.
 
 Right, so now we have our Webpack config updated to use HMR, but we need to explicitly enable HMR at the module level of our app.  Let's update the contents of "index.js" as shown below.
 
@@ -560,8 +572,8 @@ module.exports = {
     app: [
       `webpack-dev-server/client?http://${config.host}:${config.port}`,
       'webpack/hot/only-dev-server',
-      './src/index.js',
-    ],
+      './src/index.js'
+    ]
   },
 
   module: {
@@ -569,34 +581,37 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        loader: 'babel',
+        loader: 'babel'
       },
       {
         test: /\.(css|scss)$/,
-        loader: ExtractTextPlugin.extract('css?modules&sourceMap&importLoaders=1!postcss!sass'),
-      },
-    ],
+        loaders: [
+          'style',
+          'css?modules&sourceMap&importLoaders=1',
+          'postcss',
+          'sass'
+        ]
+      }
+    ]
   },
 
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: '[name]-[hash].js',
+    filename: '[name]-[hash].js'
   },
 
   plugins: [
-    new ExtractTextPlugin('styles-[contenthash].css'),
-
     new webpack.HotModuleReplacementPlugin(),
 
     new HtmlWebpackPlugin({
       template: './src/index.html',
-      inject: 'body',
-    }),
+      inject: 'body'
+    })
 
     // new webpack.optimize.UglifyJsPlugin(),
   ],
 
-  postcss: [autoprefixer],
+  postcss: [autoprefixer]
 };
 
 ```

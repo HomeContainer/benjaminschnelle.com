@@ -69,13 +69,13 @@ test/**/*.spec.js
 #### Babel
 We need to make a change to our ".babelrc" file as shown below.  We've added a new `env` section that will determine which options to use based on the value of `process.env.NODE_ENV`.  
 
-Here we're using `react-hot-loader` in "development", disabling CommonJS modules in "production", and doing neither in "test".
+Here we're using `react-hot-loader` in "development", disabling CommonJS modules in "development" and "production", and doing neither in "test".
 
 ```json
 {
   "env": {
     "development": {
-      "presets": ["es2015", "react", "stage-0"],
+      "presets": [["es2015", { "modules": false }], "react", "stage-0"],
       "plugins": ["react-hot-loader/babel"]
     },
     "production": {
@@ -131,19 +131,19 @@ Now we have three testing options: run tests, run tests and generate a code cove
 
 #### Let's create our first test!  
 
-We'll mirror our "src" directory structure in our "test" directory with test files corresponding to all source files.  Create the directories necessary and file at "test/components/Blog/Blog.spec.js".  The ".spec.js" extension is just a testing convention.
+We'll mirror our "src" directory structure in our "test" directory with test files corresponding to all source files.  Create the directories necessary and file at "test/components/Home/Home.spec.js".  The ".spec.js" extension is just a testing convention.
 
 ```javascript
 import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
 import { Link } from 'react-router';
-import Blog from '../../../src/components/Blog/Blog';
+import Home from '../../../src/components/Home/Home';
 
-describe('Blog', () => {
-  it('renders a Link with "Go Home!"', () => {
-    const wrapper = shallow(<Blog />);
-    expect(wrapper.contains(<Link to="/">Go Home!</Link>)).to.be.true;
+describe('Home', () => {
+  it('renders a Link with "Go to Counter!"', () => {
+    const wrapper = shallow(<Home />);
+    expect(wrapper.contains(<Link to="/counter">Go to Counter!</Link>)).to.be.true;
   });
 });
 
@@ -209,12 +209,12 @@ import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
 import { Link } from 'react-router';
-import Blog from './Blog'; // update our import location
+import Home from './Home'; // update our import location
 
-describe('Blog', () => {
-  it('renders a Link with "Go Home!"', () => {
-    const wrapper = shallow(<Blog />);
-    expect(wrapper.contains(<Link to="/">Go Home!</Link>)).to.be.true;
+describe('Home', () => {
+  it('renders a Link with "Go to Counter!"', () => {
+    const wrapper = shallow(<Home />);
+    expect(wrapper.contains(<Link to="/counter">Go to Counter!</Link>)).to.be.true;
   });
 });
 

@@ -43,7 +43,7 @@ Add a new `plugins` section to your ".babelrc" to enable `react-hot-loader`.
 }
 ```
 
-Update your "index.js" file as shown below.
+Update your "index.js" file as shown below.  Also, go ahead and delete "setHTML.js", "classes.scss", and the line `<input type="text" />` from "index.html".
 
 ```javascript
 import React from 'react';
@@ -74,7 +74,7 @@ If you looked closely at the `HomeContainer` import it is referencing a componen
 
 Basically, container components implement business logic and presentational components are only concerned with rendering the UI.  Dan Abramov has a good [post](https://medium.com/@dan_abramov/smart-and-dumb-components-7ca2f9a7c7d0#.f4mqb6y14) on the concepts.
 
-Next, create two new folders under "src" named "containers" and "components" where we'll put our two types of components.  You can then create "HomeContainer.js" in the "containers" folder and paste in the code below.  We'll follow a convention of appending "Container" to our container component names for clarity and to avoid naming collisions with our presentational components.
+Next, create two new folders under "src" named "containers" and "components" where we'll put our two types of components.  Then create a "Home" directory under the "containers" folder and a "HomeContainer.js" file in that directory, finally paste in the code below.  We'll follow a convention of appending "Container" to our container component names for clarity and to avoid naming collisions with our presentational components.
 
 We'll create our first presentational component a little later, for now this will work as a starting point.
 
@@ -82,7 +82,7 @@ We'll create our first presentational component a little later, for now this wil
 import React from 'react';
 
 const HomeContainer = () => (
-  <div>Hello from Home!</div>
+  <h2>Hello from Home!</h2>
 );
 
 export default HomeContainer;
@@ -121,7 +121,7 @@ When we updated our "index.js" file earlier we broken HMR.  Let's fix that now.
 import React from 'react';
 import { render } from 'react-dom';
 import { AppContainer } from 'react-hot-loader'; // eslint-disable-line
-import HomeContainer from './containers/HomeContainer';
+import HomeContainer from './containers/Home/HomeContainer';
 
 const MOUNT_NODE = document.getElementById('root');
 const App = (
@@ -131,7 +131,7 @@ const App = (
 render(App, MOUNT_NODE);
 
 if (module.hot) {
-  module.hot.accept('./containers/HomeContainer', () => {
+  module.hot.accept('./containers/Home/HomeContainer', () => {
     render(<AppContainer>{App}</AppContainer>, MOUNT_NODE);
   });
 }
@@ -146,9 +146,9 @@ We're also overriding ESLint on line 3 to avoid a rule that we otherwise want ap
 React enables you to pass data from parent components to child components via a `props` object.  Let's demonstrate that and also create our first presentational component.  Update/create the files below.
 
 ```javascript
-// containers/HomeContainer.js
+// containers/Home/HomeContainer.js
 import React from 'react';
-import Home from '../components/Home/Home';
+import Home from '../../components/Home/Home';
 
 const HomeContainer = () => (
   <Home message="Hello from HomeContainer!" />
@@ -164,7 +164,7 @@ import React from 'react';
 
 const Home = (props) => (
   <div>
-    <div>Hello from Home!</div>
+    <h2>Hello from Home!</h2>
     <div>{props.message}</div>
   </div>
 );
@@ -190,7 +190,7 @@ We'll look at `state` and `context`, two more fundamental React concepts, when w
 If you view your app now, you should see two lines rendered.
 
 #### React Router
-To make our app more interesting and useful we're going to add a router that enables us to change paths within our app (e.g., my.site.com --> my.site.com/blog).  React Router interfaces with the HTML5 [history API](https://developer.mozilla.org/en-US/docs/Web/API/History) which works flawlessly with single page apps.
+To make our app more interesting and useful we're going to add a router that enables us to change paths within our app (e.g., my.site.com --> my.site.com/counter).  React Router interfaces with the HTML5 [history API](https://developer.mozilla.org/en-US/docs/Web/API/History) which works flawlessly with single page apps.
 
 Let's get the library.
 
@@ -205,7 +205,7 @@ import React from 'react';
 import { render } from 'react-dom';
 import { AppContainer } from 'react-hot-loader'; // eslint-disable-line
 import { browserHistory, Route, Router } from 'react-router';
-import HomeContainer from './containers/HomeContainer';
+import HomeContainer from './containers/Home/HomeContainer';
 
 const MOUNT_NODE = document.getElementById('root');
 const App = (
@@ -217,7 +217,7 @@ const App = (
 render(App, MOUNT_NODE);
 
 if (module.hot) {
-  module.hot.accept('./containers/HomeContainer', () => {
+  module.hot.accept('./containers/Home/HomeContainer', () => {
     render(<AppContainer>{App}</AppContainer>, MOUNT_NODE);
   });
 }
@@ -231,75 +231,233 @@ if (module.hot) {
  - `Router`: our React router component which controls/maintains our navigation and history
 - We've updated `App` with a `Router` component and nested a `Route` component inside.  Here we're telling React to render a `Router` that uses `browserHistory` and create a single `Route` at path `"/"` (which is just our root route) that renders our `HomeContainer` component.
 
-If you refresh your browser now nothing should look different, but it *is*.  Let's add another route to demonstrate.  Below our existing route add `<Route path="/blog" component={BlogContainer} />` and add `import BlogContainer from './containers/BlogContainer';` below your `HomeContainer` import.  Finally, create the components below.
+If you refresh your browser now nothing should look different, but it *is*.  Let's add another route to demonstrate.  Below our existing route add `<Route path="/counter" component={CounterContainer} />` and add `import CounterContainer from './containers/Counter/CounterContainer';` below your `HomeContainer` import.  Finally, create the components below.
 
 ```javascript
-// containers/BlogContainer.js
+// containers/Counter/CounterContainer.js
 import React from 'react';
-import Blog from '../components/Blog/Blog';
+import Counter from '../../components/Counter/Counter';
 
-const BlogContainer = () => (
-  <Blog />
+const CounterContainer = () => (
+  <Counter />
 );
 
-export default BlogContainer;
+export default CounterContainer;
 
 ```
 
 ```javascript
-// components/Blog/Blog.js
+// components/Counter/Counter.js
 import React from 'react';
 
-const Blog = () => (
-  <div>Hello from Blog!</div>
+const Counter = () => (
+  <h2>Hello from Counter!</h2>
 );
 
-export default Blog;
+export default Counter;
 
 ```
 
-Restart your server and visit "localhost:8080/blog".  Did you get a "Cannot GET /blog" error?  Me too.  The reason this is happening is that we don't have a file in our "dist" directory named "blog".  What we want is for our server to always serve our "index.html" file when it doesn't find what it is looking for (an HTTP 404 error).  Webpack has this covered!  Add `historyApiFallback: true,` to the `devServer` section of your "webpack.config.js" file, restart your server, then visit "localhost:8080/blog" again.  It works!
+Restart your server and visit "localhost:8080/counter".  Did you get a "Cannot GET /counter" error?  Me too.  The reason this is happening is that we don't have a file in our "dist" directory named "counter".  What we want is for our server to always serve our "index.html" file when it doesn't find what it is looking for (an HTTP 404 error).  Webpack has this covered!  Add `historyApiFallback: true,` to the `devServer` section of your "webpack.config.js" file, restart your server, then visit "localhost:8080/counter" again.  It works!
 
-If you visit localhost:8080 you'll continue to receive our `HomeContainer` output.  Wouldn't it be even better if we could navigate between our routes without having to manually change the URL?  Let's do that.
+If you visit localhost:8080 you'll continue to receive our `HomeContainer` output.  Wouldn't it be even better if we could navigate between our routes without having to manually change the URL?  Let's do that.  (We're also going to remove `props.message` from `HomeContainer` and `Home`)
+
+```javascript
+// containers/Home/HomeContainer.js
+import React from 'react';
+import Home from '../../components/Home/Home';
+
+const HomeContainer = () => (
+  <Home />
+);
+
+export default HomeContainer;
+
+```
 
 ```javascript
 // components/Home/Home.js
 import React from 'react';
 import { Link } from 'react-router';
 
-const Home = (props) => (
+// we've removed our message as well
+const Home = () => (
   <div>
-    <div>Hello from Home!</div>
-    <div>{props.message}</div>
-    <Link to="/blog">Go to Blog!</Link>
+    <h2>Hello from Home!</h2>
+    <Link to="/counter">Go to Counter!</Link>
   </div>
 );
-
-Home.propTypes = {
-  message: React.PropTypes.string.isRequired
-};
 
 export default Home;
 
 ```
 
 ```javascript
-// components/Blog/Blog.js
+// components/Counter/Counter.js
 import React from 'react';
 import { Link } from 'react-router';
 
-const Blog = () => (
+const Counter = () => (
   <div>
-    <div>Hello from Blog!</div>
+    <h2>Hello from Counter!</h2>
     <Link to="/">Go Home!</Link>
   </div>
 );
 
-export default Blog;
+export default Counter;
 
 ```
 
 Here we're using React Router `Link` components to navigate between our routes.  You should now be able to navigate back and forth between the two routes.
+
+#### Layout Component
+At this point our HMR is broken.  It works for our Home components, but not our Counter components.  We're going to fix it, but let's add a little consistency across our routes with a `Layout` component first.  This is where you would typically find a navigation bar and footer among other things.  Create a new file named "Layout.js" in components/Layout with the code below.
+
+```javascript
+import React, { PropTypes } from 'react';
+
+const Layout = (props) => (
+  <div>
+    <div>
+      <h1>React Starter Kit</h1>
+      {props.children}
+    </div>
+  </div>
+);
+
+Layout.propTypes = {
+  children: PropTypes.node.isRequired
+};
+
+export default Layout;
+
+```
+
+`props.children` are any nodes (React components or regular HTML elements) rendered within a component such as `<Parent><Child /></Parent>`.  If you're wondering why there's an extra `div` in there, we'll need it later when we add some styling.
+
+#### Routes
+We've got our `Layout` component in good order, but we want to make one more change first.  We're going to break our routes out into a separate file beside our "index.js".  Create the file below.
+
+```javascript
+// routes.js
+import React from 'react';
+import { IndexRoute, Route } from 'react-router';
+import Layout from './components/Layout/Layout';
+import HomeContainer from './containers/Home/HomeContainer';
+import CounterContainer from './containers/Counter/CounterContainer';
+
+const routes = (
+  <Route path="/" component={Layout}>
+    <IndexRoute component={HomeContainer} />
+    <Route path="/counter" component={CounterContainer} />
+  </Route>
+);
+
+export default routes;
+
+```
+
+We're now rendering our `Layout` component at the "/" path and our `HomeContainer` is rendered into a new `IndexRoute` component.  React Router will render the `HomeContainer` component as the child when at the "/" route.
+
+Finally, update your "index.js" file as shown below.
+
+```javascript
+import React from 'react';
+import { render } from 'react-dom';
+import { AppContainer } from 'react-hot-loader'; // eslint-disable-line
+import { browserHistory, Router } from 'react-router';
+import routes from './routes';
+
+const MOUNT_NODE = document.getElementById('root');
+const App = (
+  <Router history={browserHistory}>
+    {routes}
+  </Router>
+);
+
+render(App, MOUNT_NODE);
+
+if (module.hot) {
+  module.hot.accept('./routes', () => {
+    render(<AppContainer>{App}</AppContainer>, MOUNT_NODE);
+  });
+}
+
+```
+
+HMR is now fixed and we have a layout for consistency between our routes.
+
+#### Adding Some Style
+
+![Nyan Cat](http://i.imgur.com/MjeqeUP.gif)
+
+Our app looks awful, let's add a little CSS to make it look slightly better.  Create a new file named "Layout.scss" in the "Layout" folder as shown below.  Then add the class to the root `div` of your `Layout` component.
+
+```css
+.layout {
+  /* colors */
+  background-color: #3949ab;
+  color: #fff;
+
+  /* layout */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* fill width and height */
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+
+  /* font */
+  font-family: 'Lato';
+  text-align: center;
+
+  /* make layout header uppercase */
+  h1 {
+    text-transform: uppercase;
+  }
+
+  /* make link yellow and little bigger */
+  a {
+    color: #fdd835 !important;
+    font-size: 1.2rem;
+  }
+}
+```
+
+```javascript
+// components/Layout.js
+import React, { PropTypes } from 'react';
+import classes from './Layout.scss';
+
+const Layout = (props) => (
+  <div className={classes.layout}>
+    <div>
+      <h1>React Starter Kit</h1>
+      {props.children}
+    </div>
+  </div>
+);
+
+Layout.propTypes = {
+  children: PropTypes.node.isRequired
+};
+
+export default Layout;
+
+```
+
+#### Better Font
+Add `<link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">` between the `<meta>` tags in your "index.html" file.  This will download our Lato font we used in our SASS file.
+
+Does your app look like this?  Spectacular I must say.
+
+![Styled App](../../images/styled-app.jpg)
+
+#### Commit our changes
 
 Let's commit and close our next GitHub issue.
 

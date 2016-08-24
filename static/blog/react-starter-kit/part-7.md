@@ -1,5 +1,5 @@
 ## 10. Immutable.js
-If you remember from the last post, I mentioned that with Redux best practice is to never modify existing state, but to always return a new object.  Redux is written under the assumption that the `state` object passed to your `reducer` will never be modified (it is immutable) so if you do modify it you'll likely break something.
+If you remember from the last post, I mentioned that with Redux best practice is to never modify existing state, but to always return a new object.  Redux is written under the assumption that the `state` object passed to your `reducer` will never be mutated (it is immutable) so if you do modify it you'll likely break something.
 
 Because of this and the fact that immutable data is easier to reason about introducing a library like Immutable.js is a good idea.  If you haven't surmised what Immutable.js actually is, let me tell you: it's a library of immutable objects!  Some of the syntax can be a little verbose, but the benefits are quite nice once you get accustomed to using it.
 
@@ -59,15 +59,13 @@ React Developer Tools should work out of the box after you install and enable th
   // ...more config
 
   plugins: [
-    new webpack.DefinePlugin({ __DEV__: !isProduction }), // new
-
-    new ExtractTextPlugin('styles-[contenthash].css'),
+    new webpack.DefinePlugin({ __DEV__: !config.production }), // new
 
     new HtmlWebpackPlugin({
       template: './src/index.html',
-      inject: 'body',
-    }),
-  ],
+      inject: 'body'
+    })
+  ]
 
   // more config...
 }
@@ -78,14 +76,14 @@ React Developer Tools should work out of the box after you install and enable th
 // src/redux/store.js
 
 import { createStore } from 'redux';
-import reducer from './reducer';
+import combinedReducer from './combinedReducer';
 
 let devTools;
 if (__DEV__) {
   devTools = window.devToolsExtension && window.devToolsExtension();
 }
 
-export default createStore(reducer, devTools);
+export default createStore(combinedReducer, devTools);
 
 ```
 
@@ -95,15 +93,17 @@ export default createStore(reducer, devTools);
 {
   "parser": "babel-eslint",
   "env": {
-    "browser": true
+    "browser": true,
+    "mocha": true // remove when eslint adds glob matching
   },
   "extends" : "airbnb",
   "globals": {
-    "__DEV__": true, // ignore this global variable
+    "__DEV__": true // ignore this global variable
   },
   "rules": {
-    // remove after upgrading to react-hot-loader 3
-    "react/prefer-stateless-function": 0,
+    "comma-dangle": 0,
+    "no-unused-expressions": 0, // remove when eslint adds glob matching
+    "react/jsx-filename-extension": 0
   }
 }
 ```
@@ -120,11 +120,7 @@ git commit -m 'added React Developer Tools and Redux DevTools...closes #9'
 git push origin master
 ```
 
-Since that was the last issue of our milestone, we can confidently it as well.  Hop over to GitHub, navigate to your milestone, and close that old thing.
-
-
-// TODO routes based reorganization
-
+Since that was the last issue of our milestone, we can confidently close it as well.  Hop over to GitHub, navigate to your milestone, and close that old thing.
 
 #### Summary
 That's it!  We now have a functional starter kit with a lot of great tools to make building apps a pleasure!  Thanks for reading and stay tuned for the next post where we'll get started on our first app (this site you're reading this from).
