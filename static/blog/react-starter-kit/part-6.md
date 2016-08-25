@@ -342,7 +342,7 @@ What we have done is create a Redux `store` with a default state of `initialStat
 
 We've wrapped our `Router` component with `Provider` and passed our store to it as a property.  Remember a little while ago when I talked about React `context`?  That is the mechanism used by `Provider` to pass the `store` down the component hierarchy which enables us to extract data (our `count` value) at any depth we please.  Let's see how we would access our store.
 
-At this point we're going to pause our TDD approach because we're going to be make several changes back to back and it would be a waste of time to keep rewriting our tests.
+At this point we're going to pause our TDD approach because we're going to be make several changes back to back and it would be a waste of time to keep rewriting our tests.  Feel free to implement the tests necessary to get coverage to 100%.
 
 ```javascript
 // containers/Counter/CounterContainer.js

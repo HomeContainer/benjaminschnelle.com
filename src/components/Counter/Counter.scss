@@ -1,0 +1,35 @@
+$red: #ff1744;
+
+.button {
+  background-color: $red;
+
+  /* round corners */
+  border-radius: 3px;
+
+  /* remove border */
+  border: none;
+
+  /* force button onto next line */
+  display: block;
+
+  /* font */
+  color: white;
+  font-size: 1.2rem;
+
+  /* turn cursor into a hand */
+  cursor: pointer;
+
+  /* add space around and inside of button */
+  margin: 15px auto;
+  padding: 7px 15px;
+
+  /* remove outline when button is focused */
+  &:focus {
+    outline: none;
+  }
+
+  /* lighten background on click */
+  &:active {
+    background-color: lighten($red, 15%);
+  }
+}

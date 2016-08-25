@@ -1,0 +1,32 @@
+.layout {
+  /* colors */
+  background-color: #3949ab;
+  color: #fff;
+
+  /* layout */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* fill width and height */
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+
+  /* font */
+  font-family: 'Lato';
+  text-align: center;
+
+  /* make layout header uppercase */
+  h1 {
+    text-transform: uppercase;
+  }
+
+  /* make link yellow and little bigger */
+  a {
+    color: #fdd835 !important;
+    font-size: 1.2rem;
+  }
+}
