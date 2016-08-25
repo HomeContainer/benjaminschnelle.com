@@ -26,6 +26,7 @@ We'll be using a *lot* of different libraries and frameworks to compose our star
   - [Istanbul](https://github.com/gotwarlost/istanbul): code coverage...how much of our code has been tested?
 - [React](https://facebook.github.io/react/): view layer of our app (just the user interface)
 - [Redux](http://redux.js.org/): data layer (state management)
+- [Immutable.js](https://facebook.github.io/immutable-js/): data structures that cannot be changed (mutated) after creation
 
 #### Browser JS vs Node.js
 JS was originally created for the browser and for many years that's the only place it worked.  Then a really sharp 🐱 named Ryan Dahl ported JS to the server and thus gave the world Node.  
