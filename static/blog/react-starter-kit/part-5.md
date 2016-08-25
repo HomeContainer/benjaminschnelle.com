@@ -234,5 +234,7 @@ git commit -m 'added testing setup...closes #6'
 git push origin master
 ```
 
+[My repo after this commit](https://github.com/bschnelle/react-starter-kit/tree/227fc6b61d30d0addf6b000375c9ea71fe2754e0)
+
 #### Summary
 Our testing setup is looking pretty good and we've written our first test.  Stellar progress!  Let's head to the next part where we'll see what Redux is all about.

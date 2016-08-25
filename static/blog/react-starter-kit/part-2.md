@@ -558,5 +558,7 @@ git commit -m 'added Webpack development config...closes #3'
 git push origin master
 ```
 
+[My repo after this commit](https://github.com/bschnelle/react-starter-kit/tree/351a065fb5a0dec0d95c1f29b9b80c0f5c0e73a3)
+
 #### Summary
 We covered a lot here and we'll continue to update our Webpack config in the next section where we'll update it for production.

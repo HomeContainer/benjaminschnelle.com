@@ -110,6 +110,8 @@ git commit -m 'added Immutable.js...closes #8'
 git push origin master
 ```
 
+[My repo after this commit](https://github.com/bschnelle/react-starter-kit/tree/7546f2519746bf908e57731de9c8b7fae3303dba)
+
 ## 11. Misc development tools
 There are two great development tools that can be installed as Chrome addons: [React Developer Tools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi?hl=en) and [Redux DevTools](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd?hl=en).
 
@@ -180,7 +182,7 @@ If you restart your server and open your Chrome DevTools you should have two new
 The Redux tab allows you to view your store at any point in time and also undo actions.  If you click the "Increment" button a few times you should see actions appear and your counter increment.  If you then click the "skip" button on the last action in the Redux tab you'll see the counter decrement back to its value before that action.  Awesome!
 
 #### File Type vs. Feature
-We've organized our project based on file type which is fine for smaller projects, but can become unruly when you project reaches a certain size.  In a future post we'll reorganize the starter kit by feature (fractal organization).  This layout will have a folder structure that aligns closely with the application's routes.
+We've organized our project based on file type which is fine for smaller projects, but can become unruly when your project reaches a certain size.  In a future post we'll reorganize the starter kit by feature (fractal organization).  This layout will have a folder structure that aligns closely with the application's routes.
 
 #### Commit our changes
 
@@ -189,6 +191,8 @@ git add .
 git commit -m 'added React Developer Tools and Redux DevTools...closes #9'
 git push origin master
 ```
+
+[My repo after this commit](https://github.com/bschnelle/react-starter-kit/tree/3c9e650a3b0f3d96c02d45cfd06db3393f8eb396)
 
 Since that was the last issue of our milestone, we can confidently close it as well.  Hop over to GitHub, navigate to your milestone, and close it.
 

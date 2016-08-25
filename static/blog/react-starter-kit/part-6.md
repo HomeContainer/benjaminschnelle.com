@@ -660,5 +660,7 @@ git commit -m 'added Redux...closes #7'
 git push origin master
 ```
 
+[My repo after this commit](https://github.com/bschnelle/react-starter-kit/tree/ca9a677ee902684cbe0bc1d8b11179c8bece8c38)
+
 #### Summary
 We've got our Redux store all setup now and ready to hold our application state.  Next we'll look at Immutable.js and the benefits it brings to the table.

@@ -467,13 +467,13 @@ Does your app look like this?  Spectacular I must say.
 
 #### Commit our changes
 
-Let's commit and close our next GitHub issue.
-
 ```bash
 git add .
 git commit -m 'added React and React Router...closes #5'
 git push origin master
 ```
+
+[My repo after this commit](https://github.com/bschnelle/react-starter-kit/tree/c91311b0c6e89e408431e38b6b8d743517943941)
 
 #### Summary
 We now have React and React Router setup which lets us modularize the functionality of our app into multiple components as well as break our app up into separate routes for a better use experience.  In the next section we'll get our testing setup in place so we can take a [Test Driven Development (TDD)](https://en.wikipedia.org/wiki/Test-driven_development) approach with the rest of our components.

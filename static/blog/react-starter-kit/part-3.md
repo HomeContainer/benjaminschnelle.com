@@ -154,5 +154,7 @@ git commit -m 'added Webpack production config...closes #4'
 git push origin master
 ```
 
+[My repo after this commit](https://github.com/bschnelle/react-starter-kit/tree/d4b5ccc63c9f795f3f97525cfd159cedc7c52017)
+
 #### Summary
 That wraps up our major Webpack config for now.  We'll continue to update it as necessary when we add additional features.  In the next section we get into React.
