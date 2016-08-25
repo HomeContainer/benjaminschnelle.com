@@ -1,4 +1,4 @@
-Last time we saw how to setup our testing environment and couple different ways to organize our tests.  This time we'll get into our state management with Redux.
+Last time we saw how to setup our testing environment and a couple different ways to organize our tests.
 
 ## 9. Redux
 React has got our UI covered, but what about application [state](http://stackoverflow.com/a/8102731/2482993)?  How should we manage that?  [Redux](http://redux.js.org/)!

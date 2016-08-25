@@ -20,7 +20,8 @@ Convinced?  Me too.
 Installation!
 
 ```bash
-npm install --save mocha chai chai-immutable sinon sinon-chai enzyme react-addons-test-utils jsdom istanbul@1.1.0-alpha.1
+npm install --save-dev mocha chai chai-immutable sinon sinon-chai \
+enzyme react-addons-test-utils jsdom istanbul@1.1.0-alpha.1
 ```
 
 Whoa, wait a second, you slipped three extra libraries in there.  `chai-immutable` lets us make assertions when using Immutable.js (to be added a little later) and `sinon-chai` lets us make more elegant assertions when using `sinon`.  `react-addons-test-utils` is required for `enzyme`.
@@ -50,7 +51,9 @@ chai.use(sinonChai);
 
 ```
 
-The code above creates a fake DOM so that we can test our client code on the server (without a browser).  If you wanted you could also run your test suite from one or more browsers, but it is generally less efficient.  It then creates all of the global variables you would typically find in a browser based JavaScript environment.  At the bottom of the file we're adding our Chai plugins.
+Next, the code creates a fake DOM so that we can test our client code on the server (without a browser).  If you wanted you could also run your test suite from one or more browsers, but it is generally less efficient.  It then creates all of the global variables you would typically find in a browser based JavaScript environment.  At the bottom of the file we're adding our Chai plugins.
+
+ESLint will be giving you some errors at this point - we're going to fix them shortly.
 
 #### Mocha Config
 Next we need to provide a few config options to Mocha, our testing framework.  Create a file named "mocha.opts" in the "test" directory.
@@ -98,15 +101,16 @@ Given our new testing context, we need to modify a few ESLint rules so that we a
   },
   "extends" : "../.eslintrc",
   "rules": {
+    "import/no-extraneous-dependencies": 0,
     "no-unused-expressions": 0
   }
 }
 ```
 
-Here we're extending our existing ESLint config, setting our environment to Mocha (for certain global variables), and ignoring the "no-unused-expressions" rule that would throw errors on some of our assertions with Chai.
+Here we're extending our existing ESLint config, setting our environment to Mocha (for certain global variables), and ignoring two rules that would throw errors on some of our test files.
 
 #### Istanbul
-One final config file we need is ".istanbul.yml" at the *root* of our project as shown below.  This file tells Istanbul that the files we want to test are in our "src" directory and to include all files JavaScript anywhere in that directory when determining code coverage.
+One final config file we need is ".istanbul.yml" at the *root* of our project as shown below.  This file tells Istanbul that the files we want to test are in our "src" directory and to include all JavaScript files anywhere in that directory when determining code coverage.
 
 ```yml
 instrumentation:
@@ -115,19 +119,18 @@ instrumentation:
 ```
 
 #### Scripts
-We have all of our config files in place, now we just need to add a few new scripts to our "package.json" file to make testing easier.  Add the three lines below to the `scripts` section of your "package.json".  You can delete the placeholder `test` script that was already in there.
+We have all of our config files in place, now we just need to add a few new scripts to our "package.json" file to make testing easier.  Add the two lines below to the `scripts` section of your "package.json".  You can delete the placeholder `test` script that was already in there.
 
 ```json
 {
-  "test": "NODE_ENV=test mocha",
-  "test:cover": "NODE_ENV=test istanbul cover _mocha",
-  "test:dev": "npm run test -- --watch"
+  "test": "NODE_ENV=test istanbul cover _mocha",
+  "test:dev": "NODE_ENV=test mocha --watch"
 }
 ```
 
 > Why are we using `_mocha` instead of `mocha` in `test:cover`? See [here](https://github.com/gotwarlost/istanbul/issues/44#issuecomment-16093330)
 
-Now we have three testing options: run tests, run tests and generate a code coverage report (we'll see this in a bit), and run tests then rerun them anytime a file is changed (`-- --watch` passes the watch flag to `mocha`).
+Now we have an option for running our tests and generating a coverage report or continually running our tests during development.
 
 #### Let's create our first test!  
 
@@ -149,16 +152,16 @@ describe('Home', () => {
 
 ```
 
-Here we're using `shallow` rendering which only renders a component one level deep.  So in this case the `Link` component is not actually evaluated so we can test that the rendered output contains `<Link to="/">Go Home!</Link>` which is exactly what we're doing above.  The `describe` block provides scoping and context, the `it` block is the actual test, and `expect` provides our assertion.  Depending on the outcome of our assertion the test passes or fails.
+Here we're using `shallow` rendering which only renders a component one level deep.  So in this case the `Link` component is not actually evaluated so we can test that the rendered output contains `<Link to="/counter">Go to Counter!</Link>` which is exactly what we're doing above.  The `describe` block provides scoping and context, the `it` block is the actual test, and `expect` provides our assertion.  Depending on the outcome of our assertion the test passes or fails.
 
 #### Code Coverage
-Jump over to the terminal and run `npm run test:cover` which will execute our test and generate a code coverage report (directory) in the root of your project called "coverage".  Your command line output should look similar to the image below.
+Jump over to the terminal and run `npm test` which will execute our test and generate a code coverage report (directory) in the root of your project called "coverage".  Your command line output should look similar to the image below.
 
 ![Test Results With Coverage](../../images/test-results-coverage.jpg)
 
 Before we go any further lets add that directory to our ".gitignore" file so we don't accidentally commit it.
 
-Our code coverage is looking pretty crummy at under 14%, let's take a closer look.  Open up the "index.html" file in coverage/lcov-report.  It should look similar to the image below.  You can explore your source files to see which are tested and which aren't.  Later we'll get our coverage up to 100%.
+Our code coverage is looking pretty crummy at under 11%, let's take a closer look.  Open up the "index.html" file in coverage/lcov-report.  It should look similar to the image below.  You can explore your source files to see which are tested and which aren't.
 
 ![Coverage Report](../../images/coverage-report.jpg)
 
@@ -187,6 +190,7 @@ Delete the ".eslintrc" file in the "test" directory and update the ".eslintrc" f
   "extends" : "airbnb",
   "rules": {
     "comma-dangle": 0,
+    "import/no-extraneous-dependencies": 0, // remove when eslint adds glob matching
     "no-unused-expressions": 0, // remove when eslint adds glob matching
     "react/jsx-filename-extension": 0
   }
@@ -220,8 +224,9 @@ describe('Home', () => {
 
 ```
 
+Make sure your test still run successfully with `npm test`.
+
 #### Commit our changes
-Let's commit and close our next GitHub issue.
 
 ```bash
 git add .

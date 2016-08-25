@@ -1,5 +1,9 @@
 To recap, we have our project under source control with Git/GitHub, we're managing our dependencies with NPM, ESLint is configured to ensure code consistency, and Webpack is configured for development and production.
 
+I just realized I didn't put a single GIF or meme in the last post so we'll start with one to balance things out.
+
+![Bulls Mascot](http://i.imgur.com/GIVQ6zq.gif)
+
 ## 7. React and React Router
 Per the React site, React makes it painless to create interactive UIs.  That is no understatement.  React is all *component* based (you can think of them as widgets of functionality) meaning you break your UI into separate components and *compose* your UI from those pieces.  I highly recommend reading [Thinking in React](https://facebook.github.io/react/docs/thinking-in-react.html) by [Pete Hunt](https://twitter.com/floydophone) for a quick overview of using React.
 
@@ -48,7 +52,7 @@ Update your "index.js" file as shown below.  Also, go ahead and delete "setHTML.
 ```javascript
 import React from 'react';
 import { render } from 'react-dom';
-import HomeContainer from './containers/HomeContainer';
+import HomeContainer from './containers/Home/HomeContainer';
 
 const MOUNT_NODE = document.getElementById('root');
 const App = (
@@ -91,7 +95,7 @@ export default HomeContainer;
 
 If you fire up your dev server you'll see your first React component in action!  Not very exciting, but we *are* using React now.
 
-#### Ways to Create Components
+#### How can we create components?
 If you read through [Thinking in React](https://facebook.github.io/react/docs/thinking-in-react.html) you would have seen components written by calling `React.createClass` (as of this writing anyway) rather than how we're doing it above.  There are actually three way to create components in React, the first of which follows.
 
 ```javascript
@@ -138,7 +142,7 @@ if (module.hot) {
 
 ```
 
-The only big difference between how we were using HMR before and using it with `react-hot-loader` is the use of `AppContainer` when applying updates.  This component hasn't received documentation yet nor have I dug into the code thoroughly to explain it.  For now, just know its use is required by `react-hot-loader`.
+The only big difference between how we were using HMR before and using it with `react-hot-loader` is the use of `AppContainer` when applying updates.  This component hasn't received documentation yet, nor have I dug into the code thoroughly to explain it.  For now, just know its use is required by `react-hot-loader`.
 
 We're also overriding ESLint on line 3 to avoid a rule that we otherwise want applied.
 
@@ -178,19 +182,19 @@ export default Home;
 ```
 
 ##### HomeContainer
-- We're importing our `Home` presentational component from components/Home...the reason we've nested it inside a "Home" directory is because we're going to add sibling SASS file a little later.
+- We're importing our `Home` presentational component from components/Home...the reason we've nested it inside a "Home" directory is so we can create SASS files beside the JS file.
 - When we render the `Home` component, we're passing a `message` property to it of "Hello from HomeContainer!".
 
 ##### Home
 - We're rendering output similar to what we had before in `HomeContainer`, but we're also now rendering the message property passed in from `HomeContainer` in `<div>{props.message}</div>`.  React will replace `props.message` with "Hello from HomeContainer!" in the rendered output.
 - Further down we're explicitly telling our component what `props` to expect with the `React.PropTypes` object.  Adding static typing and making `props` required can improve debugging during development.
 
-We'll look at `state` and `context`, two more fundamental React concepts, when we get to the post on Redux.
-
 If you view your app now, you should see two lines rendered.
 
+> We'll look at `state` and `context`, two more fundamental React concepts, when we get to the post on Redux.
+
 #### React Router
-To make our app more interesting and useful we're going to add a router that enables us to change paths within our app (e.g., my.site.com --> my.site.com/counter).  React Router interfaces with the HTML5 [history API](https://developer.mozilla.org/en-US/docs/Web/API/History) which works flawlessly with single page apps.
+To make our app more interesting and useful we're going to add a router that enables us to change paths/routes within our app (e.g., my.site.com --> my.site.com/counter).  React Router interfaces with the HTML5 [history API](https://developer.mozilla.org/en-US/docs/Web/API/History) which works well with single page apps.
 
 Let's get the library.
 
@@ -258,7 +262,9 @@ export default Counter;
 
 ```
 
-Restart your server and visit "localhost:8080/counter".  Did you get a "Cannot GET /counter" error?  Me too.  The reason this is happening is that we don't have a file in our "dist" directory named "counter".  What we want is for our server to always serve our "index.html" file when it doesn't find what it is looking for (an HTTP 404 error).  Webpack has this covered!  Add `historyApiFallback: true,` to the `devServer` section of your "webpack.config.js" file, restart your server, then visit "localhost:8080/counter" again.  It works!
+Restart your server and try to visit "localhost:8080/counter".  Did you get a "Cannot GET /counter" error?  Me too.  
+
+The reason this is happening is because we don't have a file in our "dist" directory named "counter".  What we want is for our server to always serve our "index.html" file when it doesn't find what it is looking for (an HTTP 404 error).  Webpack has this covered!  Add `historyApiFallback: true,` to the `devServer` section of your "webpack.config.js" file, restart your server, then visit "localhost:8080/counter" again.  It works!
 
 If you visit localhost:8080 you'll continue to receive our `HomeContainer` output.  Wouldn't it be even better if we could navigate between our routes without having to manually change the URL?  Let's do that.  (We're also going to remove `props.message` from `HomeContainer` and `Home`)
 
@@ -311,7 +317,9 @@ export default Counter;
 Here we're using React Router `Link` components to navigate between our routes.  You should now be able to navigate back and forth between the two routes.
 
 #### Layout Component
-At this point our HMR is broken.  It works for our Home components, but not our Counter components.  We're going to fix it, but let's add a little consistency across our routes with a `Layout` component first.  This is where you would typically find a navigation bar and footer among other things.  Create a new file named "Layout.js" in components/Layout with the code below.
+At this point our HMR is broken.  It works for our Home components, but not our Counter components.  We're going to fix it, but let's add a little consistency across our routes with a `Layout` component first.  
+
+This is where you would typically find a navigation bar and footer among other things.  Create a new file named "Layout.js" in components/Layout with the code below.
 
 ```javascript
 import React, { PropTypes } from 'react';
@@ -339,7 +347,7 @@ export default Layout;
 We've got our `Layout` component in good order, but we want to make one more change first.  We're going to break our routes out into a separate file beside our "index.js".  Create the file below.
 
 ```javascript
-// routes.js
+// src/routes.js
 import React from 'react';
 import { IndexRoute, Route } from 'react-router';
 import Layout from './components/Layout/Layout';
@@ -391,7 +399,7 @@ HMR is now fixed and we have a layout for consistency between our routes.
 
 ![Nyan Cat](http://i.imgur.com/MjeqeUP.gif)
 
-Our app looks awful, let's add a little CSS to make it look slightly better.  Create a new file named "Layout.scss" in the "Layout" folder as shown below.  Then add the class to the root `div` of your `Layout` component.
+Our app looks awful so let's add a little CSS to make it look slightly better.  Create a new file named "Layout.scss" in the "Layout" folder as shown below.  Then add the class to the root `div` of your `Layout` component.
 
 ```css
 .layout {
@@ -451,7 +459,7 @@ export default Layout;
 ```
 
 #### Better Font
-Add `<link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">` between the `<meta>` tags in your "index.html" file.  This will download our Lato font we used in our SASS file.
+Add `<link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">` between the `<head>` tags in your "index.html" file.  This will download our Lato font we used in our SASS file.
 
 Does your app look like this?  Spectacular I must say.
 
@@ -468,4 +476,4 @@ git push origin master
 ```
 
 #### Summary
-We now have React and React Router setup which lets us modularize the functionality of our app into multiple components as well as break our app up into separate routes for a better use experience.  In the next section we'll look get our testing setup in place so we can take a [Test Driven Development (TDD)](https://en.wikipedia.org/wiki/Test-driven_development) approach with the rest of our components.
+We now have React and React Router setup which lets us modularize the functionality of our app into multiple components as well as break our app up into separate routes for a better use experience.  In the next section we'll get our testing setup in place so we can take a [Test Driven Development (TDD)](https://en.wikipedia.org/wiki/Test-driven_development) approach with the rest of our components.
