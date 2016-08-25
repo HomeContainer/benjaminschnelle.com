@@ -5,9 +5,11 @@ React has got our UI covered, but what about application [state](http://stackove
 
 Redux is a simplified implementation of the [Flux](http://facebook.github.io/flux/) pattern created/used by Facebook.  Flux and Redux take a different approach than more traditional design patterns like MVC ([client MVC](http://stackoverflow.com/questions/33447710/mvc-vs-flux-bidirectional-vs-unidirectional)).
 
-Many client frameworks like Ember and Angular 1 implement two-way data binding which means if you have, for example, a `Person` model with a `firstName` property that has been wired up to an `input` and you change the value of the `input` the `firstName` property of the `Person` is updated to that new value.  Similarly, if you were to update the `firstName` property on the model directly using JavaScript your `input` would reflect the new value as well, hence two-way.  This type of binding can be convenient and results in less boilerplate code, but there are also performance implications in complex applications and it can make reasoning about your app more difficult.
+Many client frameworks like Ember and Angular 1 implement two-way data binding which means that your data model can update your view (UI) and your view can update your model.  This type of binding can be convenient and results in less boilerplate code, but there are also performance implications in complex applications and it can make reasoning about your app more difficult.
 
-Redux takes a different approach (borrowing from Flux concepts) which makes it easier to reason about.  In Redux all state is maintained by a central `store` and your application can `subscribe` to changes so that anytime your state is changed in the `store` your application is notified and can respond accordingly.  So how do you actually change the data in the `store`?  You `dispatch` an `action` via the `store` which updates the state using a `reducer` which is a *pure* function (a function that doesn't have side effects...if you call it with the same arguments over and over it will always return the same value) that takes the old state + your `action` and returns the next state.  All data flow is one-way, meaning those changes you made to that `input` wouldn't update our `Person` unless you explicitly dispatch an `action` to do so.  
+Redux takes a different approach (borrowing from Flux concepts) which makes it easier to reason about.  In Redux all state is maintained by a central `store` and your application can `subscribe` to changes so that anytime your state is changed in the `store` your application is notified and can respond accordingly.  
+
+So how do you actually change the data in the `store`?  You `dispatch` an `action` via the `store` which updates the state using a `reducer` which is a [pure](http://www.nicoespeon.com/en/2015/01/pure-functions-javascript/) function (a function that doesn't have side effects...if you call it with the same arguments over and over it will always return the same value) that takes the old state + your `action` and returns the next state.  All data flow is one-way.
 
 We'll see how this all works below in the context of React, **BUT** you do not *have* to use Redux with React.  It can be used entirely on its own, with any other view library, or you can write your own views using raw HTML and JavaScript.
 
@@ -19,18 +21,18 @@ npm install --save redux react-redux react-router-redux
 
 ##### What are those?
 - `redux`: self-explanatory
-- `react-redux`: bindings between React and Redux...remember how I said you need to `subscribe` to state changes in order to respond to them?  Well, this library provides an easy mechanism to do that for React components.  Via a `connect` function provided by `react-redux` you're able to bind Redux state and/or Redux action creators to component `props` (explained shortly).
-- `react-router-redux`: remember our router from before? It keeps track of when we navigate around our app (such as going from "/" to "/blog") which is just part of our application state.  Since we're using Redux to manage all of our application state it would probably be smart to keep the two in sync, right?  This is especially helpful using a feature of Redux called "time-travel" which allows you to undo `actions` and essentially go back in time (we'll see this a little later).  If your `action` changed your route from "/" to "/blog" and you want to undo it `react-router` needs to know about it.  This library, `react-router-redux`, provides that for us.
+- `react-redux`: bindings between React and Redux.
+- `react-router-redux`: sync React Router with Redux
 
-Back in the initial discussion of React I mentioned we would cover the concepts of `state` and `context` in this post.  Let's do that now.  I've now mentioned `state` twice in two different contexts (not to be confused with React `context`)!
+Back in the initial discussion of React I mentioned we would cover the concepts of `state` and `context` in this post.  Let's cover `state` now.
 
 #### Component State
 In React you can store data that changes over time as component `state`.  Anytime a change is made to your component's `state` the component rerenders and the UI is updated to reflect those changes.  Let's demonstrate how that would work.
 
-We'll add a button to our `Counter` component that will call an `increment` function when clicked.  This function will be and the current `count` value will be passed by `CounterContainer` to `Counter` for use/display.
+We'll add a button to our `Counter` component that will call an `increment` function when clicked.  Both `increment` and the current `count` value will be passed by `CounterContainer` to `Counter` for use/display.
 
 #### Test Driven Development (TDD) - Counter
-As mentioned in the last post, we're going to build our components using a TDD approach going forward.  Let's start by writing the tests for `Counter` to cover existing functionality as well as our new features.
+As mentioned in the last post, we're going to build our components using a TDD approach going forward (for the most part).  Let's start by writing the tests for `Counter` to cover existing functionality as well as our new features.
 
 ```javascript
 // components/Counter/Counter.spec.js
@@ -151,7 +153,11 @@ describe('CounterContainer', () => {
 
 ```
 
-We have three tests that verify our component requirements we stated a moment ago.  In the first test we call `wrapper.state('count')` to get the initial value and verify it is zero.  The second test calls `wrapper.instance().increment()`, then we verify that `state.count` is one rather than zero.  Finally, we test the `props` of `wrapper` to ensure it receives both `count` and `increment`, then we verify that the rendered component is of type `Counter`.
+We have three tests that verify our component requirements we stated a moment ago.  In the first test we call `wrapper.state('count')` to get the initial `state.counter` value and verify it is zero.  
+
+The second test calls `wrapper.instance().increment()`, then we verify that `state.count` is one rather than zero.  
+
+Finally, we test the `props` of `wrapper` to ensure it receives both `count` and `increment`, then we verify that the rendered component is of type `Counter`.
 
 > #### Why did we call `instance` in our second test?
 The `wrapper` object is just that, a wrapper *around* our component.  So if we want to access the component itself we first need to call `instance`.
@@ -257,10 +263,12 @@ export default Counter;
 
 ```
 
-Let's make sure our tests are still working after adding our CSS import.  Run `npm run test` again...and we have an error now of "Unexpected character '#'".  Remember when we setup Webpack we were using several CSS related loaders to compile SASS to CSS and to enable CSS Modules?  During testing, Webpack isn't doing anything for us so we need to be able to handle our SASS import statements in our JavaScript files.  We can fix that with the `css-modules-require-hook` which will perform the tasks we need.  
+Let's make sure our tests are still working after adding our CSS import.  Run `npm test`...and we have an error now of "Unexpected character '#'".  
+
+Remember when we setup Webpack and used several CSS loaders to compile SASS to CSS and enable CSS Modules?  During testing, Webpack isn't doing anything for us so we need to be able to handle our SASS import statements in our JavaScript files.  We can fix that with the `css-modules-require-hook` library which will perform the tasks we need.  
 
 ```bash
-npm install --save css-modules-require-hook
+npm install --save-dev css-modules-require-hook
 ```
 
 Now update your test/setup.js file as shown below so that our ".scss" files are compiled to CSS and CSS Modules via Node's `require` function.
@@ -285,7 +293,7 @@ If you rerun your tests now, they should all be passing again!
 ![Dancing Kid](http://www.nickadamsweb.com/wp-content/uploads/2009/06/white-kid-dance-club.gif)
 
 #### Does the button work? Kind of.
-If you don't have it running already, go ahead and fire up your server and visit "/counter" again.  Click the button and watch the number go up.  Now click the link to Home then back to Counter and you'll notice that our counter is back at zero.  Shoot, we wanted to keep our hard work.  
+Fire up your server and visit "/counter" again.  Click the button and watch the number go up.  Now click the link to Home then back to Counter and you'll notice that our counter is back at zero.  Shoot, we wanted to keep our hard work.
 
 The reason it reset is that when you navigated to "/" our `CounterContainer` was unmounted which removed it from the DOM and hence any data associated with it was lost.  Then when you went back to "/counter" it was recreated and `state.count` was reinitialized to zero.
 
@@ -301,7 +309,7 @@ import React from 'react';
 import { render } from 'react-dom';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
-import { AppContainer } from 'react-hot-loader'; // eslint-disable-line
+import { AppContainer } from 'react-hot-loader';
 import { browserHistory, Router } from 'react-router';
 import routes from './routes';
 
@@ -361,19 +369,19 @@ class CounterContainer extends Component {
 ```
 
 > ##### Console
-> there's a tab in your developer tools named "Console" where you can output strings, objects, etc. with `console.log` statements in your code
+> there's a "Console" tab in your developer tools where you can output strings, objects, etc. with `console.log` statements in your code
 
 What have we changed?  So we added `contextTypes` with a `store` property that looks just like `propTypes` as we've already seen.  That's because it *is* very similar...we're just defining our `context` instead of our `props`.
 
-In our `constructor` we've added a new argument for `context`.  Then we call `context.store.getState()` which returns the current state from the Redux `store`.  Finally, we're accessing the `count` property on that state.  A little further down we've added a `console.log` statement so that we can inspect the `context` object, specifically the `store` property.  If you view it in your Chrome developer tools you should see an object that looks like the one below.  
+In our `constructor` we've added a new argument for `context`.  Then we call `context.store.getState()` which returns the current state from the Redux `store`.  Finally, we're accessing the `count` property on that state.  A little further down we've added a `console.log` statement so that we can inspect the `context` object, specifically the `store` property.
 
 ![Redux Store](../../images/redux-store.jpg)
 
 We're concerned with three functions exposed on the `store` object: `dispatch`, `getState`, and `subscribe`.  `dispatch` is how we tell the `store` to update itself, we already discussed `getState`, and `subscribe` is how we listen for changes in the `store`.
 
-If you look at our app now you'll notice that `state.count` starts at 10 now because that's the default value in the Redux store.  Click the button a few times and you'll see your number increment as before, then click the link to leave the page and come back again.  We're back to 10...dammit.  We have the same issue as before because our `increment` function is updating the local component `state` rather than the Redux `store`.  
+If you look at your app you'll notice that `state.count` starts at 10 now because that's the default value in the Redux store.  Click the button a few times and you'll see your number increment as before, then click the link to leave the page and come back again.  We're back to 10...dammit.  We have the same issue as before because our `increment` function is updating the local component `state` rather than the Redux `store`.  
 
-How do we update the Redux store `count` value?  Our `reducer` of course!  Time to make our `reducer` actually do something.  Let's add our
+How do we update the Redux store `count` value?  Our `reducer` of course!  Time to make our `reducer` actually do something.  Make the changes shown below.
 
 ```javascript
 // src/index.js
@@ -388,7 +396,7 @@ const reducer = (state, action) => {
 // more stuff...
 ```
 
-We've added a new `action` argument to our `reducer` which will be passed to the `reducer` anytime we `dispatch` an `action`.  If `action.type` equals "INCREMENT" then then function returns a new object with `count` set to its old value plus `action.increment`, otherwise return the old `state`.
+We've added a new `action` argument to our `reducer` which will be passed to the `reducer` anytime we `dispatch` an `action`.  If `action.type` equals "INCREMENT" then the `reducer` returns a new object with `count` set to its old value plus `action.increment`, otherwise return the old `state`.
 
 Let's update our `CounterContainer`'s `increment` function to dispatch an "INCREMENT" action instead of updating its local `state`.
 
@@ -413,9 +421,9 @@ Let's update our `CounterContainer`'s `increment` function to dispatch an "INCRE
 
 Here we've made two changes.  Let's look at `increment` first.  Instead of updating `CounterContainer`'s local `state` with `setState` we're now creating an `action` object with `type` of "INCREMENT" and setting `increment` to 2.  
 
-`componentWillMount` is a component lifecycle hook that allows us to run code at certain times during the component's lifecycle.  In this case `constructor` and `componentWillMount` are essentially identical, but I've separated them for clarity here.  Via the `subscribe` method on the `store` object we're able to respond to changes to our Redux store's `state`.  Here we're just updating our *local* `state.count` to the corresponding property in our Redux store anytime the store is updated.
+`componentWillMount` is a component lifecycle hook that allows us to run code at certain times during the component's lifecycle.  In this case `constructor` and `componentWillMount` are essentially identical, but I've separated them for clarity.  Via the `subscribe` method on the `store` object we're able to respond to changes in our Redux store's `state`.  Here we're just updating our *local* `state.count` to the corresponding property in our Redux store when a change occurs.
 
-Fire up your app again if it isn't already running and click the button a few times, then navigate between routes and you should see `count` retain its value.  Awesome!  Increment it again after you switched routes and check the console, we have an error...shit.
+Fire up your app again if it isn't already running and click the button a few times, then navigate between routes and you should see `count` retain its value.  Awesome!  Increment it again after you switched routes and check the console, we have an error...ugh.
 
 ![setState error](../../images/setState-error.jpg)
 
@@ -430,7 +438,7 @@ How is this happening?  Remember earlier when I said our component is unmounted 
 
 componentWillMount() {
   this.unsubscribe = this.context.store.subscribe(() => {
-    this.setState({ counter: this.context.store.getState().counter });
+    this.setState({ count: this.context.store.getState().count });
   });
 }
 
@@ -490,7 +498,7 @@ Update/create the files below and then we'll discuss what we've done here.
 import React from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
-import { AppContainer } from 'react-hot-loader'; // eslint-disable-line
+import { AppContainer } from 'react-hot-loader';
 import { browserHistory, Router } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
 import store from './redux/store';
@@ -557,9 +565,9 @@ export default combineReducers({
 // src/redux/store.js
 
 import { createStore } from 'redux';
-import reducer from './reducer';
+import combinedReducer from './combinedReducer';
 
-export default createStore(reducer);
+export default createStore(combinedReducer);
 
 ```
 
@@ -580,10 +588,11 @@ CounterContainer.propTypes = {
   increment: PropTypes.func.isRequired,
 };
 
-const stateToProps = (state) => ({ count: state.counter.count });
-const dispatchToProps = { increment };
+export const stateToProps = (state) => ({ count: state.counter.count });
+export const dispatchToProps = { increment };
 
 export default connect(stateToProps, dispatchToProps)(CounterContainer);
+
 
 ```
 
@@ -593,9 +602,11 @@ Next we've created a new "redux" directory where all of our Redux related code w
 
 Nested in this folder is another named "modules" which is where we'll keep all of our reducers (we'll combine multiple reducers into a single one we pass to the `store`).  Additionally, we'll keep our action definitions (`INCREMENT`), and our action creators (`increment`), in the same file.  
 
-This approach was suggested by Erik Rasmussen, which he calls [Ducks](https://github.com/erikras/ducks-modular-redux).  The reason we've nested the file in a "counter" directory is so that if the file gets unruly we can split it up into multiple files without changing our imports all over our codebase.  The action definition is scoped ("counter/INCREMENT") for better clarity when viewing historical actions taken by the user.  You can also see in our `reducer` that we're now applying our `initialState` as a default value to the `state` argument (`state = { count: 10 }`).  We also have a new action creator called `increment` that we can import anywhere in our code where we want to increment our counter (in case we wanted to do that in multiple places).
+This approach was suggested by Erik Rasmussen, which he calls [Ducks](https://github.com/erikras/ducks-modular-redux).  The reason we've nested the file in a "counter" directory is so that if the file gets unruly we can split it up into multiple files without changing our imports all over our codebase.  
 
-The next new file is src/redux/combinedReducer.js which is where we'll be combining all of our reducers into a single `reducer`.  You'll notice another import from `react-router-redux` of `routerReducer` which is also necessary to sync `react-router` with `redux`.  One other thing to note is that we're now putting our old reducer on a new `counter` key.  The Redux `combineReducers` function is self-explanatory.
+The action definition is scoped ("counter/INCREMENT") for better clarity when viewing historical actions taken by the user.  You can see in our `reducer` that we're now applying our `initialState` as a default value to the `state` argument (`state = { count: 10 }`).  We also have a new action creator called `increment` that we can import anywhere in our code where we want to increment our counter (in case we wanted to do that in multiple places).
+
+The next new file is src/redux/combinedReducer.js which is where we're combining all of our reducers into a single `reducer`.  You'll notice another import from `react-router-redux` of `routerReducer` which is also necessary to sync `react-router` with `redux`.  One other thing to note is that we're now putting our old reducer on a new `counter` key.  The Redux `combineReducers` function is self-explanatory.
 
 In src/redux/store.js we're just creating our `store` as before using our new, combined `reducer`.
 
@@ -607,7 +618,7 @@ We've obviously broken our `CounterContainer` tests and have many other files we
 Update your test as shown below.
 
 ```javascript
-// containers/Counter/CounterContainer.js
+// containers/Counter/CounterContainer.spec.js
 
 import React from 'react';
 import { expect } from 'chai';
@@ -642,7 +653,6 @@ describe('CounterContainer', () => {
 ```
 
 #### Commit our changes
-Let's commit and close our next GitHub issue.
 
 ```bash
 git add .
