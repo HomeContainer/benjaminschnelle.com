@@ -369,7 +369,7 @@ class CounterContainer extends Component {
 ```
 
 > ##### Console
-> there's a "Console" tab in your developer tools where you can output strings, objects, etc. with `console.log` statements in your code
+> There's a "Console" tab in your developer tools where you can output strings, objects, etc. with `console.log` statements in your code
 
 What have we changed?  So we added `contextTypes` with a `store` property that looks just like `propTypes` as we've already seen.  That's because it *is* very similar...we're just defining our `context` instead of our `props`.
 
