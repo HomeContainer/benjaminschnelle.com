@@ -6,10 +6,10 @@ import IconButton from '../IconButton/IconButton';
 import classes from './Footer.scss';
 
 describe('Footer', () => {
-  it('renders an IconButton to GitHub', () => {
+  it('renders a 2x IconButton to GitHub', () => {
     const wrapper = shallow(<Footer />);
     expect(wrapper.contains(
-      <IconButton href="https://github.com/bschnelle" icon="github" />
+      <IconButton href="https://github.com/bschnelle" icon="github" size="2x" />
     )).to.be.true;
   });
 

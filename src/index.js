@@ -6,7 +6,7 @@ import { browserHistory, Router } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
 import store from './redux/store';
 import routes from './routes';
-import '../styles/core.scss';
+import './styles/core.scss';
 
 const MOUNT_NODE = document.getElementById('root');
 const history = syncHistoryWithStore(browserHistory, store);

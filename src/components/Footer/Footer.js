@@ -4,7 +4,7 @@ import classes from './Footer.scss';
 
 const Footer = () => (
   <div className={classes.footer}>
-    <IconButton href="https://github.com/bschnelle" icon="github" />
+    <IconButton href="https://github.com/bschnelle" icon="github" size="2x" />
   </div>
 );
 

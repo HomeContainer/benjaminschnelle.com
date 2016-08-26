@@ -1,7 +1,22 @@
-.nav {
-  float: right;
-}
+@import '../../styles/config';
 
-.toggle {
-  position: absolute;
+.nav {
+  > ul {
+    font-size: 1.1rem;
+    padding: 3rem;
+    list-style: none;
+    margin: 0;
+    > li {
+      margin: 10px 0;
+      > a {
+        color: $textColor;
+        text-decoration: none;
+        text-transform: uppercase;
+        transition: color $transitionDuration;
+        &:hover {
+          color: $accentColor;
+        }
+      }
+    }
+  }
 }

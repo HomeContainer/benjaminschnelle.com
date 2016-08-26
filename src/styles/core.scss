@@ -1,6 +1,7 @@
 $fa-font-path: '~font-awesome/fonts';
 
 :global {
+  @import './config';
   @import '~font-awesome/scss/font-awesome';
   @import '~normalize.css/normalize';
 
@@ -11,6 +12,7 @@ $fa-font-path: '~font-awesome/fonts';
   html,
   body,
   #root {
+    color: $textColor;
     margin: 0;
     padding: 0;
     height: 100%;

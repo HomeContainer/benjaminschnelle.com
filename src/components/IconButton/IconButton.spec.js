@@ -32,6 +32,11 @@ describe('IconButton', () => {
     expect(wrapper.contains(<span className={`fa fa-${ICON}`} />)).to.be.true;
   });
 
+  it('if props.size is set sizing class is added to span', () => {
+    const wrapper = shallow(<IconButton icon={ICON} size="2x" />);
+    expect(wrapper.find('.fa-2x')).to.have.length(1);
+  });
+
   it('if props.onClick is set and props.href is not, clicking the button calls onClick', () => {
     const onClick = sinon.stub();
     const wrapper = shallow(<IconButton icon="github" onClick={onClick} />);
