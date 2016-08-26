@@ -10,11 +10,8 @@ const webpackConfig = {
     contentBase: './dist',
     historyApiFallback: true,
     host: config.host,
-    hot: !config.production,
     port: config.port
   },
-
-  devtool: 'source-map',
 
   entry: {
     app: [
@@ -30,12 +27,24 @@ const webpackConfig = {
         loader: 'babel'
       },
       {
-        test: /\.(css|scss)$/,
-        loader: ExtractTextPlugin.extract([
-          `css?modules&sourceMap&importLoaders=1${config.production ? '&minimize' : ''}`,
-          'postcss',
-          'sass'
-        ])
+        test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
+        loader: 'url?limit=10000&mimetype=application/font-woff'
+      },
+      {
+        test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/,
+        loader: 'url?limit=10000&mimetype=application/font-woff'
+      },
+      {
+        test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
+        loader: 'url?limit=10000&mimetype=application/octet-stream'
+      },
+      {
+        test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
+        loader: 'file'
+      },
+      {
+        test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
+        loader: 'url?limit=10000&mimetype=image/svg+xml'
       }
     ]
   },
@@ -48,11 +57,12 @@ const webpackConfig = {
   plugins: [
     new webpack.DefinePlugin({ __DEV__: !config.production }),
 
-    new ExtractTextPlugin('styles-[contenthash].css'),
-
     new HtmlWebpackPlugin({
       template: './src/index.html',
-      inject: 'body'
+      inject: 'body',
+      minify: {
+        collapseWhitespace: true
+      }
     })
   ],
 
@@ -60,8 +70,18 @@ const webpackConfig = {
 };
 
 if (config.production) {
+  // add css loader with ExtractTextPlugin
+  webpackConfig.module.loaders.push({
+    test: /\.(css|scss)$/,
+    loader: ExtractTextPlugin.extract([
+      'css?modules&importLoaders=1&minimize',
+      'postcss',
+      'sass'
+    ])
+  });
   // add optimizations
   webpackConfig.plugins.push(
+    new ExtractTextPlugin('styles-[contenthash].css'),
     new webpack.optimize.DedupePlugin(),
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.optimize.UglifyJsPlugin({
@@ -71,8 +91,8 @@ if (config.production) {
       }
     }),
     // create global constants at compile time...
-    // this enables minification to remove entire
-    // code blocks that are environment specific
+    // this enables the minification step to remove
+    // entire environment specific code blocks (React.js)
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: JSON.stringify('production')
@@ -80,6 +100,21 @@ if (config.production) {
     })
   );
 } else {
+  // devServer options
+  webpackConfig.devServer.debug = true;
+  webpackConfig.devServer.hot = true;
+  // source maps
+  webpackConfig.devtool = 'source-map';
+  // add css loader
+  webpackConfig.module.loaders.push({
+    test: /\.(css|scss)$/,
+    loaders: [
+      'style',
+      'css?modules&sourceMap&importLoaders=1',
+      'postcss',
+      'sass'
+    ]
+  });
   // add HMR
   webpackConfig.entry.app.unshift(
     'react-hot-loader/patch',
