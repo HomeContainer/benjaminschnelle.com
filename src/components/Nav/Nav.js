@@ -4,10 +4,22 @@ import classes from './Nav.scss';
 
 const Nav = (props) => (
   <nav className={`${classes.nav} ${props.open ? classes.open : ''}`}>
-    <ul>
-      <li><Link to="/">Home</Link></li>
-      <li><Link to="/blog">Blog</Link></li>
-    </ul>
+    <div><span>Benjamin Schnelle</span></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div><span>blog.</span></div>
+    <div></div>
+    <div><span>home.</span></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div><span>O</span></div>
   </nav>
 );
 

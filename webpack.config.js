@@ -10,7 +10,8 @@ const webpackConfig = {
     contentBase: './dist',
     historyApiFallback: true,
     host: config.host,
-    port: config.port
+    port: config.port,
+    publicPath: 'http://localhost:8080/'
   },
 
   entry: {
@@ -106,9 +107,12 @@ if (config.production) {
     test: /\.(css|scss)$/,
     loaders: [
       'style',
-      'css?modules&sourceMap&importLoaders=1',
+      // &sourceMap removed below see following
+      // https://github.com/webpack/style-loader/issues/55
+      // https://github.com/davezuko/react-redux-starter-kit/issues/696
+      'css?modules&importLoaders=1',
       'postcss',
-      'sass'
+      'sass?sourceMap'
     ]
   });
   // add HMR

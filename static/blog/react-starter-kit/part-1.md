@@ -314,11 +314,9 @@ If you installed Atom earlier you already have APM (Atom Package Manager) instal
 apm install linter-eslint
 ```
 
+> If you receive an `apm: command not found` error, open up Atom then click *Atom > Install Shell Commands*
+
 That was eerily similar to how we install NPM packages.  That's because APM is built on top of NPM.
-
-Ok, one more thing to get it working in Atom.  From the Atom menu click Preferences which should open up a new tab.  Click the Packages link on the lefthand side of the tab, then search for "linter-eslint" and enable the package.  It should look like the image below after it has been enabled.
-
-![Atom linter-eslint](../../images/atom-linter-eslint.jpg)
 
 Go ahead and create an `index.js` file in the "src" folder and paste in the code below.  
 
@@ -328,7 +326,9 @@ export default 'Hello!'
 
 If ESLint is setup correctly you should get an error telling you that line 1 is missing a newline then when you fix that it'll say it's missing a semicolon.  Running `npm run lint` will return the same errors as well (you may get a deprecation warning about react/require-extension that you can safely ignore).
 
-We'll need this file later (with different contents) so you can keep it around if you please.
+> If you aren't getting an error in Atom click *Atom > Preferences* which should open up a new tab.  Click the *Packages* link on the lefthand side of the tab, then search for "linter-eslint" and disable/reenable the package.  The image below shows what you should see.
+
+![Atom linter-eslint](../../images/atom-linter-eslint.jpg)
 
 #### Commit our changes
 

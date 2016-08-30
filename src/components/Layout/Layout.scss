@@ -1,10 +1,5 @@
 .layout {
-  background-image: url(../../../static/images/pattern.png);
-  font-family: 'Lato';
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  overflow: auto;
   /* content/nav */
   > div:first-of-type {
     display: flex;
@@ -14,4 +9,11 @@
       flex: 1;
     }
   }
+}
+
+.menu {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.2rem;
+  z-index: 10;
 }

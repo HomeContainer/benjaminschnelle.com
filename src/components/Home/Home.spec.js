@@ -1,12 +1,12 @@
-import React from 'react';
+/* import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
-import { Link } from 'react-router';
 import Home from './Home';
+import Profile from '../Profile/Profile';
 
 describe('Home', () => {
-  it('renders a Link with "Go to Counter!"', () => {
+  it('renders a Profile', () => {
     const wrapper = shallow(<Home />);
-    expect(wrapper.contains(<Link to="/counter">Go to Counter!</Link>)).to.be.true;
+    expect(wrapper.contains(<Profile />)).to.be.true;
   });
-});
+}); */

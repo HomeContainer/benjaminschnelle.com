@@ -1,0 +1,28 @@
+@import '../../styles/config';
+
+.profile {
+  font-weight: 700;
+  padding: 3rem;
+  > img {
+    background-color: #fff;
+    border: dashed 3px #fff;
+    border-radius: 50%;
+    &:hover {
+      animation: lightShow 1s infinite;
+      border-style: dashed;
+      cursor: grab;
+    }
+  }
+  > p {
+    color: lighten($textColor, 50%);
+    font-size: 1.3em;
+  }
+}
+
+@keyframes lightShow {
+  0% { background-color: #81d4fa; }
+  25% { background-color: #69f0ae; }
+  50% { background-color: #ffd740; }
+  75% { background-color: #f48fb1; }
+  100% { background-color: #b39ddb; }
+}

@@ -1,11 +1,15 @@
 import React from 'react';
-import { Link } from 'react-router';
+// import Sidebar from '../Sidebar/Sidebar';
+import classes from './Home.scss';
 
-// we've removed our message as well
 const Home = () => (
   <div>
-    <h2>Hello from Home!</h2>
-    <Link to="/counter">Go to Counter!</Link>
+    <div className={classes.home}>
+      <div className={classes.welcome}>
+        <h1>Benjamin Schnelle</h1>
+        <h6>CPA gone SOFTWARE DEVELOPER</h6>
+      </div>
+    </div>
   </div>
 );
 
