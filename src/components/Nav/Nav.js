@@ -9,7 +9,8 @@ class Nav extends Component {
   }
 
   static propTypes = {
-    open: PropTypes.bool
+    open: PropTypes.bool,
+    size: PropTypes.string // TODO add NavContainer
   }
 
   getChildContext() {
@@ -19,7 +20,7 @@ class Nav extends Component {
   render() {
     return (
       <nav className={`${classes.nav} ${this.props.open ? classes.open : ''}`}>
-        <NavGrid />
+        <NavGrid size="large" />
       </nav>
     );
   }

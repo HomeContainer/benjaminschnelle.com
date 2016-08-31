@@ -1,7 +1,6 @@
 @import '../../../../styles/config';
 
 .cell {
-  flex: 1 1 25%; // TODO update
   height: 25%;
 }
 
@@ -26,12 +25,19 @@
   height: 100%;
 }
 
-.large {
-  @extend .navGrid;
+.largeCell {
+  @extend .cell;
+  flex: 1 1 25%;
 }
 
-.small {
-  @extend .navGrid;
+.mediumCell {
+  @extend .cell;
+  flex: 1 1 33.3333%;
+}
+
+.smallCell {
+  @extend .cell;
+  flex: 1 1 50%;
 }
 
 .social {
