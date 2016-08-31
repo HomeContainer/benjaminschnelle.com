@@ -1,0 +1,49 @@
+@import '../../../../styles/config';
+
+.cell {
+  flex: 1 1 25%; // TODO update
+  height: 25%;
+}
+
+.info {
+  > span {
+    display: block;
+    &:first-of-type {
+      color: rgba(255, 255, 255, .95);
+      margin-bottom: 2rem;
+    }
+    &:not(:first-of-type) {
+      color: rgba(255, 255, 255, .5);
+      font-size: 1rem;
+      font-weight: 400;
+    }
+  }
+}
+
+.navGrid {
+  display: flex;
+  flex-wrap: wrap;
+  height: 100%;
+}
+
+.large {
+  @extend .navGrid;
+}
+
+.small {
+  @extend .navGrid;
+}
+
+.social {
+  > div {
+    width: 100%;
+    text-align: right;
+    > a {
+      color: inherit;
+      // transition: color $transitionDuration;
+      &:hover {
+        color: rgba(255, 255, 255, .95);
+      }
+    }
+  }
+}

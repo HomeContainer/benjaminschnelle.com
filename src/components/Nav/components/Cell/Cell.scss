@@ -1,0 +1,28 @@
+@import '../../../../styles/config';
+
+.cell {
+  align-items: flex-end;
+  border: 0px solid rgba(25, 25, 25, .95);
+  border-left-width: 1px;
+  border-bottom-width: 1px;
+  display: flex;
+  font-size: 2rem;
+  font-weight: 700;
+  overflow: hidden;
+  padding: 1rem;
+  text-transform: lowercase;
+  transition: border-left-width $transitionDuration;
+
+  > div {
+    color: rgba(255, 255, 255, 0);
+    transform: translateX(-50px);
+    transition: all 700ms;
+  }
+}
+
+.open {
+  > div {
+    color: rgba(255, 255, 255, .7);
+    transform: none;
+  }
+}

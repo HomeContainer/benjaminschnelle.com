@@ -1,30 +1,28 @@
-import React, { PropTypes } from 'react';
-import { Link } from 'react-router';
+import React, { Component, PropTypes } from 'react';
+import NavGrid from './components/NavGrid/NavGrid';
 import classes from './Nav.scss';
 
-const Nav = (props) => (
-  <nav className={`${classes.nav} ${props.open ? classes.open : ''}`}>
-    <div><span>Benjamin Schnelle</span></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div><span>blog.</span></div>
-    <div></div>
-    <div><span>home.</span></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div><span>O</span></div>
-  </nav>
-);
+class Nav extends Component {
 
-Nav.propTypes = {
-  open: PropTypes.bool
-};
+  static childContextTypes = {
+    navOpen: PropTypes.bool
+  }
+
+  static propTypes = {
+    open: PropTypes.bool
+  }
+
+  getChildContext() {
+    return { navOpen: this.props.open };
+  }
+
+  render() {
+    return (
+      <nav className={`${classes.nav} ${this.props.open ? classes.open : ''}`}>
+        <NavGrid />
+      </nav>
+    );
+  }
+}
 
 export default Nav;

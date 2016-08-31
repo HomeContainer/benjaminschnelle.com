@@ -1,0 +1,15 @@
+.contentCell {
+  background-color: rgba(0, 0, 0, .95);
+}
+
+.clickable {
+  cursor: pointer;
+  &:hover {
+    border-left-color: red;
+    border-left-width: 5px;
+
+    > div {
+      color: rgba(255, 255, 255, .95);
+    }
+  }
+}
