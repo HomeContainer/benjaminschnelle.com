@@ -32,3 +32,12 @@
   position: relative;
   z-index: 1;
 }
+
+@media screen and (max-width: 480px) {
+  .welcome {
+    margin: 2rem;
+    > h6 {
+      margin: 0;
+    }
+  }
+}
