@@ -2,9 +2,12 @@ import React, { PropTypes } from 'react';
 import Cell from '../Cell/Cell';
 import ContentCell from '../ContentCell/ContentCell';
 import IconButton from '../../IconButton/IconButton';
+import userInfo from '../../userInfo/userInfo';
 import classes from './NavGrid.scss';
 
 const NavGrid = (props) => {
+  const { email, name, phone } = props.userInfo;
+
   let className;
   let cellMapping;
   let cells = [];
@@ -12,9 +15,9 @@ const NavGrid = (props) => {
   const info = {
     content: (
       <div className={classes.info}>
-        <span>Benjamin Schnelle</span>
-        <span>618.303.6355</span>
-        <span>benjamin.schnelle@gmail.com</span>
+        <span>{name}</span>
+        <span>{phone}</span>
+        <span>{email}</span>
       </div>
     )
   };
@@ -90,7 +93,8 @@ const NavGrid = (props) => {
 };
 
 NavGrid.propTypes = {
-  size: PropTypes.string
+  size: PropTypes.string,
+  userInfo: PropTypes.object.isRequired
 };
 
-export default NavGrid;
+export default userInfo(NavGrid);
