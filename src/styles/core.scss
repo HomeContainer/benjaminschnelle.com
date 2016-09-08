@@ -24,4 +24,12 @@ $fa-font-path: '~font-awesome/fonts';
   *:after {
     box-sizing: inherit;
   }
+
+  @media screen and (max-width: 480px) {
+    html,
+    body,
+    #root {
+      font-size: 14px;
+    }
+  }
 }

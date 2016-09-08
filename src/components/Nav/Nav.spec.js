@@ -1,17 +1,22 @@
 import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
-import { Link } from 'react-router';
 import Nav from './Nav';
+import NavList from './List/NavList';
+import NavGrid from './Grid/NavGrid';
 import classes from './Nav.scss';
 
 describe('Nav', () => {
-  it('renders list items with links to Home and Blog', () => {
-    const wrapper = shallow(<Nav />);
-    expect(wrapper.containsAllMatchingElements([
-      <li><Link to="/">Home</Link></li>,
-      <li><Link to="/blog">Blog</Link></li>
-    ])).to.be.true;
+  it('renders a NavList when screen === "extraSmall"', () => {
+    const screen = 'extraSmall';
+    const wrapper = shallow(<Nav screen={screen} />);
+    expect(wrapper.contains(<NavList />)).to.be.true;
+  });
+
+  it('renders a NavGrid otherwise', () => {
+    const screen = 'small';
+    const wrapper = shallow(<Nav screen={screen} />);
+    expect(wrapper.contains(<NavGrid screen={screen} />)).to.be.true;
   });
 
   it('renders a nav element with a .nav class', () => {
