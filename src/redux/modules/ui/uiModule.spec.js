@@ -52,8 +52,8 @@ describe('[Redux] UIModule', () => {
         };
         uiService.default.calculateBreakPointFlags.returns(breakPoints);
         const newState = reducer(state, { type: WINDOW_RESIZE, width });
-        const mediaIs = newState.getIn(['media', 'is']).toJS();
-        const { extraSmall, small, medium, large, extraLarge, huge } = mediaIs;
+        const is = newState.get('is').toJS();
+        const { extraSmall, small, medium, large, extraLarge, huge } = is;
 
         expect(uiService.default.calculateBreakPointFlags).to.have.been.calledOnce;
         expect(extraSmall).to.equal(breakPoints.extraSmall);

@@ -7,16 +7,14 @@ export const WINDOW_RESIZE = 'browser/WINDOW_RESIZE';
 // Reducer
 const uiSvc = uiService.default;
 const initialState = fromJS({
-  media: {
-    is: uiSvc.calculateBreakPointFlags(window.innerWidth),
-    breakPoints: uiSvc.breakPoints
-  }
+  is: uiSvc.calculateBreakPointFlags(window.innerWidth),
+  breakPoints: uiSvc.breakPoints
 });
 
 export default (state = initialState, action) => {
   if (action.type === WINDOW_RESIZE) {
     const breakPoints = uiSvc.calculateBreakPointFlags(action.width);
-    return state.mergeIn(['media', 'is'], fromJS(breakPoints));
+    return state.mergeIn(['is'], fromJS(breakPoints));
   }
   return state;
 };

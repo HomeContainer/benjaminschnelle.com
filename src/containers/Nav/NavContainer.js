@@ -12,8 +12,10 @@ NavContainer.propTypes = {
   size: PropTypes.string.isRequired
 };
 
-const stateToProps = (state) =({
-  size: uiService.maxScreenSize(state.ui)
+const stateToProps = (state) = ({
+  size: {
+
+  }
 });
 
 export default connect(stateToProps)(NavContainer);
