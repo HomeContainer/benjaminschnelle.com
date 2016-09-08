@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import Cell from '../Cell/Cell';
 import ContentCell from '../ContentCell/ContentCell';
-import IconButton from '../../../IconButton/IconButton';
+import IconButton from '../../IconButton/IconButton';
 import classes from './NavGrid.scss';
 
 const NavGrid = (props) => {

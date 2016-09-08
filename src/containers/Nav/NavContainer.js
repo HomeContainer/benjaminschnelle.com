@@ -1,21 +1,16 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import uiService from '../../services/ui/uiService';
-import NavList from '../../components/NavList/NavList';
-import NavGrid from '../../components/NavGrid/NavGrid';
+import Nav from '../../components/Nav/Nav';
 
-const NavContainer = (props) => {
-
-};
+const NavContainer = (props) => <Nav screen={props.screen} />;
 
 NavContainer.propTypes = {
-  size: PropTypes.string.isRequired
+  screen: PropTypes.string.isRequired
 };
 
-const stateToProps = (state) = ({
-  size: {
-
-  }
+const stateToProps = (state) => ({
+  screen: uiService.getScreen(state.ui)
 });
 
 export default connect(stateToProps)(NavContainer);

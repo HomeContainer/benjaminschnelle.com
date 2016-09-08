@@ -1,22 +1,28 @@
 class UIService {
   constructor() {
-    this.breakPoints = {
-      extraSmall: { max: 480 },
-      small: { min: 480, max: 768 },
-      medium: { min: 768, max: 992 },
-      large: { min: 992, max: 1200 },
-      extraLarge: { min: 1200, max: 1920 },
-      huge: { min: 1920 }
-    };
+    this.breakPoints = [
+      { name: 'extraSmall', max: 480 },
+      { name: 'small', min: 480, max: 768 },
+      { name: 'medium', min: 768, max: 992 },
+      { name: 'large', min: 992, max: 1200 },
+      { name: 'extraLarge', min: 1200, max: 1920 },
+      { name: 'huge', min: 1920 }
+    ];
   }
 
   calculateBreakPointFlags(width) {
-    return Object.keys(this.breakPoints).reduce((flags, breakPoint) => {
+    return this.breakPoints.reduce((flags, { name, min, max }) => {
       const newFlags = Object.assign({}, flags);
-      const { min, max } = this.breakPoints[breakPoint];
-      newFlags[breakPoint] = (!min || width > min) && (!max || width <= max);
+      newFlags[name] = (!min || width > min) && (!max || width <= max);
       return newFlags;
     }, {});
+  }
+
+  getScreen(state) {
+    const is = state.get('is').toObject();
+    return this.breakPoints.reverse().find(
+      (breakPoint) => is[breakPoint.name]
+    ).name;
   }
 }
 

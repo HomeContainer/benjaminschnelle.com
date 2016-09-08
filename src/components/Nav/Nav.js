@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
-import NavGrid from './components/NavGrid/NavGrid';
+import NavGrid from './Grid/NavGrid';
+// import NavList from './List/NavList';
 import classes from './Nav.scss';
 
 class Nav extends Component {
@@ -10,7 +11,7 @@ class Nav extends Component {
 
   static propTypes = {
     open: PropTypes.bool,
-    size: PropTypes.string // TODO add NavContainer
+    screen: PropTypes.string
   }
 
   getChildContext() {
@@ -18,11 +19,11 @@ class Nav extends Component {
   }
 
   render() {
-    return (
-      <nav className={`${classes.nav} ${this.props.open ? classes.open : ''}`}>
-        <NavGrid size="large" />
-      </nav>
-    );
+    const { open, screen } = this.props;
+    const className = `${classes.nav} ${open ? classes.open : ''}`;
+    const nav = screen === 'extraSmall' ? null : <NavGrid screen={screen} />;
+
+    return <nav className={className}>{nav}</nav>;
   }
 }
 
