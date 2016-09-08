@@ -1,23 +1,22 @@
 class UIService {
   constructor() {
     this.breakPoints = {
-      extraSmall: 480,
-      small: 768,
-      medium: 992,
-      large: 1200,
-      extraLarge: 1920
+      extraSmall: { max: 480 },
+      small: { min: 480, max: 768 },
+      medium: { min: 768, max: 992 },
+      large: { min: 992, max: 1200 },
+      extraLarge: { min: 1200, max: 1920 },
+      huge: { min: 1920 }
     };
   }
 
   calculateBreakPointFlags(width) {
-    const { extraSmall, small, medium, large, extraLarge } = this.breakPoints;
-    return {
-      extraSmall: extraSmall <= width,
-      small: small <= width,
-      medium: medium <= width,
-      large: large <= width,
-      extraLarge: extraLarge <= width
-    };
+    return Object.keys(this.breakPoints).reduce((flags, breakPoint) => {
+      const newFlags = Object.assign({}, flags);
+      const { min, max } = this.breakPoints[breakPoint];
+      newFlags[breakPoint] = (!min || width > min) && (!max || width <= max);
+      return newFlags;
+    }, {});
   }
 }
 
