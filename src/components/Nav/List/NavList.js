@@ -4,8 +4,10 @@ import IconButton from '../../IconButton/IconButton';
 import userInfo from '../../userInfo/userInfo';
 import classes from './NavList.scss';
 
-const NavList = (props) => {
+const NavList = (props, context) => {
   const { email, github, name, phone } = props.userInfo;
+  let bodyClassName = classes.body;
+  if (context.navOpen) bodyClassName += ` ${classes.open}`;
 
   return (
     <div className={classes.navList}>
@@ -13,7 +15,7 @@ const NavList = (props) => {
         <h2>{name}</h2>
       </div>
 
-      <div className={classes.body}>
+      <div className={bodyClassName}>
         <ul>
           <li><Link to="home">home.</Link></li>
           <li><Link to="blog">blog.</Link></li>
@@ -31,6 +33,10 @@ const NavList = (props) => {
       </div>
     </div>
   );
+};
+
+NavList.contextTypes = {
+  navOpen: PropTypes.bool
 };
 
 NavList.propTypes = {
