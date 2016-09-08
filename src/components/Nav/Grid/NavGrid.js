@@ -6,12 +6,7 @@ import userInfo from '../../userInfo/userInfo';
 import classes from './NavGrid.scss';
 
 const NavGrid = (props) => {
-  const { email, name, phone } = props.userInfo;
-
-  let className;
-  let cellMapping;
-  let cells = [];
-  let totalCells;
+  const { email, github, name, phone } = props.userInfo;
   const info = {
     content: (
       <div className={classes.info}>
@@ -31,13 +26,15 @@ const NavGrid = (props) => {
   };
   const social = {
     className: classes.social,
-    content: <IconButton href="https://github.com/bschnelle" icon="github" />
+    content: <IconButton href={github} icon="github" />
   };
 
-  switch (props.size) {
-    case 'extraSmall': {
-      break;
-    }
+  let className;
+  let cellMapping;
+  let cells = [];
+  let totalCells;
+
+  switch (props.screen) {
     case 'small': {
       className = classes.smallCell;
       totalCells = 8;
@@ -93,7 +90,7 @@ const NavGrid = (props) => {
 };
 
 NavGrid.propTypes = {
-  size: PropTypes.string,
+  screen: PropTypes.string,
   userInfo: PropTypes.object.isRequired
 };
 

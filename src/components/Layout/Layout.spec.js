@@ -3,16 +3,16 @@ import { expect } from 'chai';
 import { shallow } from 'enzyme';
 import Layout from './Layout';
 import MenuIconButton from '../MenuIconButton/MenuIconButton';
-import Nav from '../Nav/Nav';
+import NavContainer from '../../containers/Nav/NavContainer';
 
 describe('Layout', () => {
-  it('renders its children, a MenuIconButton, a Nav, and a Footer', () => {
+  it('renders its children, a MenuIconButton, a NavContainer, and a Footer', () => {
     const child = <div>Some child</div>;
     const wrapper = shallow(<Layout>{child}</Layout>);
     expect(wrapper.containsAllMatchingElements([
       <div>{child}</div>,
       <MenuIconButton />,
-      <Nav />
+      <NavContainer />
     ])).to.be.true;
   });
 

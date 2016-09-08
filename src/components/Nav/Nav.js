@@ -11,7 +11,7 @@ class Nav extends Component {
 
   static propTypes = {
     open: PropTypes.bool,
-    screen: PropTypes.string
+    screen: PropTypes.string.isRequired
   }
 
   getChildContext() {
@@ -20,6 +20,7 @@ class Nav extends Component {
 
   render() {
     const { open, screen } = this.props;
+
     const className = `${classes.nav} ${open ? classes.open : ''}`;
     const nav = screen === 'extraSmall' ? null : <NavGrid screen={screen} />;
 

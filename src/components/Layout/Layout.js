@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import MenuIconButton from '../MenuIconButton/MenuIconButton';
-import Nav from '../Nav/Nav';
+import NavContainer from '../../containers/Nav/NavContainer';
 import classes from './Layout.scss';
 
 export class Layout extends Component {
@@ -27,7 +27,7 @@ export class Layout extends Component {
           onClick={this.toggleMenu}
           open={this.state.menuOpen}
         />
-        <Nav open={this.state.menuOpen} />
+        <NavContainer open={this.state.menuOpen} />
       </div>
     );
   }

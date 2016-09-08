@@ -3,9 +3,10 @@ import { connect } from 'react-redux';
 import uiService from '../../services/ui/uiService';
 import Nav from '../../components/Nav/Nav';
 
-const NavContainer = (props) => <Nav screen={props.screen} />;
+const NavContainer = (props) => <Nav open={props.open} screen={props.screen} />;
 
 NavContainer.propTypes = {
+  open: PropTypes.bool,
   screen: PropTypes.string.isRequired
 };
 
