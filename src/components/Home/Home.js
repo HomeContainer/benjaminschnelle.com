@@ -11,8 +11,8 @@ const Home = (props) => (
         <h6>{props.userInfo.slogan}</h6>
       </div>
       <div className={classes.tabs}>
-        <Tab label="About me" />
-        <Tab label="This site" />
+        <Tab label="About me" onClick={() => console.log('.....')} />
+        <Tab label="This site" onClick={() => console.log('.....')} />
       </div>
     </div>
   </div>

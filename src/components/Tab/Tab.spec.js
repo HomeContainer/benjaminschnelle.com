@@ -1,6 +1,7 @@
 import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
+import sinon from 'sinon';
 import Tab from './Tab';
 import classes from './Tab.scss';
 
@@ -23,5 +24,13 @@ describe('Tab', () => {
   it('root element has a class of .tab', () => {
     const wrapper = shallow(<Tab label="label" />);
     expect(wrapper.find(`.${classes.tab}`)).to.have.length(1);
+  });
+
+  it('clicking the element calls props.onClick', () => {
+    const onClick = sinon.stub();
+    const wrapper = shallow(<Tab label="label" onClick={onClick} />);
+    expect(wrapper.find(`.${classes.tab}`)).to.have.length(1);
+    wrapper.simulate('click');
+    expect(onClick).to.have.been.calledOnce;
   });
 });
