@@ -10,3 +10,9 @@
     color: lighten($textColor, 50%);
   }
 }
+
+@media screen and (max-width: 480px) {
+  .profile {
+    padding: 1rem;
+  }
+}
