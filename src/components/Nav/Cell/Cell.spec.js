@@ -22,4 +22,11 @@ describe('Cell', () => {
     const wrapper = shallow(<Cell className="myClass" />);
     expect(wrapper.is('.myClass')).to.be.true;
   });
+
+  it('adds an .open class when context.navOpen is true', () => {
+    const wrapper = shallow(<Cell />, { context: { navOpen: false } });
+    expect(wrapper.find(`.${classes.open}`)).to.have.length(0);
+    wrapper.setContext({ navOpen: true });
+    expect(wrapper.find(`.${classes.open}`)).to.have.length(1);
+  });
 });
