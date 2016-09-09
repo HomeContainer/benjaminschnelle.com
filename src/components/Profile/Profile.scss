@@ -14,5 +14,9 @@
 @media screen and (max-width: 480px) {
   .profile {
     padding: 1rem;
+    > img {
+      margin-left: 25%;
+      width: 50%;
+    }
   }
 }

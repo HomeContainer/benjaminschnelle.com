@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import MenuIconButton from '../MenuIconButton/MenuIconButton';
 import Tab from '../Tab/Tab';
 import classes from './TabbedDrawer.scss';
 
@@ -11,7 +12,7 @@ class TabbedDrawer extends Component {
     super(props);
     this.state = { activeTab: null, open: false };
     this.tabs = this.mapTabs(props.tabs);
-    const fns = ['onTabClick', 'mapTabs'];
+    const fns = ['onTabClick', 'closeDrawer', 'mapTabs'];
     fns.forEach((fn) => { this[fn] = this[fn].bind(this); });
   }
 
@@ -27,6 +28,13 @@ class TabbedDrawer extends Component {
         this.setState({ activeTab: tab, open: true });
       }
     };
+  }
+
+  closeDrawer() {
+    this.setState({
+      activeTab: this.state.activeTab,
+      open: false
+    });
   }
 
   mapTabs(tabs) {
@@ -51,15 +59,21 @@ class TabbedDrawer extends Component {
     ));
 
     return (
-      <div className={classes.wrapper}>
-        <div className={drawerClassName}>
+      <div className={drawerClassName}>
+        <div className={classes.inner}>
           <div>
             {this.state.activeTab && this.state.activeTab.content}
           </div>
+          <MenuIconButton
+            className={classes.menu}
+            onClick={this.closeDrawer}
+            open
+          />
         </div>
         <div className={classes.tabs}>
           {tabs}
         </div>
+        <div className={classes.overlay} onClick={this.closeDrawer} />
       </div>
     );
   }
