@@ -1,35 +1,56 @@
-/*
 import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
-import NavGrid from './NavGrid';
-import classes from './NavGrid.scss';
+import Cell from '../Cell/Cell';
+import ContentCell from '../ContentCell/ContentCell';
+import { NavGrid } from './NavGrid';
 
-const child = <div>I am a child</div>;
+const userInfo = { name: 'Rick', email: 'rick@world.com', phone: '1234567890' };
 
 describe('NavGrid', () => {
-  describe('large', () => {
-    it('renders 16 children', () => {
-      const wrapper = shallow(<NavGrid />);
-      expect(wrapper.type()).to.equal('div');
-      expect(wrapper.containsAllMatchingElements([<div>{child}</div>])).to.be.true;
+  describe('screen is', () => {
+    let wrapper;
+
+    describe('small', () => {
+      beforeEach(() => {
+        wrapper = shallow(<NavGrid screen="small" userInfo={userInfo} />);
+      });
+
+      it('renders 4 ContentCells', () => {
+        expect(wrapper.find(ContentCell)).to.have.length(4);
+      });
+
+      it('renders 4 Cells', () => {
+        expect(wrapper.find(Cell)).to.have.length(4);
+      });
+    });
+
+    describe('medium', () => {
+      beforeEach(() => {
+        wrapper = shallow(<NavGrid screen="medium" userInfo={userInfo} />);
+      });
+
+      it('renders 4 ContentCells', () => {
+        expect(wrapper.find(ContentCell)).to.have.length(4);
+      });
+
+      it('renders 8 Cells', () => {
+        expect(wrapper.find(Cell)).to.have.length(8);
+      });
+    });
+
+    describe('other', () => {
+      beforeEach(() => {
+        wrapper = shallow(<NavGrid screen="large" userInfo={userInfo} />);
+      });
+
+      it('renders 4 ContentCells', () => {
+        expect(wrapper.find(ContentCell)).to.have.length(4);
+      });
+
+      it('renders 12 Cells', () => {
+        expect(wrapper.find(Cell)).to.have.length(12);
+      });
     });
   });
-
-  describe('small', () => {
-
-  });
-
-  it('small')
-
-  it('has a .cell class', () => {
-    const wrapper = shallow(<Cell>{child}</Cell>);
-    expect(wrapper.is(`.${classes.cell}`)).to.be.true;
-  });
-
-  it('adds props.className, if set', () => {
-    const wrapper = shallow(<Cell className="myClass">{child}</Cell>);
-    expect(wrapper.is('.myClass')).to.be.true;
-  });
 });
-*/

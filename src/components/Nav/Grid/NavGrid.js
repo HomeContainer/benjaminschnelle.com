@@ -5,7 +5,10 @@ import IconButton from '../../IconButton/IconButton';
 import userInfo from '../../userInfo/userInfo';
 import classes from './NavGrid.scss';
 
-const NavGrid = (props) => {
+/**
+ * Nav component for anything larger than mobile
+ */
+export const NavGrid = (props) => {
   const { email, github, name, phone } = props.userInfo;
   const info = {
     content: (

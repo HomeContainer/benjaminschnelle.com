@@ -1,35 +1,25 @@
-/*
 import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
-import NavGrid from './NavGrid';
-import classes from './NavGrid.scss';
+import { Link } from 'react-router';
+import { NavList } from './NavList';
+import classes from './NavList.scss';
 
-const child = <div>I am a child</div>;
+const userInfo = { name: 'Rick', email: 'rick@world.com', phone: '1234567890' };
 
-describe('NavGrid', () => {
-  describe('large', () => {
-    it('renders 16 children', () => {
-      const wrapper = shallow(<NavGrid />);
-      expect(wrapper.type()).to.equal('div');
-      expect(wrapper.containsAllMatchingElements([<div>{child}</div>])).to.be.true;
-    });
+describe('NavList', () => {
+  it('renders links to "home" and "blog"', () => {
+    const wrapper = shallow(<NavList userInfo={userInfo} />);
+    expect(wrapper.contains([
+      <li><Link to="/">home.</Link></li>,
+      <li><Link to="blog">blog.</Link></li>
+    ])).to.be.true;
   });
 
-  describe('small', () => {
-
-  });
-
-  it('small')
-
-  it('has a .cell class', () => {
-    const wrapper = shallow(<Cell>{child}</Cell>);
-    expect(wrapper.is(`.${classes.cell}`)).to.be.true;
-  });
-
-  it('adds props.className, if set', () => {
-    const wrapper = shallow(<Cell className="myClass">{child}</Cell>);
-    expect(wrapper.is('.myClass')).to.be.true;
+  it('adds an .open class to the body element when context.navOpen is true', () => {
+    const wrapper = shallow(<NavList userInfo={userInfo} />, { context: { navOpen: false } });
+    expect(wrapper.find(`.${classes.open}`)).to.have.length(0);
+    wrapper.setContext({ navOpen: true });
+    expect(wrapper.find(`.${classes.open}`)).to.have.length(1);
   });
 });
-*/
