@@ -8,7 +8,7 @@ import classes from './NavList.scss';
  * Nav component for mobile
  */
 export const NavList = (props, context) => {
-  const { email, github, name, phone } = props.userInfo;
+  const { email, github, name } = props.userInfo;
   let bodyClassName = classes.body;
   if (context.navOpen) bodyClassName += ` ${classes.open}`;
 
@@ -27,7 +27,6 @@ export const NavList = (props, context) => {
 
       <div className={classes.footer}>
         <div className={classes.info}>
-          <span>{phone}</span>
           <span>{email}</span>
         </div>
         <div className={classes.social}>

@@ -1,0 +1,32 @@
+@import '../../styles/config';
+
+.drawer {
+  background-color: #fff;
+  color: $textColor;
+  height: 100%;
+  overflow: hidden;
+  transition: width 450ms;
+  width: 0px;
+  > div {
+    padding: 1.4rem;
+    width: 450px;
+  }
+}
+
+.drawerOpen {
+  width: 450px;
+}
+
+.tabs {
+  bottom: 2.8rem;
+  position: absolute;
+  right: 0;
+  transform: translateX(100%);
+}
+
+.wrapper {
+  align-items: flex-end;
+  display: flex;
+  position: relative;
+  z-index: 1;
+}

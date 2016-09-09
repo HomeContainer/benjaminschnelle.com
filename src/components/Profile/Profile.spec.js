@@ -5,13 +5,11 @@ import Profile from './Profile';
 import classes from './Profile.scss';
 
 describe('Profile', () => {
-  it('renders an image, h2, and a paragraph', () => {
+  it('renders an image, h2, and 4 paragraphs', () => {
     const wrapper = shallow(<Profile />);
-    expect(wrapper.containsAllMatchingElements([
-      <img src="/images/me.png" alt="Ben" />,
-      <h1>Benjamin Schnelle</h1>,
-      <p>CPA gone software developer</p>
-    ])).to.be.true;
+    expect(wrapper.find('img')).to.have.length(1);
+    expect(wrapper.find('h2')).to.have.length(1);
+    expect(wrapper.find('p')).to.have.length(4);
   });
 
   it('root element has a class of .profile', () => {

@@ -9,12 +9,11 @@ import classes from './NavGrid.scss';
  * Nav component for anything larger than mobile
  */
 export const NavGrid = (props) => {
-  const { email, github, name, phone } = props.userInfo;
+  const { email, github, name } = props.userInfo;
   const info = {
     content: (
       <div className={classes.info}>
         <span>{name}</span>
-        <span>{phone}</span>
         <span>{email}</span>
       </div>
     )

@@ -1,25 +1,36 @@
-import React, { PropTypes } from 'react';
-import Tab from '../Tab/Tab';
+import React, { Component, PropTypes } from 'react';
+import Profile from '../Profile/Profile';
+import TabbedDrawer from '../TabbedDrawer/TabbedDrawer';
 import userInfo from '../userInfo/userInfo';
 import classes from './Home.scss';
 
-const Home = (props) => (
-  <div>
-    <div className={classes.home}>
-      <div className={classes.welcome}>
-        <h1>{props.userInfo.name}</h1>
-        <h6>{props.userInfo.slogan}</h6>
-      </div>
-      <div className={classes.tabs}>
-        <Tab label="About me" onClick={() => console.log('.....')} />
-        <Tab label="This site" onClick={() => console.log('.....')} />
-      </div>
-    </div>
-  </div>
-);
+export class Home extends Component {
+  static propTypes = {
+    userInfo: PropTypes.object.isRequired
+  }
 
-Home.propTypes = {
-  userInfo: PropTypes.object.isRequired
-};
+  constructor(props) {
+    super(props);
+    this.tabs = [{ label: 'About', content: <Profile /> }];
+  }
+
+  render() {
+    const { name, slogan } = this.props.userInfo;
+
+
+    return (
+      <div className={classes.wrapper}>
+        <TabbedDrawer tabs={this.tabs} />
+
+        <div className={classes.home}>
+          <div className={classes.welcome}>
+            <h1>{name}</h1>
+            <h6>{slogan}</h6>
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
 
 export default userInfo(Home);
