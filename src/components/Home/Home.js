@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import Tab from '../Tab/Tab';
+import userInfo from '../userInfo/userInfo';
 import classes from './Home.scss';
 
-const Home = () => (
+const Home = (props) => (
   <div>
     <div className={classes.home}>
       <div className={classes.welcome}>
-        <h1>Benjamin Schnelle</h1>
-        <h6>CPA gone SOFTWARE DEVELOPER</h6>
+        <h1>{props.userInfo.name}</h1>
+        <h6>{props.userInfo.slogan}</h6>
       </div>
       <div className={classes.tabs}>
         <Tab label="About me" />
@@ -17,4 +18,8 @@ const Home = () => (
   </div>
 );
 
-export default Home;
+Home.propTypes = {
+  userInfo: PropTypes.object.isRequired
+};
+
+export default userInfo(Home);
