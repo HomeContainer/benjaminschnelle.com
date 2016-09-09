@@ -1,0 +1,27 @@
+.tab {
+  cursor: pointer;
+  display: flex;
+  margin: .5rem 0;
+  transition: all 300ms;
+  > span {
+    background-color: #fff;
+    flex: 1;
+    white-space: nowrap;
+    &:nth-of-type(1) {
+      font-weight: 700;
+      padding: .75rem 1.5rem;
+      text-transform: lowercase;
+    }
+    &:nth-of-type(2) {
+      transform-origin: right;
+      transition: all 300ms;
+      width: .5rem;
+    }
+  }
+  &:hover {
+    transform: translateX(5px);
+    > span:nth-of-type(2) {
+      transform: scaleX(.5);
+    }
+  }
+}
