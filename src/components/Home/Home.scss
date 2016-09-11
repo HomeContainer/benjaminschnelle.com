@@ -1,5 +1,22 @@
 @import '../../styles/config';
 
+.credit {
+  bottom: .7rem;
+  color: rgba(255, 255, 255, .5);
+  font-size: .85rem;
+  position: absolute;
+  right: 1.4rem;
+  white-space: nowrap;
+  > a {
+    color: rgba(255, 255, 255, .75);
+    // font-size: 1rem;
+    text-decoration: none;
+    &:hover {
+      color: rgba(255, 255, 255, .95);
+    }
+  }
+}
+
 .home {
   align-items: center;
   display: flex;
@@ -26,7 +43,6 @@
 }
 
 .wrapper {
-  background-color: #000;
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;

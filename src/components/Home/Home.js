@@ -16,11 +16,12 @@ export class Home extends Component {
   }
 
   render() {
-    const { name, slogan } = this.props.userInfo;
-    const imageUrl = this.props.image && this.props.image.getIn(['urls', 'custom']);
+    const { image, userInfo: { name, slogan } } = this.props;
+    const backgroundColor = image && image.get('color');
+    const backgroundImage = image && `url(${image.getIn(['urls', 'custom'])})`;
 
     return (
-      <div className={classes.wrapper} style={{ backgroundImage: `url(${imageUrl})` }}>
+      <div className={classes.wrapper} style={{ backgroundColor, backgroundImage }}>
         <TabbedDrawer tabs={this.tabs} />
 
         <div className={classes.home}>
@@ -29,6 +30,17 @@ export class Home extends Component {
             <h6>{slogan}</h6>
           </div>
         </div>
+
+        {image ? (
+          <span className={classes.credit}>
+            <span>random </span>
+            <a href="https://unsplash.com" alt="Unsplash">Unsplash</a>
+            <span> photo by </span>
+            <a href={image.getIn(['user', 'links', 'html'])} alt={image.getIn(['user', 'name'])}>
+              {image.getIn(['user', 'name'])}
+            </a>
+          </span>
+        ) : null}
       </div>
     );
   }

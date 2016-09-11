@@ -22,7 +22,6 @@ class Nav extends Component {
   render() {
     const { image, open, screen } = this.props;
     const className = `${classes.nav} ${open ? classes.open : ''}`;
-    console.log('image', image);
     const imageUrl = image && image.getIn(['urls', 'custom']);
 
     return (
