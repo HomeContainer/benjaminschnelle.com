@@ -4,9 +4,11 @@ import { Provider } from 'react-redux';
 import { AppContainer } from 'react-hot-loader';
 import { browserHistory, Router } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
+import 'isomorphic-fetch';
 import store from './redux/store';
 import routes from './routes';
 import './styles/core.scss';
+
 
 const MOUNT_NODE = document.getElementById('root');
 const history = syncHistoryWithStore(browserHistory, store);

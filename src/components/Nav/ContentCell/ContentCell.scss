@@ -5,7 +5,7 @@
 .clickable {
   cursor: pointer;
   &:hover {
-    border-left-color: #ff1744;
+    border-left-color: rgba(255, 255, 255, .7);
     border-left-width: 5px;
 
     > div {

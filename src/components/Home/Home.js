@@ -6,6 +6,7 @@ import classes from './Home.scss';
 
 export class Home extends Component {
   static propTypes = {
+    image: PropTypes.object,
     userInfo: PropTypes.object.isRequired
   }
 
@@ -16,10 +17,10 @@ export class Home extends Component {
 
   render() {
     const { name, slogan } = this.props.userInfo;
-
+    const imageUrl = this.props.image && this.props.image.getIn(['urls', 'custom']);
 
     return (
-      <div className={classes.wrapper}>
+      <div className={classes.wrapper} style={{ backgroundImage: `url(${imageUrl})` }}>
         <TabbedDrawer tabs={this.tabs} />
 
         <div className={classes.home}>

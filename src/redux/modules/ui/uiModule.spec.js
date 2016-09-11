@@ -24,16 +24,6 @@ const state = fromJS({
 });
 
 describe('[Redux] UIModule', () => {
-  describe('windowResize', () => {
-    it('returns an object with a type of WINDOW_RESIZE and a width equal to the width arg', () => {
-      const { windowResize, WINDOW_RESIZE } = uiModule;
-      const width = 1300;
-      const action = windowResize(width);
-      expect(action.type).to.equal(WINDOW_RESIZE);
-      expect(action.width).to.equal(width);
-    });
-  });
-
   describe('reducer', () => {
     describe('WINDOW_RESIZE', () => {
       beforeEach(() => sinon.stub(uiService.default, 'calculateBreakPointFlags'));
@@ -70,6 +60,16 @@ describe('[Redux] UIModule', () => {
         const newState = uiModule.default(state, { type: 'SOMETHING' });
         expect(state).to.equal(newState);
       });
+    });
+  });
+  
+  describe('windowResize', () => {
+    it('returns an object with a type of WINDOW_RESIZE and a width equal to the width arg', () => {
+      const { windowResize, WINDOW_RESIZE } = uiModule;
+      const width = 1300;
+      const action = windowResize(width);
+      expect(action.type).to.equal(WINDOW_RESIZE);
+      expect(action.width).to.equal(width);
     });
   });
 });

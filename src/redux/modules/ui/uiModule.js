@@ -2,7 +2,7 @@ import { fromJS } from 'immutable';
 import * as uiService from '../../../services/ui/uiService';
 
 // Actions
-export const WINDOW_RESIZE = 'browser/WINDOW_RESIZE';
+export const WINDOW_RESIZE = 'ui/WINDOW_RESIZE';
 
 // Reducer
 const uiSvc = uiService.default;

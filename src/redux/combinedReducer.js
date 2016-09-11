@@ -1,11 +1,11 @@
 import { combineReducers } from 'redux';
 import { routerReducer } from 'react-router-redux';
 
+import images from './modules/images/imagesModule';
 import ui from './modules/ui/uiModule';
-import counter from './modules/counter/counterModule';
 
 export default combineReducers({
-  counter,
+  images,
   routing: routerReducer,
   ui
 });
