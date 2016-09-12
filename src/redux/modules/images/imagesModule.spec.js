@@ -61,6 +61,12 @@ describe('[Redux] UnsplashModule', () => {
 
   describe('getRandomPhoto()', () => {
     let dispatch;
+    const getState = () => ({
+      ui: fromJS({
+        height: 1080,
+        width: 1920
+      })
+    });
 
     beforeEach(() => {
       dispatch = sinon.stub();
@@ -70,18 +76,15 @@ describe('[Redux] UnsplashModule', () => {
 
     it('dispatches GET_RANDOM_IMAGE', () => {
       unsplashSvc.getRandomImage.returns(Promise.resolve());
-      imagesModule.getRandomImage()(dispatch);
+      imagesModule.getRandomImage()(dispatch, getState);
       expect(dispatch).to.have.been.calledWith({ type: GET_RANDOM_IMAGE });
     });
 
     it('calls unsplashService.getRandomPhoto with params object', () => {
-      const params = {
-        query: 'dark',
-        h: '1080',
-        w: '1920'
-      };
       unsplashSvc.getRandomImage.returns(Promise.resolve());
-      imagesModule.getRandomImage()(dispatch);
+      imagesModule.getRandomImage()(dispatch, getState);
+      const { height, width } = getState().ui.toJS();
+      const params = { query: 'dark', h: height, w: width };
       expect(unsplashSvc.getRandomImage).to.have.been.calledWith(params);
     });
 
@@ -89,7 +92,7 @@ describe('[Redux] UnsplashModule', () => {
       const image = {};
       const action = { type: GET_RANDOM_IMAGE_SUCCESS, image };
       unsplashSvc.getRandomImage.returns(Promise.resolve(image));
-      imagesModule.getRandomImage()(dispatch).then(() => {
+      imagesModule.getRandomImage()(dispatch, getState).then(() => {
         expect(dispatch).to.have.been.calledWith(action);
         done();
       });
@@ -97,7 +100,7 @@ describe('[Redux] UnsplashModule', () => {
 
     it('dispatches GET_RANDOM_IMAGE_FAILURE on error', (done) => {
       unsplashSvc.getRandomImage.returns(Promise.reject());
-      imagesModule.getRandomImage()(dispatch).then(() => {
+      imagesModule.getRandomImage()(dispatch, getState).then(() => {
         expect(dispatch).to.have.been.calledWith({ type: GET_RANDOM_IMAGE_FAILURE });
         done();
       });
