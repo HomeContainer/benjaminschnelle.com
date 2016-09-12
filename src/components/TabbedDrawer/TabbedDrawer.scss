@@ -3,6 +3,7 @@
 .drawer {
   align-items: flex-end;
   display: flex;
+  height: 100vh; // safari fix
   position: relative;
   z-index: 1;
 }
