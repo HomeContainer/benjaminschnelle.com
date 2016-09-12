@@ -6,20 +6,24 @@ export const WINDOW_RESIZE = 'ui/WINDOW_RESIZE';
 
 // Reducer
 const uiSvc = uiService.default;
+const { innerHeight, innerWidth } = window;
 const initialState = fromJS({
-  is: uiSvc.calculateBreakPointFlags(window.innerWidth),
-  breakPoints: uiSvc.breakPoints
+  breakPoints: uiSvc.breakPoints,
+  is: uiSvc.calculateBreakPointFlags(innerWidth),
+  height: innerHeight,
+  width: innerWidth
 });
 
 export default (state = initialState, action) => {
   if (action.type === WINDOW_RESIZE) {
-    const breakPoints = uiSvc.calculateBreakPointFlags(action.width);
-    return state.mergeIn(['is'], fromJS(breakPoints));
+    const { height, width } = action;
+    const breakPoints = uiSvc.calculateBreakPointFlags(width);
+    return state.merge(fromJS({ is: breakPoints, height, width }));
   }
   return state;
 };
 
 // Action Creators
-export function windowResize(width) {
-  return { type: WINDOW_RESIZE, width };
+export function windowResize(height, width) {
+  return { type: WINDOW_RESIZE, height, width };
 }

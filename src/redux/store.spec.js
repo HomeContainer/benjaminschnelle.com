@@ -10,6 +10,7 @@ describe('Store', () => {
 
   before(() => {
     storeStub = { dispatch: sinon.stub() };
+    window.innerHeight = 500;
     window.innerWidth = 800;
     sinon.stub(uiModule, 'windowResize');
     sinon.stub(redux, 'createStore').returns(storeStub);
@@ -30,8 +31,8 @@ describe('Store', () => {
   })
 
   describe('adds resize event listener', () => {
-    it('dispatches a uiModule.windowResize with window.innerWidth', () => {
-      expect(uiModule.windowResize).to.have.been.calledWith(window.innerWidth);
+    it('dispatches a uiModule.windowResize with window.innerHeight and window.innerWidth', () => {
+      expect(uiModule.windowResize).to.have.been.calledWith(window.innerHeight, window.innerWidth);
     });
   });
 

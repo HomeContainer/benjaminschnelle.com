@@ -16,7 +16,7 @@ const store = createStore(combinedReducer.default, compose(applyMiddleware(thunk
 /* add resize listener to keep ui state up to date */
 window.addEventListener('resize', () =>
   // TODO debounce
-  store.dispatch(uiModule.windowResize(window.innerWidth))
+  store.dispatch(uiModule.windowResize(window.innerHeight, window.innerWidth))
 );
 
 export default store;

@@ -41,11 +41,12 @@ export default (state = initialState, action) => {
 
 // Action Creators
 export function getRandomImage() {
-  return (dispatch) => {
+  return (dispatch, getState) => {
+    const state = getState();
     const params = {
       query: 'dark',
-      h: '1080',
-      w: '1920'
+      h: state.ui.get('height'),
+      w: state.ui.get('width')
     };
 
     dispatch({ type: GET_RANDOM_IMAGE });

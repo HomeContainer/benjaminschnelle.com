@@ -12,13 +12,20 @@ export class Home extends Component {
 
   constructor(props) {
     super(props);
+    this.state = { backgroundImage: undefined };
     this.tabs = [{ label: 'About', content: <Profile /> }];
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const newImage = new Image();
+    newImage.onload = () => this.setState({ backgroundImage: newImage.src });
+    newImage.src = nextProps.image && nextProps.image.getIn(['urls', 'custom']);
   }
 
   render() {
     const { image, userInfo: { name, slogan } } = this.props;
     const backgroundColor = image && image.get('color');
-    const backgroundImage = image && `url(${image.getIn(['urls', 'custom'])})`;
+    const backgroundImage = image && `url(${this.state.backgroundImage})`;
 
     return (
       <div className={classes.wrapper} style={{ backgroundColor, backgroundImage }}>

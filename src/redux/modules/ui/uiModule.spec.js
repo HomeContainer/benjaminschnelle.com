@@ -31,6 +31,7 @@ describe('[Redux] UIModule', () => {
 
       it('uiService.calculateBreakPointFlags(width) --> merged into state.breakPoints', () => {
         const { default: reducer, WINDOW_RESIZE } = uiModule;
+        const height = 300;
         const width = 769;
         const breakPoints = {
           extraSmall: false,
@@ -41,7 +42,7 @@ describe('[Redux] UIModule', () => {
           huge: false
         };
         uiService.default.calculateBreakPointFlags.returns(breakPoints);
-        const newState = reducer(state, { type: WINDOW_RESIZE, width });
+        const newState = reducer(state, { type: WINDOW_RESIZE, height, width });
         const is = newState.get('is').toJS();
         const { extraSmall, small, medium, large, extraLarge, huge } = is;
 
@@ -53,6 +54,16 @@ describe('[Redux] UIModule', () => {
         expect(extraLarge).to.equal(breakPoints.extraLarge);
         expect(huge).to.equal(breakPoints.huge);
       });
+
+      it('sets height and width to action.height and action.width', () => {
+        const { default: reducer, WINDOW_RESIZE } = uiModule;
+        const height = 300;
+        const width = 769;
+        const newState = reducer(state, { type: WINDOW_RESIZE, height, width });
+
+        expect(newState.get('height')).to.equal(height);
+        expect(newState.get('width')).to.equal(width);
+      });
     });
 
     describe('default', () => {
@@ -62,13 +73,15 @@ describe('[Redux] UIModule', () => {
       });
     });
   });
-  
+
   describe('windowResize', () => {
-    it('returns an object with a type of WINDOW_RESIZE and a width equal to the width arg', () => {
+    it('returns an object with a type of WINDOW_RESIZE, window width, and window height', () => {
       const { windowResize, WINDOW_RESIZE } = uiModule;
+      const height = 900;
       const width = 1300;
-      const action = windowResize(width);
+      const action = windowResize(height, width);
       expect(action.type).to.equal(WINDOW_RESIZE);
+      expect(action.height).to.equal(height);
       expect(action.width).to.equal(width);
     });
   });
