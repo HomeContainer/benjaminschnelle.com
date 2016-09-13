@@ -1,25 +1,5 @@
 @import '../../styles/config';
 
-.credit {
-  bottom: .7rem;
-  color: rgba(255, 255, 255, .5);
-  font-size: .85rem;
-  line-height: normal;
-  max-width: 85%;
-  overflow: hidden;
-  position: absolute;
-  right: 1.4rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  > a {
-    color: rgba(255, 255, 255, .75);
-    text-decoration: none;
-    &:hover {
-      color: rgba(255, 255, 255, .95);
-    }
-  }
-}
-
 .home {
   align-items: center;
   display: flex;
@@ -46,10 +26,8 @@
 }
 
 .wrapper {
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
   display: flex;
+  flex: 1;
 }
 
 @media screen and (max-width: 480px) {

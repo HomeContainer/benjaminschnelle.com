@@ -73,7 +73,7 @@ describe('[Redux] BlogModule', () => {
 
     it('dispatches GET_POSTS_SUCCESS with resolved payload on success', (done) => {
       const posts = { posts: [] };
-      const action = { type: GET_POSTS_SUCCESS, posts };
+      const action = { type: GET_POSTS_SUCCESS, posts: posts.posts };
       blogSvc.getPosts.returns(Promise.resolve(posts));
       blogModule.getPosts()(dispatch).then(() => {
         expect(dispatch).to.have.been.calledWith(action);

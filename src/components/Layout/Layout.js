@@ -4,22 +4,41 @@ import NavContainer from '../../containers/Nav/NavContainer';
 import classes from './Layout.scss';
 
 export class Layout extends Component {
+
   static childContextTypes = {
     toggleMenu: PropTypes.func
   }
 
   static propTypes = {
-    children: PropTypes.node.isRequired
+    children: PropTypes.node.isRequired,
+    image: PropTypes.object
   }
 
   constructor(props) {
     super(props);
-    this.state = { menuOpen: false };
-    this.toggleMenu = this.toggleMenu.bind(this);
+    this.state = { backgroundImage: undefined, menuOpen: false };
+    const fns = ['setImage', 'toggleMenu'];
+    fns.forEach((fn) => { this[fn] = this[fn].bind(this); });
+
+    if (props.image) {
+      this.setImage(props.image);
+    }
   }
 
   getChildContext() {
     return { toggleMenu: this.toggleMenu };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.image) {
+      this.setImage(nextProps.image);
+    }
+  }
+
+  setImage(image) {
+    const newImage = new Image();
+    newImage.onload = () => this.setState({ backgroundImage: newImage.src });
+    newImage.src = image.getIn(['urls', 'custom']);
   }
 
   toggleMenu() {
@@ -27,15 +46,38 @@ export class Layout extends Component {
   }
 
   render() {
+    const { children, image } = this.props;
+    let contentWrapperClass = classes.contentWrapper;
+    let layoutStyle = {};
+
+    if (this.state.menuOpen) contentWrapperClass += ` ${classes.hide}`;
+    if (image) layoutStyle.backgroundColor = image.get('color');
+    if (this.state.backgroundImage) {
+      layoutStyle.backgroundImage = `url(${this.state.backgroundImage})`;
+    }
+
     return (
-      <div className={classes.layout}>
-        <div>{this.props.children}</div>
+      <div className={classes.layout} style={layoutStyle}>
+        <div className={contentWrapperClass}>{children}</div>
+
         <MenuIconButton
           className={classes.menu}
           onClick={this.toggleMenu}
           open={this.state.menuOpen}
         />
+
         <NavContainer open={this.state.menuOpen} />
+
+        {image ? (
+          <span className={classes.credit}>
+            <span>random </span>
+            <a href="https://unsplash.com" alt="Unsplash">Unsplash</a>
+            <span> photo by </span>
+            <a href={image.getIn(['user', 'links', 'html'])} alt={image.getIn(['user', 'name'])}>
+              {image.getIn(['user', 'name'])}
+            </a>
+          </span>
+        ) : null}
       </div>
     );
   }

@@ -1,31 +1,28 @@
-import React, { Component } from 'react';
-// import { connect } from 'react-redux';
-// import { getRandomImage } from '../../redux/modules/images/imagesModule';
+import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
+import { List as iList } from 'immutable';
+import { getPosts } from '../../redux/modules/blog/blogModule';
 import Blog from '../../components/Blog/Blog';
 
 export class BlogContainer extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { content: undefined };
+  static propTypes = {
+    getPosts: PropTypes.func.isRequired,
+    posts: PropTypes.instanceOf(iList)
   }
 
   componentWillMount() {
-    // TODO fetch config json from S3
+    this.props.getPosts();
   }
 
   render() {
-    return <Blog content={this.state.content} />;
+    return <Blog posts={this.props.posts} />;
   }
 }
 
-/* export const stateToProps = (state) => {
-  const activeImage = state.images.get('activeImage');
-  const image = state.images.getIn(['images', activeImage]);
-  return { image };
-};
+export const stateToProps = (state) => ({
+  posts: state.blog.get('posts')
+});
 
-const dispatchToProps = { getRandomImage };
+const dispatchToProps = { getPosts };
 
-export default connect(stateToProps, dispatchToProps)(BlogContainer); */
-
-export default BlogContainer;
+export default connect(stateToProps, dispatchToProps)(BlogContainer);

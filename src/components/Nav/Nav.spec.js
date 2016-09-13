@@ -1,7 +1,6 @@
 import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
-import { fromJS } from 'immutable';
 import Nav from './Nav';
 import NavList from './List/NavList';
 import NavGrid from './Grid/NavGrid';
@@ -32,12 +31,5 @@ describe('Nav', () => {
     expect(wrapper.find(`.${classes.open}`)).to.have.length(0);
     wrapper.setProps({ open: true });
     expect(wrapper.find(`.${classes.open}`)).to.have.length(1);
-  });
-
-  it('adds style.backgroundImage with props.image.urls.custom if props.image is passed', () => {
-    const image = fromJS({ urls: { custom: '/images/myimage.png' } });
-    const wrapper = shallow(<Nav image={image} />);
-    const bgImg = wrapper.prop('style').backgroundImage;
-    expect(bgImg).to.equal(`url(${image.getIn(['urls', 'custom'])})`);
   });
 });

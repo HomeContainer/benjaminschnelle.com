@@ -40,7 +40,7 @@ export function getPosts() {
   return (dispatch) => {
     dispatch({ type: GET_POSTS });
     return blogSvc.getPosts()
-      .then((posts) => dispatch({ type: GET_POSTS_SUCCESS, posts }))
+      .then((posts) => dispatch({ type: GET_POSTS_SUCCESS, posts: posts.posts }))
       .catch(() => dispatch({ type: GET_POSTS_FAILURE }));
   };
 }

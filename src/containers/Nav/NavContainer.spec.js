@@ -14,14 +14,9 @@ describe('NavContainer', () => {
     expect(wrapper.type()).to.equal(Nav);
   });
 
-  it('passes props.image|open|screen to Nav', () => {
-    const props = {
-      image: {},
-      open: false,
-      screen: 'large'
-    };
+  it('passes props.open|screen to Nav', () => {
+    const props = { open: false, screen: 'large' };
     const wrapper = shallow(<NavContainer {...props} />);
-    expect(wrapper.prop('image')).to.equal(props.image);
     expect(wrapper.prop('open')).to.equal(props.open);
     expect(wrapper.prop('screen')).to.equal(props.screen);
   });
@@ -29,16 +24,6 @@ describe('NavContainer', () => {
   describe('stateToProps', () => {
     beforeEach(() => { sinon.stub(uiService, 'getScreen'); });
     afterEach(() => { uiService.getScreen.restore(); });
-
-    it('gets state.images.activeImage from images and maps to props.image', () => {
-      const images = {
-        activeImage: 1,
-        images: [{}, {}]
-      };
-      const state = { images: fromJS(images) };
-      const activeImage = state.images.getIn(['images', images.activeImage]);
-      expect(stateToProps(state).image).to.equal(activeImage);
-    });
 
     it('maps uiService.getScreen() return value to props.screen', () => {
       const screen = {};

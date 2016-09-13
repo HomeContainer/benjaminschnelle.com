@@ -6,43 +6,19 @@ import classes from './Home.scss';
 
 export class Home extends Component {
   static propTypes = {
-    image: PropTypes.object,
     userInfo: PropTypes.object.isRequired
   }
 
   constructor(props) {
     super(props);
-    this.state = { backgroundImage: undefined };
     this.tabs = [{ label: 'About', content: <Profile /> }];
-    this.setImage = this.setImage.bind(this);
-  }
-
-  componentWillMount() {
-    if (this.props.image) {
-      this.setImage(this.props.image);
-    }
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this.setImage(nextProps.image);
-  }
-
-  setImage(image) {
-    const newImage = new Image();
-    newImage.onload = () => this.setState({ backgroundImage: newImage.src });
-    newImage.src = image.getIn(['urls', 'custom']);
   }
 
   render() {
-    const { image, userInfo: { name, slogan } } = this.props;
-    const wrapperStyle = {};
-    if (image) wrapperStyle.backgroundColor = image.get('color');
-    if (this.state.backgroundImage) {
-      wrapperStyle.backgroundImage = `url(${this.state.backgroundImage})`;
-    }
+    const { name, slogan } = this.props.userInfo;
 
     return (
-      <div className={classes.wrapper} style={wrapperStyle}>
+      <div className={classes.wrapper}>
         <TabbedDrawer tabs={this.tabs} />
 
         <div className={classes.home}>
@@ -51,17 +27,6 @@ export class Home extends Component {
             <h6>{slogan}</h6>
           </div>
         </div>
-
-        {image ? (
-          <span className={classes.credit}>
-            <span>random </span>
-            <a href="https://unsplash.com" alt="Unsplash">Unsplash</a>
-            <span> photo by </span>
-            <a href={image.getIn(['user', 'links', 'html'])} alt={image.getIn(['user', 'name'])}>
-              {image.getIn(['user', 'name'])}
-            </a>
-          </span>
-        ) : null}
       </div>
     );
   }

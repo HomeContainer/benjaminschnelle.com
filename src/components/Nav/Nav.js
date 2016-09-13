@@ -10,7 +10,6 @@ class Nav extends Component {
   }
 
   static propTypes = {
-    image: PropTypes.object,
     open: PropTypes.bool,
     screen: PropTypes.string.isRequired
   }
@@ -20,15 +19,11 @@ class Nav extends Component {
   }
 
   render() {
-    const { image, open, screen } = this.props;
+    const { open, screen } = this.props;
     const className = `${classes.nav} ${open ? classes.open : ''}`;
-    const navStyle = {};
-    if (image) {
-      navStyle.backgroundImage = `url(${image.getIn(['urls', 'custom'])})`;
-    }
 
     return (
-      <nav className={className} style={navStyle}>
+      <nav className={className}>
         {screen === 'extraSmall' ? <NavList /> : <NavGrid screen={screen} />}
       </nav>
     );
