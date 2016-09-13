@@ -1,6 +1,7 @@
 import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
+import sinon from 'sinon';
 import Cell from './Cell';
 import classes from './Cell.scss';
 
@@ -11,6 +12,13 @@ describe('Cell', () => {
     const wrapper = shallow(<Cell>{child}</Cell>);
     expect(wrapper.type()).to.equal('div');
     expect(wrapper.containsAllMatchingElements([<div>{child}</div>])).to.be.true;
+  });
+
+  it('calls props.onClick when clicked', () => {
+    const onClick = sinon.stub();
+    const wrapper = shallow(<Cell onClick={onClick}>{child}</Cell>);
+    wrapper.simulate('click');
+    expect(onClick).to.have.been.calledOnce;
   });
 
   it('has a .cell class', () => {

@@ -13,6 +13,12 @@ describe('ContentCell', () => {
     expect(wrapper.type()).to.equal(Cell);
   });
 
+  it('passes props.onClick to Cell', () => {
+    const onClick = () => {};
+    const wrapper = shallow(<ContentCell onClick={onClick}>{child}</ContentCell>);
+    expect(wrapper.prop('onClick')).to.equal(onClick);
+  });
+
   it('has a .contentCell class', () => {
     const wrapper = shallow(<ContentCell>{child}</ContentCell>);
     expect(wrapper.is(`.${classes.contentCell}`)).to.be.true;
@@ -21,10 +27,5 @@ describe('ContentCell', () => {
   it('adds props.className, if set', () => {
     const wrapper = shallow(<ContentCell className="myClass">{child}</ContentCell>);
     expect(wrapper.is('.myClass')).to.be.true;
-  });
-
-  it('adds a .clickable class if props.clickable is true', () => {
-    const wrapper = shallow(<ContentCell clickable>{child}</ContentCell>);
-    expect(wrapper.is(`.${classes.clickable}`)).to.be.true;
   });
 });

@@ -22,14 +22,14 @@ describe('HomeContainer', () => {
   });
 
   describe('stateToProps()', () => {
-    it('gets state.images.currentImage from images and maps to props.image', () => {
+    it('gets state.images.activeImage from images and maps to props.image', () => {
       const images = {
-        currentImage: 1,
+        activeImage: 1,
         images: [{}, {}]
       };
       const state = { images: fromJS(images) };
-      const currentImage = state.images.getIn(['images', images.currentImage]);
-      expect(stateToProps(state).image).to.equal(currentImage);
+      const activeImage = state.images.getIn(['images', images.activeImage]);
+      expect(stateToProps(state).image).to.equal(activeImage);
     });
   });
 });

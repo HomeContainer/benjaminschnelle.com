@@ -9,7 +9,7 @@ export const GET_RANDOM_IMAGE_SUCCESS = 'images/GET_RANDOM_IMAGE_SUCCESS';
 // Reducer
 const unsplashSvc = unsplashService.default;
 const initialState = fromJS({
-  currentImage: undefined,
+  activeImage: undefined,
   error: false,
   fetchingImage: false,
   images: []
@@ -27,7 +27,7 @@ export default (state = initialState, action) => {
 
     case GET_RANDOM_IMAGE_SUCCESS: {
       const newState = state.merge({
-        currentImage: state.get('images').size,
+        activeImage: state.get('images').size,
         fetchingImage: false
       });
       return newState.update('images', (images) => images.push(fromJS(action.image)));

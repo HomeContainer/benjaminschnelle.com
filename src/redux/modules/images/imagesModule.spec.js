@@ -42,8 +42,8 @@ describe('[Redux] UnsplashModule', () => {
         newState = reducer(state, { type: GET_RANDOM_IMAGE_SUCCESS, image });
       });
 
-      it('sets currentImage to next images index', () =>
-        expect(newState.get('currentImage')).to.equal(2)
+      it('sets activeImage to next images index', () =>
+        expect(newState.get('activeImage')).to.equal(2)
       );
       it('sets fetchingImage to false', () => expect(newState.get('fetchingImage')).to.be.false);
       it('pushes action.image into state.images', () =>
@@ -80,7 +80,7 @@ describe('[Redux] UnsplashModule', () => {
       expect(dispatch).to.have.been.calledWith({ type: GET_RANDOM_IMAGE });
     });
 
-    it('calls unsplashService.getRandomPhoto with params object', () => {
+    it('calls unsplashService.getRandomImage with params object', () => {
       unsplashSvc.getRandomImage.returns(Promise.resolve());
       imagesModule.getRandomImage()(dispatch, getState);
       const { height, width } = getState().ui.toJS();

@@ -9,7 +9,7 @@ class BlogService {
     const url = `${this.url}posts.json`;
     return fetch.default(url)
       .then(fetch.handleError)
-      .then(fetch.getText);
+      .then(fetch.getJSON);
   }
 }
 

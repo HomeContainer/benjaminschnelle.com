@@ -13,8 +13,8 @@ NavContainer.propTypes = {
 };
 
 export const stateToProps = (state) => {
-  const currentImage = state.images.get('currentImage');
-  const image = state.images.getIn(['images', currentImage]);
+  const activeImage = state.images.get('activeImage');
+  const image = state.images.getIn(['images', activeImage]);
   const screen = uiService.getScreen(state.ui);
 
   return { image, screen };

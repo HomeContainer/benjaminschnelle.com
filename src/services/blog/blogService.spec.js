@@ -15,11 +15,11 @@ describe('[Service] BlogService', () => {
       );
     });
 
-    it('if res.ok is true, returns res.text()', () => {
-      const text = '{ posts: [] }';
-      const response = { ok: true, text: () => text };
+    it('if res.ok is true, returns res.json()', () => {
+      const json = { posts: [] };
+      const response = { ok: true, json: () => json };
       sinon.stub(fetch, 'default').returns(Promise.resolve(response));
-      return expect(blogService.getPosts()).to.eventually.equal(text);
+      return expect(blogService.getPosts()).to.eventually.equal(json);
     });
 
     it('if res.ok is false, throws an error', () => {
