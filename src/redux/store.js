@@ -10,7 +10,8 @@ if (__DEV__) {
   devTools = window.devToolsExtension && window.devToolsExtension();
 }
 
-const store = createStore(combinedReducer.default, compose(applyMiddleware(thunk)));
+// TODO fix this in Safari and Firefox
+const store = createStore(combinedReducer.default, compose(applyMiddleware(thunk), devTools));
 
 /* add resize listener to keep ui state up to date */
 window.addEventListener('resize', () =>

@@ -24,11 +24,16 @@ export class Home extends Component {
 
   render() {
     const { image, userInfo: { name, slogan } } = this.props;
-    const backgroundColor = image && image.get('color');
-    const backgroundImage = image && `url(${this.state.backgroundImage})`;
+    const wrapperStyle = {};
+    if (image) {
+      wrapperStyle.backgroundColor = image.get('color');
+    }
+    if (this.state.backgroundImage) {
+      wrapperStyle.backgroundImage = `url(${this.state.backgroundImage})`;
+    }
 
     return (
-      <div className={classes.wrapper} style={{ backgroundColor, backgroundImage }}>
+      <div className={classes.wrapper} style={wrapperStyle}>
         <TabbedDrawer tabs={this.tabs} />
 
         <div className={classes.home}>

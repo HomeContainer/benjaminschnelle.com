@@ -22,10 +22,13 @@ class Nav extends Component {
   render() {
     const { image, open, screen } = this.props;
     const className = `${classes.nav} ${open ? classes.open : ''}`;
-    const imageUrl = image && image.getIn(['urls', 'custom']);
+    const navStyle = {};
+    if (image) {
+      navStyle.backgroundImage = `url(${image.getIn(['urls', 'custom'])})`;
+    }
 
     return (
-      <nav className={className} style={{ backgroundImage: `url(${imageUrl})` }}>
+      <nav className={className} style={navStyle}>
         {screen === 'extraSmall' ? <NavList /> : <NavGrid screen={screen} />}
       </nav>
     );
