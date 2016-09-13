@@ -22,9 +22,7 @@ describe('IconButton', () => {
   it('passes props.className down to the root element', () => {
     const className = 'myButton';
     const wrapper = shallow(<IconButton className={className} icon="github" />);
-    const foundElements = wrapper.find({ className });
-    expect(foundElements).to.have.length(1);
-    expect(foundElements.first().type()).to.equal('button');
+    expect(wrapper.is(`.${className}`)).to.be.true;
   });
 
   it('renders a nested span element using "props.icon" to determine className', () => {

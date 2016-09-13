@@ -32,4 +32,9 @@ $fa-font-path: '~font-awesome/fonts';
       font-size: 14px;
     }
   }
+
+  /* prevent font awesome from displaying as boxes in Firefox */
+  .fa {
+    font-family: FontAwesome;
+  }
 }

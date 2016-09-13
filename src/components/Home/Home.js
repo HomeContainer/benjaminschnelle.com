@@ -25,9 +25,7 @@ export class Home extends Component {
   render() {
     const { image, userInfo: { name, slogan } } = this.props;
     const wrapperStyle = {};
-    if (image) {
-      wrapperStyle.backgroundColor = image.get('color');
-    }
+    if (image) wrapperStyle.backgroundColor = image.get('color');
     if (this.state.backgroundImage) {
       wrapperStyle.backgroundImage = `url(${this.state.backgroundImage})`;
     }

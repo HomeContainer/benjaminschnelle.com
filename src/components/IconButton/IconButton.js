@@ -1,15 +1,17 @@
 import React, { PropTypes } from 'react';
+import classes from './IconButton.scss';
 
 const IconButton = (props) => {
   const { className, href, icon, onClick, size } = props;
+  let wrapperClassName = `${classes.link} ${className}`;
   let iconClassName = `fa fa-${icon}`;
   if (size) iconClassName += ` fa-${size}`;
   const iconElement = <span className={iconClassName} />;
 
   if (props.href) {
-    return <a className={className} href={href}>{iconElement}</a>;
+    return <a className={wrapperClassName} href={href}>{iconElement}</a>;
   }
-  return <button className={className} onClick={onClick}>{iconElement}</button>;
+  return <button className={wrapperClassName} onClick={onClick}>{iconElement}</button>;
 };
 
 IconButton.propTypes = {
