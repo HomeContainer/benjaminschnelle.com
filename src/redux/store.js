@@ -1,22 +1,22 @@
 import * as redux from 'redux';
 import thunk from 'redux-thunk';
+import { debounce } from 'lodash';
 import * as combinedReducer from './combinedReducer';
 import * as uiModule from './modules/ui/uiModule';
 
 const { applyMiddleware, compose, createStore } = redux;
-let devTools;
+const enhancers = [applyMiddleware(thunk)];
+
 /* istanbul ignore if */
-if (__DEV__) {
-  devTools = window.devToolsExtension && window.devToolsExtension();
+if (__DEV__ && window.devToolsExtension) {
+  enhancers.push(window.devToolsExtension());
 }
 
-// TODO fix this in Safari and Firefox
-const store = createStore(combinedReducer.default, compose(applyMiddleware(thunk), devTools));
+const store = createStore(combinedReducer.default, compose(...enhancers));
 
 /* add resize listener to keep ui state up to date */
-window.addEventListener('resize', () =>
-  // TODO debounce
+window.addEventListener('resize', debounce(() =>
   store.dispatch(uiModule.windowResize(window.innerHeight, window.innerWidth))
-);
+), 100);
 
 export default store;
