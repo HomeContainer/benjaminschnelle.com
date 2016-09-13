@@ -5,15 +5,15 @@ import classes from './ContentCell.scss';
 const ContentCell = (props) => {
   let className = classes.contentCell;
   if (props.className) className += ` ${props.className}`;
-  if (props.clickable) className += ` ${classes.clickable}`;
+  if (props.onClick) className += ` ${classes.clickable}`;
 
-  return <Cell className={className}>{props.children}</Cell>;
+  return <Cell className={className} onClick={props.onClick}>{props.children}</Cell>;
 };
 
 ContentCell.propTypes = {
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
-  clickable: PropTypes.bool
+  onClick: PropTypes.func
 };
 
 export default ContentCell;

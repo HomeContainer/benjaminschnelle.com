@@ -4,6 +4,10 @@ import NavContainer from '../../containers/Nav/NavContainer';
 import classes from './Layout.scss';
 
 export class Layout extends Component {
+  static childContextTypes = {
+    toggleMenu: PropTypes.func
+  }
+
   static propTypes = {
     children: PropTypes.node.isRequired
   }
@@ -12,6 +16,10 @@ export class Layout extends Component {
     super(props);
     this.state = { menuOpen: false };
     this.toggleMenu = this.toggleMenu.bind(this);
+  }
+
+  getChildContext() {
+    return { toggleMenu: this.toggleMenu };
   }
 
   toggleMenu() {

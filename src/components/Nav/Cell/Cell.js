@@ -6,7 +6,7 @@ const Cell = (props, context) => {
   if (props.className) className += ` ${props.className}`;
   if (context.navOpen) className += ` ${classes.open}`;
 
-  return <div className={className}><div>{props.children}</div></div>;
+  return <div className={className} onClick={props.onClick}><div>{props.children}</div></div>;
 };
 
 Cell.contextTypes = {
@@ -15,7 +15,8 @@ Cell.contextTypes = {
 
 Cell.propTypes = {
   children: PropTypes.node,
-  className: PropTypes.string
+  className: PropTypes.string,
+  onClick: PropTypes.func
 };
 
 export default Cell;

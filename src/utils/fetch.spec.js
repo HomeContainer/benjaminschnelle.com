@@ -21,4 +21,12 @@ describe('[Utility] Fetch', () => {
       expect(fetch.getJSON(res)).to.equal(json);
     });
   });
+
+  describe('getText()', () => {
+    it('returns response.text()', () => {
+      const text = 'this is some text';
+      const res = { text: () => text };
+      expect(fetch.getText(res)).to.equal(text);
+    });
+  });
 });

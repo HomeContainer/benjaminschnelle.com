@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import { withRouter } from 'react-router';
 import Cell from '../Cell/Cell';
 import ContentCell from '../ContentCell/ContentCell';
 import IconButton from '../../IconButton/IconButton';
@@ -8,7 +9,7 @@ import classes from './NavGrid.scss';
 /**
  * Nav component for anything larger than mobile
  */
-export const NavGrid = (props) => {
+export const NavGrid = (props, context) => {
   const { email, github, name } = props.userInfo;
   const info = {
     content: (
@@ -19,12 +20,18 @@ export const NavGrid = (props) => {
     )
   };
   const blog = {
-    clickable: true,
-    content: 'blog.'
+    content: 'blog.',
+    onClick: () => {
+      props.router.push('/blog');
+      context.toggleMenu();
+    }
   };
   const home = {
-    clickable: true,
-    content: 'home.'
+    content: 'home.',
+    onClick: () => {
+      props.router.push('/');
+      context.toggleMenu();
+    }
   };
   const social = {
     className: classes.social,
@@ -77,8 +84,8 @@ export const NavGrid = (props) => {
       cells.push(
         <ContentCell
           className={mapping.className ? `${className} ${mapping.className}` : className}
-          clickable={mapping.clickable}
           key={i}
+          onClick={mapping.onClick}
         >
           {mapping.content}
         </ContentCell>
@@ -91,9 +98,14 @@ export const NavGrid = (props) => {
   return <div className={classes.navGrid}>{cells}</div>;
 };
 
+NavGrid.contextTypes = {
+  toggleMenu: PropTypes.func.isRequired
+};
+
 NavGrid.propTypes = {
+  router: PropTypes.object.isRequired,
   screen: PropTypes.string,
   userInfo: PropTypes.object.isRequired
 };
 
-export default userInfo(NavGrid);
+export default withRouter(userInfo(NavGrid));

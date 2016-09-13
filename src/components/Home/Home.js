@@ -14,12 +14,23 @@ export class Home extends Component {
     super(props);
     this.state = { backgroundImage: undefined };
     this.tabs = [{ label: 'About', content: <Profile /> }];
+    this.setImage = this.setImage.bind(this);
+  }
+
+  componentWillMount() {
+    if (this.props.image) {
+      this.setImage(this.props.image);
+    }
   }
 
   componentWillReceiveProps(nextProps) {
+    this.setImage(nextProps.image);
+  }
+
+  setImage(image) {
     const newImage = new Image();
     newImage.onload = () => this.setState({ backgroundImage: newImage.src });
-    newImage.src = nextProps.image && nextProps.image.getIn(['urls', 'custom']);
+    newImage.src = image.getIn(['urls', 'custom']);
   }
 
   render() {

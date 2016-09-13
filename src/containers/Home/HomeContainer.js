@@ -10,7 +10,9 @@ export class HomeContainer extends Component {
   }
 
   componentWillMount() {
-    this.props.getRandomImage();
+    if (!this.props.image) {
+      this.props.getRandomImage();
+    }
   }
 
   render() {
