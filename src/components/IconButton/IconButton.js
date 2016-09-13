@@ -3,7 +3,7 @@ import classes from './IconButton.scss';
 
 const IconButton = (props) => {
   const { className, href, icon, onClick, size } = props;
-  let wrapperClassName = `${classes.link} ${className}`;
+  let wrapperClassName = `${classes.link} ${className || ''}`;
   let iconClassName = `fa fa-${icon}`;
   if (size) iconClassName += ` fa-${size}`;
   const iconElement = <span className={iconClassName} />;
