@@ -26,6 +26,11 @@ describe('Tab', () => {
     expect(wrapper.find(`.${classes.tab}`)).to.have.length(1);
   });
 
+  it('adds .active class when props.active is true', () => {
+    const wrapper = shallow(<Tab active label="label" />);
+    expect(wrapper.is(`.${classes.active}`)).to.be.true;
+  });
+
   it('clicking the element calls props.onClick', () => {
     const onClick = sinon.stub();
     const wrapper = shallow(<Tab label="label" onClick={onClick} />);

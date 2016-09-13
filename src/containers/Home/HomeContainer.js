@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { getRandomImage } from '../../redux/modules/images/imagesModule';
 import Home from '../../components/Home/Home';
 
-class HomeContainer extends Component {
+export class HomeContainer extends Component {
   static propTypes = {
     getRandomImage: PropTypes.func.isRequired,
     image: PropTypes.object
@@ -18,7 +18,7 @@ class HomeContainer extends Component {
   }
 }
 
-const stateToProps = (state) => {
+export const stateToProps = (state) => {
   const currentImage = state.images.get('currentImage');
   const image = state.images.getIn(['images', currentImage]);
   return { image };

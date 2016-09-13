@@ -3,7 +3,8 @@ import { connect } from 'react-redux';
 import uiService from '../../services/ui/uiService';
 import Nav from '../../components/Nav/Nav';
 
-const NavContainer = (props) => <Nav image={props.image} open={props.open} screen={props.screen} />;
+export const NavContainer = (props) =>
+  <Nav image={props.image} open={props.open} screen={props.screen} />;
 
 NavContainer.propTypes = {
   image: PropTypes.object,
@@ -11,7 +12,7 @@ NavContainer.propTypes = {
   screen: PropTypes.string.isRequired
 };
 
-const stateToProps = (state) => {
+export const stateToProps = (state) => {
   const currentImage = state.images.get('currentImage');
   const image = state.images.getIn(['images', currentImage]);
   const screen = uiService.getScreen(state.ui);

@@ -1,12 +1,13 @@
-/* import React from 'react';
+import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
-import Home from './Home';
-import Profile from '../Profile/Profile';
+import { Home } from './Home';
+import TabbedDrawer from '../TabbedDrawer/TabbedDrawer';
 
 describe('Home', () => {
-  it('renders a Profile', () => {
-    const wrapper = shallow(<Home />);
-    expect(wrapper.contains(<Profile />)).to.be.true;
+  it('renders a TabbedDrawer', () => {
+    const userInfo = { name: 'Doge', slogan: 'So wow' };
+    const wrapper = shallow(<Home userInfo={userInfo} />);
+    expect(wrapper.find(TabbedDrawer)).to.have.length(1);
   });
-}); */
+});
