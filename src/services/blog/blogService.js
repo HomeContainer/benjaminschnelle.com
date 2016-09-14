@@ -19,6 +19,15 @@ class BlogService {
       .then(fetch.getJSON);
   }
 
+  // TODO move to microservice
+  parseMarkdown(markdown) {
+    const url = 'https://api.github.com/markdown';
+    const options = { method: 'POST', body: JSON.stringify({ text: markdown }) };
+    return fetch.default(url, options)
+      .then(fetch.handleError)
+      .then(fetch.getText);
+  }
+
   // TODO reselect
   selectActivePost(state) {
     const slug = state.get('activePost');

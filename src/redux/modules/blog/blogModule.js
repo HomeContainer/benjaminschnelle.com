@@ -64,6 +64,8 @@ export function getPost(slug) {
   return (dispatch) => {
     dispatch({ type: GET_POST });
     return blogSvc.getPost(slug)
+      .then((content) => blogSvc.parseMarkdown(content))
+
       .then((content) => dispatch({ type: GET_POST_SUCCESS, content, slug }))
       .catch(() => dispatch({ type: GET_POST_FAILURE }));
   };

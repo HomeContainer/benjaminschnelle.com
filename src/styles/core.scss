@@ -4,6 +4,7 @@ $fa-font-path: '~font-awesome/fonts';
   @import './config';
   @import '~font-awesome/scss/font-awesome';
   @import '~normalize.css/normalize';
+  @import '~github-markdown-css/github-markdown';
 
   html {
     box-sizing: border-box;
@@ -13,7 +14,7 @@ $fa-font-path: '~font-awesome/fonts';
   body,
   #root {
     color: $textColor;
-    font-family: 'Open Sans';
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     margin: 0;
     padding: 0;
     height: 100%;
@@ -24,7 +25,7 @@ $fa-font-path: '~font-awesome/fonts';
   }
 
   p {
-    font-size: .9rem;
+    // font-size: .9rem;
   }
 
   *,
