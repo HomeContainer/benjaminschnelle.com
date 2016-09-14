@@ -5,26 +5,35 @@ import * as uiModule from './uiModule';
 import * as uiService from '../../../services/ui/uiService';
 
 const state = fromJS({
-  width: {
-    atLeast: {
-      extraSmall: true,
-      small: true,
-      medium: false,
-      large: false,
-      extraLarge: false
-    },
-    breakPoints: {
-      extraSmall: 480,
-      small: 768,
-      medium: 992,
-      large: 1200,
-      extraLarge: 1920
-    }
-  }
+  breakPoints: {
+    extraSmall: 480,
+    small: 768,
+    medium: 992,
+    large: 1200,
+    extraLarge: 1920
+  },
+  invertMenuColor: false,
+  is: {
+    extraSmall: false,
+    small: true,
+    medium: false,
+    large: false,
+    extraLarge: false
+  },
+  height: 0,
+  width: 0
 });
 
 describe('[Redux] UIModule', () => {
   describe('reducer', () => {
+    describe('SET_MENU_COLOR', () => {
+      it('sets state.invertMenuColor to action.invert', () => {
+        const { default: reducer, SET_MENU_COLOR } = uiModule;
+        const newState = reducer(state, { type: SET_MENU_COLOR, invert: true });
+        expect(newState.get('invertMenuColor')).to.be.true;
+      });
+    });
+
     describe('WINDOW_RESIZE', () => {
       beforeEach(() => sinon.stub(uiService.default, 'calculateBreakPointFlags'));
       afterEach(() => uiService.default.calculateBreakPointFlags.restore());
@@ -74,7 +83,16 @@ describe('[Redux] UIModule', () => {
     });
   });
 
-  describe('windowResize', () => {
+  describe('setMenuColor()', () => {
+    it('returns an object with type of SET_MENU_COLOR and invert prop set to arg', () => {
+      const { setMenuColor, SET_MENU_COLOR } = uiModule;
+      const action = setMenuColor(true);
+      expect(action.type).to.equal(SET_MENU_COLOR);
+      expect(action.invert).to.be.true;
+    });
+  });
+
+  describe('windowResize()', () => {
     it('returns an object with a type of WINDOW_RESIZE, window width, and window height', () => {
       const { windowResize, WINDOW_RESIZE } = uiModule;
       const height = 900;

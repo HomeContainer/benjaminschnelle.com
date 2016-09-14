@@ -1,0 +1,8 @@
+.blogPostList {
+  cursor: pointer;
+  margin-bottom: 5rem;
+  > h1 {
+    padding: 0 3rem;
+    text-transform: lowercase;
+  }
+}

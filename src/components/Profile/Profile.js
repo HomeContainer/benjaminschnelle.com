@@ -4,7 +4,7 @@ import classes from './Profile.scss';
 const Profile = () => (
   <div className={classes.profile}>
     <img src="/images/me.png" alt="Ben" />
-    <h2>Hi! I'm Ben.</h2>
+    <h2>Hello.</h2>
     <p>
       Once upon a time I was a CPA, but now
       I'm a software developer and life is groovy.

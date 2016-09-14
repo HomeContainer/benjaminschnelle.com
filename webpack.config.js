@@ -11,7 +11,7 @@ const webpackConfig = {
     historyApiFallback: true,
     host: config.host,
     port: config.port,
-    publicPath: 'http://localhost:8080/'
+    publicPath: '/'
   },
 
   entry: {
@@ -52,7 +52,8 @@ const webpackConfig = {
 
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: '[name]-[hash].js'
+    filename: '[name]-[hash].js',
+    publicPath: '/'
   },
 
   plugins: [

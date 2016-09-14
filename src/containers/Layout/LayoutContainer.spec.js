@@ -22,14 +22,26 @@ describe('LayoutContainer', () => {
   });
 
   describe('stateToProps()', () => {
-    it('gets state.images.activeImage from images and maps to props.image', () => {
-      const images = {
+    let images;
+    let state;
+    let ui;
+
+    beforeEach(() => {
+      images = {
         activeImage: 1,
         images: [{}, {}]
       };
-      const state = { images: fromJS(images) };
+      ui = { invertMenuColor: false };
+      state = { images: fromJS(images), ui: fromJS(ui) };
+    });
+
+    it('gets state.images.activeImage from images and maps to props.image', () => {
       const activeImage = state.images.getIn(['images', images.activeImage]);
       expect(stateToProps(state).image).to.equal(activeImage);
+    });
+
+    it('maps ui.invertMenuColor to props.invertMenuColor', () => {
+      expect(stateToProps(state).invertMenuColor).to.equal(state.ui.get('invertMenuColor'));
     });
   });
 });

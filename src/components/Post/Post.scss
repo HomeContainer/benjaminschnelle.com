@@ -1,0 +1,39 @@
+@import '../../styles/config';
+
+.post {
+  padding: 0 3rem;
+  &:hover {
+    background-color: rgba(0,0,0,.05);
+  }
+}
+
+.inner {
+  border-bottom: 1px rgba(0,0,0,.1) solid;
+  display: flex;
+  padding: 2rem 0;
+  > div {
+    overflow: hidden;
+    &:nth-of-type(1) {
+      flex: 1;
+      font-size: 2.5rem;
+      font-weight: 700;
+      line-height: 3rem;
+      margin-right: 1rem;
+      text-transform: uppercase;
+      word-wrap: break-word;
+    }
+    &:nth-of-type(2) {
+      display: flex;
+      flex: 1.5;
+      flex-direction: column;
+      margin-left: 1rem;
+      > p {
+        flex: 1;
+      }
+      > div > span:not(:nth-of-type(2)) {
+        color: lighten($textColor, 40%);
+        font-size: .8rem;
+      }
+    }
+  }
+}

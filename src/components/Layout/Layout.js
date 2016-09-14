@@ -11,7 +11,8 @@ export class Layout extends Component {
 
   static propTypes = {
     children: PropTypes.node.isRequired,
-    image: PropTypes.object
+    image: PropTypes.object,
+    invertMenuColor: PropTypes.bool
   }
 
   constructor(props) {
@@ -46,7 +47,7 @@ export class Layout extends Component {
   }
 
   render() {
-    const { children, image } = this.props;
+    const { children, image, invertMenuColor } = this.props;
     let contentWrapperClass = classes.contentWrapper;
     let layoutStyle = {};
 
@@ -62,6 +63,7 @@ export class Layout extends Component {
 
         <MenuIconButton
           className={classes.menu}
+          invertColor={invertMenuColor}
           onClick={this.toggleMenu}
           open={this.state.menuOpen}
         />

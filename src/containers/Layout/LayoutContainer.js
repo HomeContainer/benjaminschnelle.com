@@ -7,7 +7,8 @@ export class LayoutContainer extends Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
     getRandomImage: PropTypes.func.isRequired,
-    image: PropTypes.object
+    image: PropTypes.object,
+    invertMenuColor: PropTypes.bool
   }
 
   componentWillMount() {
@@ -17,15 +18,16 @@ export class LayoutContainer extends Component {
   }
 
   render() {
-    const { children, image } = this.props;
-    return <Layout image={image}>{children}</Layout>;
+    const { children, image, invertMenuColor } = this.props;
+    return <Layout image={image} invertMenuColor={invertMenuColor}>{children}</Layout>;
   }
 }
 
 export const stateToProps = (state) => {
   const activeImage = state.images.get('activeImage');
   const image = state.images.getIn(['images', activeImage]);
-  return { image };
+  const invertMenuColor = state.ui.get('invertMenuColor');
+  return { image, invertMenuColor };
 };
 
 const dispatchToProps = { getRandomImage };

@@ -1,3 +1,9 @@
+.invertColor {
+  > span {
+    background-color: #000 !important;
+  }
+}
+
 .menu {
   background-color: transparent;
   border: none;
@@ -14,7 +20,7 @@
     position: absolute;
     height: 3px;
     width: 100%;
-    background: #fff;
+    background-color: #fff;
     opacity: 1;
     left: 0;
     transform: rotate(0deg);

@@ -1,4 +1,4 @@
-Hi! I'm Ben and this is the beginning of my software engineering blog.  Initially, the focus is going to be on front-end development, but later we'll get into other things as well.
+Hello. I'm Ben and this is the beginning of my software engineering blog.  Initially, the focus is going to be on front-end development, but later we'll get into other things as well.
 
 ![React So Hot](../../images/react-so-hot.jpeg)
 
