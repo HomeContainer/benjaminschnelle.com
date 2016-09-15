@@ -10,3 +10,19 @@
   margin-left: 10%;
   overflow: auto;
 }
+
+@media screen and (min-width: 993px) and (max-width: 1200px) {
+  .content {
+    width: 70%;
+    margin-left: 15%;
+    max-width: none;
+  }
+}
+
+@media screen and (max-width: 992px) {
+  .content {
+    width: 100%;
+    margin-left: 0;
+    max-width: none;
+  }
+}

@@ -8,3 +8,14 @@
     padding: 0 3rem 3rem 3rem;
   }
 }
+
+@media screen and (max-width: 480px) {
+  .blogPost {
+    > h1 {
+      padding: 0 2rem;
+    }
+    > div {
+      padding: 0 2rem 2rem 2rem;
+    }
+  }
+}

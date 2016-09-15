@@ -4,7 +4,7 @@ import classes from './MenuIconButton.scss';
 const MenuIconButton = (props) => {
   let className = classes.menu;
   if (props.className) className += ` ${props.className}`;
-  if (props.invertColor) className += ` ${classes.invertColor}`;
+  if (props.invertColor && !props.open) className += ` ${classes.invertColor}`;
   if (props.open) className += ` ${classes.open}`;
 
   return (

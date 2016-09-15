@@ -20,8 +20,8 @@ export const NavList = (props, context) => {
 
       <div className={bodyClassName}>
         <ul>
-          <li><Link to="/">home.</Link></li>
-          <li><Link to="blog">blog.</Link></li>
+          <li><Link onClick={context.toggleMenu} to="/">home.</Link></li>
+          <li><Link onClick={context.toggleMenu} to="/blog">blog.</Link></li>
         </ul>
       </div>
 
@@ -38,7 +38,8 @@ export const NavList = (props, context) => {
 };
 
 NavList.contextTypes = {
-  navOpen: PropTypes.bool
+  navOpen: PropTypes.bool,
+  toggleMenu: PropTypes.func.isRequired
 };
 
 NavList.propTypes = {

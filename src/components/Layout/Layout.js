@@ -70,7 +70,7 @@ export class Layout extends Component {
 
         <NavContainer open={this.state.menuOpen} />
 
-        {image ? (
+        {image && !this.state.menuOpen ? (
           <span className={classes.credit}>
             <span>random </span>
             <a href="https://unsplash.com" alt="Unsplash">Unsplash</a>

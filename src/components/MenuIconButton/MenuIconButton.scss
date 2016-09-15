@@ -41,22 +41,6 @@
       transform-origin: left center;
     }
   }
-
-  &:hover {
-    > span {
-      &:nth-child(1) {
-        transform: translateX(-3px);
-      }
-
-      &:nth-child(2) {
-        transform: translateX(3px);
-      }
-
-      &:nth-child(3) {
-        transform: translateX(-3px);
-      }
-    }
-  }
 }
 
 .open {
@@ -76,6 +60,26 @@
       transform: rotate(-45deg) !important;
       top: 17px;
       left: 8px;
+    }
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .menu {
+    &:hover {
+      > span {
+        &:nth-child(1) {
+          transform: translateX(-3px);
+        }
+
+        &:nth-child(2) {
+          transform: translateX(3px);
+        }
+
+        &:nth-child(3) {
+          transform: translateX(-3px);
+        }
+      }
     }
   }
 }
