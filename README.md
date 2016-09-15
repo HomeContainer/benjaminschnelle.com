@@ -1,1 +1,1 @@
-Doing stuff, with things. Ben Schnelle HQ.
+Software development blog and learning environment.
