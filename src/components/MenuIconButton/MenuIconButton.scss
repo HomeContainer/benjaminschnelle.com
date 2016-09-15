@@ -7,13 +7,15 @@
 .menu {
   background-color: transparent;
   border: none;
+  cursor: pointer;
   outline: none;
   width: 30px;
   height: 25px;
   position: relative;
   transform: rotate(0deg);
   transition: .5s ease-in-out;
-  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 
   > span {
     display: block;
