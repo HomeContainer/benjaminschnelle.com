@@ -16,7 +16,10 @@ export class BlogPostContainer extends Component {
   }
 
   componentWillMount() {
-    this.props.getPost(this.props.params.slug);
+    const { params: { slug }, post } = this.props;
+    if (!post || !post.get('content')) {
+      this.props.getPost(slug);
+    }
   }
 
   render() {
@@ -27,9 +30,9 @@ export class BlogPostContainer extends Component {
   }
 }
 
-const stateToProps = (state) => ({
+const stateToProps = (state, props) => ({
   fetchingPost: state.blog.get('fetchingPost'),
-  post: blogService.selectActivePost(state.blog)
+  post: blogService.selectPost(state.blog, props.params.slug)
 });
 
 const dispatchToProps = { getPost };

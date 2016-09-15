@@ -53,13 +53,12 @@ describe('[Service] BlogService', () => {
     });
   });
 
-  describe('selectActivePost()', () => {
-    it('finds state.activePost in state.posts and returns it', () => {
+  describe('selectPost()', () => {
+    it('finds post with matching slug in state.posts and returns it', () => {
       const state = fromJS({
-        activePost: 'slug',
         posts: [{ slug: 'something', title: 'Something' }, { slug: 'slug', title: 'Slug' }]
       });
-      expect(blogService.selectActivePost(state).get('title')).to.equal('Slug');
+      expect(blogService.selectPost(state, 'slug').get('title')).to.equal('Slug');
     });
   });
 });
