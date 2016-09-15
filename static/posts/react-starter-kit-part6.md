@@ -290,7 +290,7 @@ hook({
 
 If you rerun your tests now, they should all be passing again!
 
-![Dancing Kid](http://www.nickadamsweb.com/wp-content/uploads/2009/06/white-kid-dance-club.gif)
+![Dancing Kid](http://i.imgur.com/KnWUMK2.gif)
 
 #### Does the button work? Kind of.
 Fire up your server and visit "/counter" again.  Click the button and watch the number go up.  Now click the link to Home then back to Counter and you'll notice that our counter is back at zero.  Shoot, we wanted to keep our hard work.

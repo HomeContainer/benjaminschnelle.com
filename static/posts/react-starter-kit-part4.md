@@ -1,9 +1,5 @@
 To recap, we have our project under source control with Git/GitHub, we're managing our dependencies with NPM, ESLint is configured to ensure code consistency, and Webpack is configured for development and production.
 
-I just realized I didn't put a single GIF or meme in the last post so we'll start with one to balance things out.
-
-![Bulls Mascot](http://i.imgur.com/GIVQ6zq.gif)
-
 ## 7. React and React Router
 Per the React site, React makes it painless to create interactive UIs.  That is no understatement.  React is all *component* based (you can think of them as widgets of functionality) meaning you break your UI into separate components and *compose* your UI from those pieces.  I highly recommend reading [Thinking in React](https://facebook.github.io/react/docs/thinking-in-react.html) by [Pete Hunt](https://twitter.com/floydophone) for a quick overview of using React.
 
