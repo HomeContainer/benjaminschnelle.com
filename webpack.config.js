@@ -9,7 +9,7 @@ const webpackConfig = {
   devServer: {
     contentBase: './dist',
     historyApiFallback: true,
-    host: '192.168.0.4', // config.host,
+    host: config.host,
     port: config.port,
     publicPath: '/'
   },
