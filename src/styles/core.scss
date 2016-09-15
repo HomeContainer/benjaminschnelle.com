@@ -1,8 +1,5 @@
-$fa-font-path: '~font-awesome/fonts';
-
 :global {
   @import './config';
-  @import '~font-awesome/scss/font-awesome';
   @import '~normalize.css/normalize';
   @import '~github-markdown-css/github-markdown';
 
