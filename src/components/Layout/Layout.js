@@ -49,10 +49,13 @@ export class Layout extends Component {
   render() {
     const { children, image, invertMenuColor } = this.props;
     let contentWrapperClass = classes.contentWrapper;
+    let creditClass = classes.credit;
     let layoutStyle = {};
 
-    if (this.state.menuOpen) contentWrapperClass += ` ${classes.hide}`;
-    if (image) layoutStyle.backgroundColor = image.get('color');
+    if (this.state.menuOpen) {
+      contentWrapperClass += ` ${classes.hide}`;
+      creditClass += ` ${classes.hide}`;
+    }
     if (this.state.backgroundImage) {
       layoutStyle.backgroundImage = `url(${this.state.backgroundImage})`;
     }
@@ -70,8 +73,8 @@ export class Layout extends Component {
 
         <NavContainer open={this.state.menuOpen} />
 
-        {image && !this.state.menuOpen ? (
-          <span className={classes.credit}>
+        {image ? (
+          <span className={creditClass}>
             <span>random </span>
             <a href="https://unsplash.com" alt="Unsplash">Unsplash</a>
             <span> photo by </span>

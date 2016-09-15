@@ -1,11 +1,13 @@
 import React, { Component, PropTypes } from 'react';
 import { List as iList } from 'immutable';
 import BlogPostList from '../BlogPostList/BlogPostList';
+import Loader from '../Loader/Loader';
 import classes from './Blog.scss';
 
 class Blog extends Component {
   static propTypes = {
     children: PropTypes.node,
+    fetchingPosts: PropTypes.bool,
     posts: PropTypes.instanceOf(iList),
     screen: PropTypes.string.isRequired,
     setMenuColor: PropTypes.func.isRequired
@@ -36,10 +38,12 @@ class Blog extends Component {
   }
 
   render() {
+    const { children, fetchingPosts, posts } = this.props;
+
     return (
       <div className={classes.wrapper}>
         <div className={classes.content}>
-          {this.props.children || <BlogPostList posts={this.props.posts} />}
+          {children || (fetchingPosts ? <Loader /> : <BlogPostList posts={posts} />)}
         </div>
       </div>
     );

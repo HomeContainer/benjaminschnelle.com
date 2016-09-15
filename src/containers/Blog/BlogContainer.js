@@ -9,6 +9,7 @@ import Blog from '../../components/Blog/Blog';
 export class BlogContainer extends Component {
   static propTypes = {
     children: PropTypes.node,
+    fetchingPosts: PropTypes.bool,
     getPosts: PropTypes.func.isRequired,
     posts: PropTypes.instanceOf(iList),
     screen: PropTypes.string.isRequired,
@@ -20,12 +21,22 @@ export class BlogContainer extends Component {
   }
 
   render() {
-    const { children, posts, screen, setMenuColor: setMenuClr } = this.props;
-    return <Blog posts={posts} setMenuColor={setMenuClr} screen={screen}>{children}</Blog>;
+    const { children, fetchingPosts, posts, screen, setMenuColor: setMenuClr } = this.props;
+    return (
+      <Blog
+        fetchingPosts={fetchingPosts}
+        posts={posts}
+        setMenuColor={setMenuClr}
+        screen={screen}
+      >
+        {children}
+      </Blog>
+    );
   }
 }
 
 export const stateToProps = (state) => ({
+  fetchingPosts: state.blog.get('fetchingPosts'),
   posts: state.blog.get('posts'),
   screen: uiService.getScreen(state.ui)
 });
