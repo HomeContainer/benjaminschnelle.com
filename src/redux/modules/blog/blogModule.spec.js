@@ -129,8 +129,8 @@ describe('[Redux] BlogModule', () => {
       const action = { type: GET_POST_SUCCESS, content, slug };
 
       sinon.stub(blogSvc, 'parseMarkdown');
-      blogSvc.getPost.returns(Promise.resolve());
-      blogSvc.parseMarkdown.returns(Promise.resolve(content));
+      blogSvc.getPost.returns(Promise.resolve(content));
+      // blogSvc.parseMarkdown.returns(Promise.resolve(content));
       blogModule.getPost(slug)(dispatch).then(() => {
         expect(dispatch).to.have.been.calledWith(action);
         blogSvc.parseMarkdown.restore();

@@ -1,0 +1,191 @@
+<p>In the last part we looked at Redux and added it to our project.  It was a pretty intense read, but it gave us a much better understanding of what benefits Redux gives us.</p>
+
+<h2>
+<a id="user-content-10-immutablejs" class="anchor" href="#10-immutablejs" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>10. Immutable.js</h2>
+
+<p>If you remember from the last time, I mentioned that with Redux best practice is to never modify existing state, but rather always return a new object.  Redux is written under the assumption that the <code>state</code> object passed to your <code>reducer</code> will never be mutated (it is immutable) so if you do modify it you'll likely break something.</p>
+
+<p>Because of this and the fact that immutable data is easier to reason about introducing a library like Immutable.js is a good idea.  If you haven't surmised what Immutable.js actually is, let me tell you: it's a library of immutable objects!  Some of the syntax can be take a bit to get used to, but the benefits are quite nice.</p>
+
+<div class="highlight highlight-source-shell"><pre>npm install --save immutable</pre></div>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// Regular JS vs. Immutable.js (just an example)</span>
+
+<span class="pl-c">// plain JS</span>
+<span class="pl-c">// --------------------------------------</span>
+<span class="pl-k">const</span> <span class="pl-c1">person</span> <span class="pl-k">=</span> {
+  name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>Rick<span class="pl-pds">'</span></span>,
+  age<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>45<span class="pl-pds">'</span></span>
+}
+<span class="pl-c">// create shallow copy of person</span>
+<span class="pl-k">const</span> <span class="pl-c1">newPerson</span> <span class="pl-k">=</span> <span class="pl-c1">Object</span>.<span class="pl-en">assign</span>({}, person);
+<span class="pl-c">// update and return new state</span>
+<span class="pl-smi">newPerson</span>.<span class="pl-c1">name</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>Bobby<span class="pl-pds">'</span></span>;
+<span class="pl-k">return</span> newPerson;
+
+<span class="pl-c">// Immutable.js</span>
+<span class="pl-c">// --------------------------------------</span>
+<span class="pl-k">import</span> { <span class="pl-smi">Map</span> <span class="pl-k">as</span> <span class="pl-smi">iMap</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>immutable<span class="pl-pds">'</span></span>;
+<span class="pl-k">const</span> <span class="pl-c1">person</span> <span class="pl-k">=</span> <span class="pl-en">iMap</span>({
+  name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>Rick<span class="pl-pds">'</span></span>,
+  age<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>45<span class="pl-pds">'</span></span>
+})
+<span class="pl-c">// update and return new state</span>
+<span class="pl-k">return</span> <span class="pl-smi">person</span>.<span class="pl-c1">set</span>(<span class="pl-s"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>Bobby<span class="pl-pds">'</span></span>);
+</pre></div>
+
+<h4>
+<a id="user-content-update-counter" class="anchor" href="#update-counter" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Update Counter</h4>
+
+<p>To use Immutable.js with our <code>store</code> we need to make a few updates.  We need to update "counterModule.js", "CounterContainer.spec.js", and "CounterContainer.js".</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// redux/modules/counter/counterModule.js</span>
+
+<span class="pl-k">import</span> { <span class="pl-smi">Map</span> <span class="pl-k">as</span> <span class="pl-smi">iMap</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>immutable<span class="pl-pds">'</span></span>;
+
+<span class="pl-c">// Actions</span>
+<span class="pl-k">const</span> <span class="pl-c1">INCREMENT</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>counter/INCREMENT<span class="pl-pds">'</span></span>;
+
+<span class="pl-c">// Reducer</span>
+<span class="pl-k">export</span> <span class="pl-v">default</span> (state <span class="pl-k">=</span> <span class="pl-en">iMap</span>({ count<span class="pl-k">:</span> <span class="pl-c1">10</span> }), action) <span class="pl-k">=&gt;</span> {
+  <span class="pl-k">if</span> (<span class="pl-smi">action</span>.<span class="pl-c1">type</span> <span class="pl-k">===</span> <span class="pl-c1">INCREMENT</span>) {
+    <span class="pl-k">return</span> <span class="pl-smi">state</span>.<span class="pl-en">update</span>(<span class="pl-s"><span class="pl-pds">'</span>count<span class="pl-pds">'</span></span>, (<span class="pl-smi">count</span>) <span class="pl-k">=&gt;</span> count <span class="pl-k">+</span> <span class="pl-smi">action</span>.<span class="pl-smi">increment</span>);
+  }
+  <span class="pl-k">return</span> state;
+};
+
+<span class="pl-c">// Action Creators</span>
+<span class="pl-k">export</span> <span class="pl-k">function</span> <span class="pl-en">increment</span>() {
+  <span class="pl-k">return</span> { type<span class="pl-k">:</span> <span class="pl-c1">INCREMENT</span>, increment<span class="pl-k">:</span> <span class="pl-c1">2</span> };
+}
+</pre></div>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// containers/Counter/CounterContainer.spec.js</span>
+
+<span class="pl-k">import</span> <span class="pl-smi">React</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">expect</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>chai<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">shallow</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>enzyme<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">Map</span> <span class="pl-k">as</span> <span class="pl-smi">iMap</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>immutable<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">CounterContainer</span>, <span class="pl-smi">dispatchToProps</span>, <span class="pl-smi">stateToProps</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./CounterContainer<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">Counter</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>../../components/Counter/Counter<span class="pl-pds">'</span></span>;
+
+<span class="pl-en">describe</span>(<span class="pl-s"><span class="pl-pds">'</span>CounterContainer<span class="pl-pds">'</span></span>, () <span class="pl-k">=&gt;</span> {
+  <span class="pl-c">// first test</span>
+
+  <span class="pl-en">describe</span>(<span class="pl-s"><span class="pl-pds">'</span>stateToProps<span class="pl-pds">'</span></span>, () <span class="pl-k">=&gt;</span> {
+    <span class="pl-en">it</span>(<span class="pl-s"><span class="pl-pds">'</span>maps state.counter.count to props.count<span class="pl-pds">'</span></span>, () <span class="pl-k">=&gt;</span> {
+      <span class="pl-k">const</span> <span class="pl-c1">state</span> <span class="pl-k">=</span> { counter<span class="pl-k">:</span> <span class="pl-en">iMap</span>({ count<span class="pl-k">:</span> <span class="pl-c1">5</span> }) };
+      <span class="pl-en">expect</span>(<span class="pl-en">stateToProps</span>(state).<span class="pl-smi">count</span>).<span class="pl-smi">to</span>.<span class="pl-en">equal</span>(<span class="pl-smi">state</span>.<span class="pl-smi">counter</span>.<span class="pl-c1">get</span>(<span class="pl-s"><span class="pl-pds">'</span>count<span class="pl-pds">'</span></span>));
+    });
+  });
+
+  <span class="pl-c">// third test</span>
+});
+</pre></div>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// containers/Counter/CounterContainer.js</span>
+
+<span class="pl-c">// ...more stuff</span>
+
+<span class="pl-k">export</span> <span class="pl-k">const</span> <span class="pl-c1">stateToProps</span> <span class="pl-k">=</span> (<span class="pl-smi">state</span>) <span class="pl-k">=&gt;</span> ({ count<span class="pl-k">:</span> <span class="pl-smi">state</span>.<span class="pl-smi">counter</span>.<span class="pl-c1">get</span>(<span class="pl-s"><span class="pl-pds">'</span>count<span class="pl-pds">'</span></span>) });
+
+<span class="pl-c">// more stuff...</span></pre></div>
+
+<p>We've just replaced our <code>counter</code> state with an Immutable Map rather than a plain JavaScript object.  Therefore, we need to update our getters to use <code>counter.get('count')</code> instead of <code>counter.count</code>.  We also need to incorporate Immutable into our test.</p>
+
+<p>Now we can be confident that our state won't be mutated accidentally or deliberately.</p>
+
+<h4>
+<a id="user-content-commit-our-changes" class="anchor" href="#commit-our-changes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Commit our changes</h4>
+
+<div class="highlight highlight-source-shell"><pre>git add <span class="pl-c1">.</span>
+git commit -m <span class="pl-s"><span class="pl-pds">'</span>added Immutable.js...closes #8<span class="pl-pds">'</span></span>
+git push origin master</pre></div>
+
+<p><a href="https://github.com/bschnelle/react-starter-kit/tree/7546f2519746bf908e57731de9c8b7fae3303dba">My repo after this commit</a></p>
+
+<h2>
+<a id="user-content-11-misc-development-tools" class="anchor" href="#11-misc-development-tools" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>11. Misc development tools</h2>
+
+<p>There are two great development tools that can be installed as Chrome addons: <a href="https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi?hl=en">React Developer Tools</a> and <a href="https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd?hl=en">Redux DevTools</a>.</p>
+
+<p>React Developer Tools should work out of the box after you install and enable them.  Redux DevTools need a small kickstart from our application though.  We need to make small changes to three files.  </p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// webpack.config.js</span>
+
+<span class="pl-c">// ...else block at very bottom of file</span>
+{
+  <span class="pl-c">// ...more config</span>
+
+  plugins<span class="pl-k">:</span> [
+    <span class="pl-k">new</span> <span class="pl-en">webpack.DefinePlugin</span>({ __DEV__<span class="pl-k">:</span> <span class="pl-k">!</span><span class="pl-smi">config</span>.<span class="pl-smi">production</span> }), <span class="pl-c">// new</span>
+
+    <span class="pl-k">new</span> <span class="pl-en">HtmlWebpackPlugin</span>({
+      template<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>./src/index.html<span class="pl-pds">'</span></span>,
+      inject<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>body<span class="pl-pds">'</span></span>
+    })
+  ]
+
+  <span class="pl-c">// more config...</span>
+}
+</pre></div>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// src/redux/store.js</span>
+
+<span class="pl-k">import</span> { <span class="pl-smi">createStore</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>redux<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">combinedReducer</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./combinedReducer<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">let</span> devTools;
+<span class="pl-k">if</span> (<span class="pl-c1">__DEV__</span>) {
+  devTools <span class="pl-k">=</span> <span class="pl-c1">window</span>.<span class="pl-smi">devToolsExtension</span> <span class="pl-k">&amp;&amp;</span> <span class="pl-c1">window</span>.<span class="pl-en">devToolsExtension</span>();
+}
+
+<span class="pl-k">export</span> <span class="pl-v">default</span> <span class="pl-smi">createStore</span>(combinedReducer, devTools);
+</pre></div>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// .eslintrc</span>
+
+{
+  <span class="pl-s"><span class="pl-pds">"</span>parser<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>babel-eslint<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>env<span class="pl-pds">"</span></span><span class="pl-k">:</span> {
+    <span class="pl-s"><span class="pl-pds">"</span>browser<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">true</span>,
+    <span class="pl-s"><span class="pl-pds">"</span>mocha<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">true</span> <span class="pl-c">// remove when eslint adds glob matching</span>
+  },
+  <span class="pl-s"><span class="pl-pds">"</span>extends<span class="pl-pds">"</span></span> <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>airbnb<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>globals<span class="pl-pds">"</span></span><span class="pl-k">:</span> {
+    <span class="pl-s"><span class="pl-pds">"</span>__DEV__<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">true</span> <span class="pl-c">// ignore this global variable</span>
+  },
+  <span class="pl-s"><span class="pl-pds">"</span>rules<span class="pl-pds">"</span></span><span class="pl-k">:</span> {
+    <span class="pl-s"><span class="pl-pds">"</span>comma-dangle<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">0</span>,
+    <span class="pl-s"><span class="pl-pds">"</span>import/no-extraneous-dependencies<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">0</span>, <span class="pl-c">// remove when eslint adds glob matching</span>
+    <span class="pl-s"><span class="pl-pds">"</span>no-unused-expressions<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">0</span>, <span class="pl-c">// remove when eslint adds glob matching</span>
+    <span class="pl-s"><span class="pl-pds">"</span>react/jsx-filename-extension<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">0</span>
+  }
+}</pre></div>
+
+<p>We're creating a global variable <code>__DEV__</code> that Webpack will evaluate at runtime and replace with <code>true</code> or <code>false</code> in our bundle.  In src/redux/store.js we enable Redux DevTools if we're currently in our development environment.  Finally, we don't want ESLint throwing an undefined variable error so we update our .eslintrc file.</p>
+
+<p>If you restart your server and open your Chrome DevTools you should have two new tabs: "React" and "Redux".  On the React tab you can explore your application from a React component perspective.  </p>
+
+<p>The Redux tab allows you to view your store at any point in time and also undo actions.  If you click the "Increment" button a few times you should see actions appear and your counter increment.  If you then click the "skip" button on the last action in the Redux tab you'll see the counter decrement back to its value before that action.  Awesome!</p>
+
+<h4>
+<a id="user-content-file-type-vs-feature" class="anchor" href="#file-type-vs-feature" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>File Type vs. Feature</h4>
+
+<p>We've organized our project based on file type which is fine for smaller projects, but can become unruly when your project reaches a certain size.  In a future post we'll reorganize the starter kit by feature (fractal organization).  This layout will have a folder structure that aligns closely with the application's routes.</p>
+
+<h4>
+<a id="user-content-commit-our-changes-1" class="anchor" href="#commit-our-changes-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Commit our changes</h4>
+
+<div class="highlight highlight-source-shell"><pre>git add <span class="pl-c1">.</span>
+git commit -m <span class="pl-s"><span class="pl-pds">'</span>added React Developer Tools and Redux DevTools...closes #9<span class="pl-pds">'</span></span>
+git push origin master</pre></div>
+
+<p><a href="https://github.com/bschnelle/react-starter-kit/tree/3c9e650a3b0f3d96c02d45cfd06db3393f8eb396">My repo after this commit</a></p>
+
+<p>Since that was the last issue of our milestone, we can confidently close it as well.  Hop over to GitHub, navigate to your milestone, and close it.</p>
+
+<h4>
+<a id="user-content-summary" class="anchor" href="#summary" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Summary</h4>
+
+<p>That's it!  We now have a functional starter kit with a lot of great tools to make building apps a pleasure!  Thanks for reading and stay tuned for the next post where we'll get started on our first app (the site you're reading this from).</p>

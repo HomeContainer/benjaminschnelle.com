@@ -8,9 +8,9 @@ describe('[Service] BlogService', () => {
   describe('getPost()', () => {
     afterEach(() => { fetch.default.restore(); });
 
-    it('calls fetch.default with https://s3-us-west-2.amazonaws.com/benjaminschnelle.com/blog/slug.md', () => {
+    it('calls fetch.default with https://s3-us-west-2.amazonaws.com/benjaminschnelle.com/blog/slug.html', () => {
       sinon.stub(fetch, 'default').returns(Promise.resolve());
-      const r = /^https:\/\/s3-us-west-2\.amazonaws\.com\/benjaminschnelle\.com\/blog\/slug\.md/;
+      const r = /^https:\/\/s3-us-west-2\.amazonaws\.com\/benjaminschnelle\.com\/blog\/slug\.html/;
       blogService.getPost('slug');
       expect(fetch.default).to.have.been.calledWith(sinon.match(r));
     });

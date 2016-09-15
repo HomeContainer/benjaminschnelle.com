@@ -168,7 +168,7 @@ dist
 
 The first 70 lines or so are all Webpack related stuff for module caching so that we don't load modules more than once.  If you scroll to the bottom you'll see our application code that just adds "Hey dude!" to a div.  If you look close you'll see that our arrow function is gone and has been replaced by a regular function.  That's the ES6 --> ES5 transpilation that Babel does for us.  Wow.
 
-![Wow](http://i.imgur.com/RJ6S6eY.gif)
+![Wow](https://media.giphy.com/media/3Lc7UTKUBh00U/giphy.gif)
 
 #### Minification
 Pretty cool, but what about all those comments and whitespace?  We don't want to send all that crap to our users because they don't need it and it's only going to make their downloads take longer.  Let's get rid of it.  Update your "webpack.config.js" file to look like the one below.
@@ -546,7 +546,7 @@ Damn Ben, that was a lot of stuff.  What are we even getting out of this?
 
 Restart your dev server and reload your application from the browser.  Type some stuff in the input, then update your "setHTML.js" file to add/remove a few exclamation marks to "Hey man!" then watch the browser as you save the file.  Your changes come through *AND* your application retains its state!
 
-![Oh Shit](http://i.imgur.com/osgFGlI.gif)
+![Oh Shit!](https://media.giphy.com/media/dRGWII2nDN1D2/giphy.gif)
 
 Ok, maybe you don't think it's that great, but when you're working with application state that takes a while to reach (filling out a form/walking through a wizard) it makes developing/debugging a lot more enjoyable.
 

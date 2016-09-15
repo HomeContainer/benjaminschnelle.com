@@ -1,0 +1,488 @@
+<p>To recap, we have our project under source control with Git/GitHub, we're managing our dependencies with NPM, ESLint is configured to ensure code consistency, and Webpack is configured for development and production.</p>
+
+<h2>
+<a id="user-content-7-react-and-react-router" class="anchor" href="#7-react-and-react-router" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>7. React and React Router</h2>
+
+<p>Per the React site, React makes it painless to create interactive UIs.  That is no understatement.  React is all <em>component</em> based (you can think of them as widgets of functionality) meaning you break your UI into separate components and <em>compose</em> your UI from those pieces.  I highly recommend reading <a href="https://facebook.github.io/react/docs/thinking-in-react.html">Thinking in React</a> by <a href="https://twitter.com/floydophone">Pete Hunt</a> for a quick overview of using React.</p>
+
+<p>Go ahead and install React and related packages.</p>
+
+<div class="highlight highlight-source-shell"><pre>npm install --save react react-dom
+npm install --save-dev react-hot-loader@3.0.0-beta.2</pre></div>
+
+<h5>
+<a id="user-content-what-did-we-just-install" class="anchor" href="#what-did-we-just-install" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What did we just install?</h5>
+
+<ul>
+<li>
+<code>react</code>: React.js</li>
+<li>
+<code>react-dom</code>: React package for working with the DOM</li>
+<li>
+<code>react-hot-loader</code>: HMR with React in mind...we're using a beta version for compatibility with functional stateless components</li>
+</ul>
+
+<p>We'll start by making the necessary config changes to get <code>react-hot-loader</code> working, then we'll create our first React component.</p>
+
+<p>Update the very bottom of your "webpack.config.js" file as shown below.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// ...more config</span>
+{
+  <span class="pl-c">// add HMR</span>
+  <span class="pl-smi">webpackConfig</span>.<span class="pl-smi">entry</span>.<span class="pl-smi">app</span>.<span class="pl-c1">unshift</span>(
+    <span class="pl-s"><span class="pl-pds">'</span>react-hot-loader/patch<span class="pl-pds">'</span></span>, <span class="pl-c">// this is new</span>
+    <span class="pl-s"><span class="pl-pds">`</span>webpack-dev-server/client?http://<span class="pl-s1"><span class="pl-pse">${</span><span class="pl-smi">config</span>.<span class="pl-c1">host</span><span class="pl-pse">}</span></span>:<span class="pl-s1"><span class="pl-pse">${</span><span class="pl-smi">config</span>.<span class="pl-c1">port</span><span class="pl-pse">}</span></span><span class="pl-pds">`</span></span>,
+    <span class="pl-s"><span class="pl-pds">'</span>webpack/hot/only-dev-server<span class="pl-pds">'</span></span>
+  );
+  <span class="pl-smi">webpackConfig</span>.<span class="pl-c1">plugins</span>.<span class="pl-c1">push</span>(
+    <span class="pl-k">new</span> <span class="pl-en">webpack.HotModuleReplacementPlugin</span>()
+  );
+}</pre></div>
+
+<p>Add a new <code>plugins</code> section to your ".babelrc" to enable <code>react-hot-loader</code>.</p>
+
+<div class="highlight highlight-source-json"><pre>{
+  <span class="pl-s"><span class="pl-pds">"</span>presets<span class="pl-pds">"</span></span>: [[<span class="pl-s"><span class="pl-pds">"</span>es2015<span class="pl-pds">"</span></span>, { <span class="pl-s"><span class="pl-pds">"</span>modules<span class="pl-pds">"</span></span>: <span class="pl-c1">false</span> }], <span class="pl-s"><span class="pl-pds">"</span>react<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>stage-0<span class="pl-pds">"</span></span>],
+  <span class="pl-s"><span class="pl-pds">"</span>plugins<span class="pl-pds">"</span></span>: [<span class="pl-s"><span class="pl-pds">"</span>react-hot-loader/babel<span class="pl-pds">"</span></span>]
+}</pre></div>
+
+<p>Update your "index.js" file as shown below.  Also, go ahead and delete "setHTML.js", "classes.scss", and the line <code>&lt;input type="text" /&gt;</code> from "index.html".</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">React</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">render</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-dom<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">HomeContainer</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./containers/Home/HomeContainer<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">const</span> <span class="pl-c1">MOUNT_NODE</span> <span class="pl-k">=</span> <span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>root<span class="pl-pds">'</span></span>);
+<span class="pl-k">const</span> <span class="pl-c1">App</span> <span class="pl-k">=</span> (
+  <span class="pl-k">&lt;</span>HomeContainer <span class="pl-k">/</span><span class="pl-k">&gt;</span>
+);
+
+<span class="pl-en">render</span>(App, <span class="pl-c1">MOUNT_NODE</span>);
+</pre></div>
+
+<p>That weird looking syntax (<code>&lt;HomeContainer /&gt;</code>) is JSX, it's just JavaScript in disguise.  You can read more <a href="https://facebook.github.io/react/docs/jsx-in-depth.html">here</a> where they give before and after code examples.</p>
+
+<h5>
+<a id="user-content-whats-going-on-here" class="anchor" href="#whats-going-on-here" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What's going on here?</h5>
+
+<ul>
+<li>
+<code>React</code>: required to be in scope when using JSX</li>
+<li>
+<code>render</code>: a function provided by the <code>react-dom</code> library which is used to inject our root component into the DOM</li>
+<li>
+<code>HomeContainer</code>: the first React component we'll build momentarily</li>
+<li>
+<code>MOUNT_NODE</code>: reference to our "root" <code>div</code>
+</li>
+<li>
+<code>App</code>: our application...we'll be adding to this a little later</li>
+<li>
+<code>render()</code>: render our app into the DOM</li>
+</ul>
+
+<h4>
+<a id="user-content-container-vs-presentational" class="anchor" href="#container-vs-presentational" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Container vs. Presentational</h4>
+
+<p>If you looked closely at the <code>HomeContainer</code> import it is referencing a component in a sibling folder named "containers".  There's a useful philosophy in the React community of splitting up your components into two groups: container and presentational components (smart and dumb).</p>
+
+<p>Basically, container components implement business logic and presentational components are only concerned with rendering the UI.  Dan Abramov has a good <a href="https://medium.com/@dan_abramov/smart-and-dumb-components-7ca2f9a7c7d0#.f4mqb6y14">post</a> on the concepts.</p>
+
+<p>Next, create two new folders under "src" named "containers" and "components" where we'll put our two types of components.  Then create a "Home" directory under the "containers" folder and a "HomeContainer.js" file in that directory, finally paste in the code below.  We'll follow a convention of appending "Container" to our container component names for clarity and to avoid naming collisions with our presentational components.</p>
+
+<p>We'll create our first presentational component a little later, for now this will work as a starting point.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">React</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">const</span> <span class="pl-c1">HomeContainer</span> <span class="pl-k">=</span> () <span class="pl-k">=&gt;</span> (
+  <span class="pl-k">&lt;</span>h2<span class="pl-k">&gt;</span>Hello from Home<span class="pl-k">!</span><span class="pl-k">&lt;</span><span class="pl-k">/</span>h2<span class="pl-k">&gt;</span>
+);
+
+<span class="pl-k">export</span> <span class="pl-v">default</span> <span class="pl-smi">HomeContainer</span>;
+</pre></div>
+
+<p>If you fire up your dev server you'll see your first React component in action!  Not very exciting, but we <em>are</em> using React now.</p>
+
+<h4>
+<a id="user-content-how-can-we-create-components" class="anchor" href="#how-can-we-create-components" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How can we create components?</h4>
+
+<p>If you read through <a href="https://facebook.github.io/react/docs/thinking-in-react.html">Thinking in React</a> you would have seen components written by calling <code>React.createClass</code> (as of this writing anyway) rather than how we're doing it above.  There are actually three way to create components in React, the first of which follows.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> HomeContainer <span class="pl-k">=</span> <span class="pl-smi">React</span>.<span class="pl-en">createClass</span>({})</pre></div>
+
+<p>The second way you can create components is using <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes">ES6 classes</a>.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">class</span> <span class="pl-en">HomeContainer</span> <span class="pl-k">extends</span> <span class="pl-e">React</span>.<span class="pl-smi">Component</span> {}</pre></div>
+
+<p>Finally, you can create <a href="https://facebook.github.io/react/docs/reusable-components.html#stateless-functions">functional stateless components</a>.  There are certain limitations to this approach, but they're also simpler and Facebook has <a href="https://github.com/facebook/react/issues/5677">stated</a> that they're planning future optimizations for components written in this way.  Stateless functions cannot use component lifecycle hooks or internal state (hence, stateless).  </p>
+
+<p>We'll look at some of the lifecycle hooks in a later post when we cover Redux.  Stateless components are just implemented as a regular JavaScript functions.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">function</span> <span class="pl-en">HomeContainer</span>() {}
+<span class="pl-c">// or</span>
+<span class="pl-k">const</span> <span class="pl-c1">HomeContainer</span> <span class="pl-k">=</span> () <span class="pl-k">=&gt;</span> {}</pre></div>
+
+<h4>
+<a id="user-content-react-hot-loader" class="anchor" href="#react-hot-loader" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>React Hot Loader</h4>
+
+<p>When we updated our "index.js" file earlier we broken HMR.  Let's fix that now.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">React</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">render</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-dom<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">AppContainer</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-hot-loader<span class="pl-pds">'</span></span>; <span class="pl-c">// eslint-disable-line</span>
+<span class="pl-k">import</span> <span class="pl-smi">HomeContainer</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./containers/Home/HomeContainer<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">const</span> <span class="pl-c1">MOUNT_NODE</span> <span class="pl-k">=</span> <span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>root<span class="pl-pds">'</span></span>);
+<span class="pl-k">const</span> <span class="pl-c1">App</span> <span class="pl-k">=</span> (
+  <span class="pl-k">&lt;</span>HomeContainer <span class="pl-k">/</span><span class="pl-k">&gt;</span>
+);
+
+<span class="pl-en">render</span>(App, <span class="pl-c1">MOUNT_NODE</span>);
+
+<span class="pl-k">if</span> (<span class="pl-c1">module</span>.<span class="pl-smi">hot</span>) {
+  <span class="pl-c1">module</span>.<span class="pl-smi">hot</span>.<span class="pl-c1">accept</span>(<span class="pl-s"><span class="pl-pds">'</span>./containers/Home/HomeContainer<span class="pl-pds">'</span></span>, () <span class="pl-k">=&gt;</span> {
+    <span class="pl-en">render</span>(<span class="pl-k">&lt;</span>AppContainer<span class="pl-k">&gt;</span>{App}<span class="pl-k">&lt;</span><span class="pl-k">/</span>AppContainer<span class="pl-k">&gt;</span>, <span class="pl-c1">MOUNT_NODE</span>);
+  });
+}
+</pre></div>
+
+<p>The only big difference between how we were using HMR before and using it with <code>react-hot-loader</code> is the use of <code>AppContainer</code> when applying updates.  This component hasn't received documentation yet, nor have I dug into the code thoroughly to explain it.  For now, just know its use is required by <code>react-hot-loader</code>.</p>
+
+<p>We're also overriding ESLint on line 3 to avoid a rule that we otherwise want applied.</p>
+
+<h4>
+<a id="user-content-props" class="anchor" href="#props" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Props</h4>
+
+<p>React enables you to pass data from parent components to child components via a <code>props</code> object.  Let's demonstrate that and also create our first presentational component.  Update/create the files below.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// containers/Home/HomeContainer.js</span>
+<span class="pl-k">import</span> <span class="pl-smi">React</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">Home</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>../../components/Home/Home<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">const</span> <span class="pl-c1">HomeContainer</span> <span class="pl-k">=</span> () <span class="pl-k">=&gt;</span> (
+  <span class="pl-k">&lt;</span>Home message<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>Hello from HomeContainer!<span class="pl-pds">"</span></span> <span class="pl-k">/</span><span class="pl-k">&gt;</span>
+);
+
+<span class="pl-k">export</span> <span class="pl-v">default</span> <span class="pl-smi">HomeContainer</span>;
+</pre></div>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// components/Home/Home.js</span>
+<span class="pl-k">import</span> <span class="pl-smi">React</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">const</span> <span class="pl-c1">Home</span> <span class="pl-k">=</span> (<span class="pl-smi">props</span>) <span class="pl-k">=&gt;</span> (
+  <span class="pl-k">&lt;</span>div<span class="pl-k">&gt;</span>
+    <span class="pl-k">&lt;</span>h2<span class="pl-k">&gt;</span>Hello from Home<span class="pl-k">!</span><span class="pl-k">&lt;</span><span class="pl-k">/</span>h2<span class="pl-k">&gt;</span>
+    <span class="pl-k">&lt;</span>div<span class="pl-k">&gt;</span>{<span class="pl-smi">props</span>.<span class="pl-smi">message</span>}<span class="pl-k">&lt;</span><span class="pl-k">/</span>div<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span><span class="pl-k">/</span>div<span class="pl-k">&gt;</span>
+);
+
+<span class="pl-smi">Home</span>.<span class="pl-smi">propTypes</span> <span class="pl-k">=</span> {
+  message<span class="pl-k">:</span> <span class="pl-smi">React</span>.<span class="pl-smi">PropTypes</span>.<span class="pl-smi">string</span>.<span class="pl-smi">isRequired</span>
+};
+
+<span class="pl-k">export</span> <span class="pl-v">default</span> <span class="pl-smi">Home</span>;
+</pre></div>
+
+<h5>
+<a id="user-content-homecontainer" class="anchor" href="#homecontainer" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>HomeContainer</h5>
+
+<ul>
+<li>We're importing our <code>Home</code> presentational component from components/Home...the reason we've nested it inside a "Home" directory is so we can create SASS files beside the JS file.</li>
+<li>When we render the <code>Home</code> component, we're passing a <code>message</code> property to it of "Hello from HomeContainer!".</li>
+</ul>
+
+<h5>
+<a id="user-content-home" class="anchor" href="#home" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Home</h5>
+
+<ul>
+<li>We're rendering output similar to what we had before in <code>HomeContainer</code>, but we're also now rendering the message property passed in from <code>HomeContainer</code> in <code>&lt;div&gt;{props.message}&lt;/div&gt;</code>.  React will replace <code>props.message</code> with "Hello from HomeContainer!" in the rendered output.</li>
+<li>Further down we're explicitly telling our component what <code>props</code> to expect with the <code>React.PropTypes</code> object.  Adding static typing and making <code>props</code> required can improve debugging during development.</li>
+</ul>
+
+<p>If you view your app now, you should see two lines rendered.</p>
+
+<blockquote>
+<p>We'll look at <code>state</code> and <code>context</code>, two more fundamental React concepts, when we get to the post on Redux.</p>
+</blockquote>
+
+<h4>
+<a id="user-content-react-router" class="anchor" href="#react-router" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>React Router</h4>
+
+<p>To make our app more interesting and useful we're going to add a router that enables us to change paths/routes within our app (e.g., my.site.com --&gt; my.site.com/counter).  React Router interfaces with the HTML5 <a href="https://developer.mozilla.org/en-US/docs/Web/API/History">history API</a> which works well with single page apps.</p>
+
+<p>Let's get the library.</p>
+
+<div class="highlight highlight-source-js"><pre>npm install <span class="pl-k">--</span>save react<span class="pl-k">-</span>router</pre></div>
+
+<p>Update "index.js" as follows.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">React</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">render</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-dom<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">AppContainer</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-hot-loader<span class="pl-pds">'</span></span>; <span class="pl-c">// eslint-disable-line</span>
+<span class="pl-k">import</span> { <span class="pl-smi">browserHistory</span>, <span class="pl-smi">Route</span>, <span class="pl-smi">Router</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-router<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">HomeContainer</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./containers/Home/HomeContainer<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">const</span> <span class="pl-c1">MOUNT_NODE</span> <span class="pl-k">=</span> <span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>root<span class="pl-pds">'</span></span>);
+<span class="pl-k">const</span> <span class="pl-c1">App</span> <span class="pl-k">=</span> (
+  <span class="pl-k">&lt;</span>Router history<span class="pl-k">=</span>{browserHistory}<span class="pl-k">&gt;</span>
+    <span class="pl-k">&lt;</span>Route path<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>/<span class="pl-pds">"</span></span> component<span class="pl-k">=</span>{HomeContainer} <span class="pl-k">/</span><span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span><span class="pl-k">/</span>Router<span class="pl-k">&gt;</span>
+);
+
+<span class="pl-en">render</span>(App, <span class="pl-c1">MOUNT_NODE</span>);
+
+<span class="pl-k">if</span> (<span class="pl-c1">module</span>.<span class="pl-smi">hot</span>) {
+  <span class="pl-c1">module</span>.<span class="pl-smi">hot</span>.<span class="pl-c1">accept</span>(<span class="pl-s"><span class="pl-pds">'</span>./containers/Home/HomeContainer<span class="pl-pds">'</span></span>, () <span class="pl-k">=&gt;</span> {
+    <span class="pl-en">render</span>(<span class="pl-k">&lt;</span>AppContainer<span class="pl-k">&gt;</span>{App}<span class="pl-k">&lt;</span><span class="pl-k">/</span>AppContainer<span class="pl-k">&gt;</span>, <span class="pl-c1">MOUNT_NODE</span>);
+  });
+}
+</pre></div>
+
+<h5>
+<a id="user-content-whats-going-on-here-1" class="anchor" href="#whats-going-on-here-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What's going on here?</h5>
+
+<ul>
+<li>React Router imports
+
+<ul>
+<li>
+<code>browserHistory</code>: use the HTML5 history api for the router's history</li>
+<li>
+<code>Route</code>: an individual React route component</li>
+<li>
+<code>Router</code>: our React router component which controls/maintains our navigation and history</li>
+</ul>
+</li>
+<li>We've updated <code>App</code> with a <code>Router</code> component and nested a <code>Route</code> component inside.  Here we're telling React to render a <code>Router</code> that uses <code>browserHistory</code> and create a single <code>Route</code> at path <code>"/"</code> (which is just our root route) that renders our <code>HomeContainer</code> component.</li>
+</ul>
+
+<p>If you refresh your browser now nothing should look different, but it <em>is</em>.  Let's add another route to demonstrate.  Below our existing route add <code>&lt;Route path="/counter" component={CounterContainer} /&gt;</code> and add <code>import CounterContainer from './containers/Counter/CounterContainer';</code> below your <code>HomeContainer</code> import.  Finally, create the components below.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// containers/Counter/CounterContainer.js</span>
+<span class="pl-k">import</span> <span class="pl-smi">React</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">Counter</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>../../components/Counter/Counter<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">const</span> <span class="pl-c1">CounterContainer</span> <span class="pl-k">=</span> () <span class="pl-k">=&gt;</span> (
+  <span class="pl-k">&lt;</span>Counter <span class="pl-k">/</span><span class="pl-k">&gt;</span>
+);
+
+<span class="pl-k">export</span> <span class="pl-v">default</span> <span class="pl-smi">CounterContainer</span>;
+</pre></div>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// components/Counter/Counter.js</span>
+<span class="pl-k">import</span> <span class="pl-smi">React</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">const</span> <span class="pl-c1">Counter</span> <span class="pl-k">=</span> () <span class="pl-k">=&gt;</span> (
+  <span class="pl-k">&lt;</span>h2<span class="pl-k">&gt;</span>Hello from Counter<span class="pl-k">!</span><span class="pl-k">&lt;</span><span class="pl-k">/</span>h2<span class="pl-k">&gt;</span>
+);
+
+<span class="pl-k">export</span> <span class="pl-v">default</span> <span class="pl-smi">Counter</span>;
+</pre></div>
+
+<p>Restart your server and try to visit "localhost:8080/counter".  Did you get a "Cannot GET /counter" error?  Me too.  </p>
+
+<p>The reason this is happening is because we don't have a file in our "dist" directory named "counter".  What we want is for our server to always serve our "index.html" file when it doesn't find what it is looking for (an HTTP 404 error).  Webpack has this covered!  Add <code>historyApiFallback: true,</code> to the <code>devServer</code> section of your "webpack.config.js" file, restart your server, then visit "localhost:8080/counter" again.  It works!</p>
+
+<p>If you visit localhost:8080 you'll continue to receive our <code>HomeContainer</code> output.  Wouldn't it be even better if we could navigate between our routes without having to manually change the URL?  Let's do that.  (We're also going to remove <code>props.message</code> from <code>HomeContainer</code> and <code>Home</code>)</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// containers/Home/HomeContainer.js</span>
+<span class="pl-k">import</span> <span class="pl-smi">React</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">Home</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>../../components/Home/Home<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">const</span> <span class="pl-c1">HomeContainer</span> <span class="pl-k">=</span> () <span class="pl-k">=&gt;</span> (
+  <span class="pl-k">&lt;</span>Home <span class="pl-k">/</span><span class="pl-k">&gt;</span>
+);
+
+<span class="pl-k">export</span> <span class="pl-v">default</span> <span class="pl-smi">HomeContainer</span>;
+</pre></div>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// components/Home/Home.js</span>
+<span class="pl-k">import</span> <span class="pl-smi">React</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">Link</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-router<span class="pl-pds">'</span></span>;
+
+<span class="pl-c">// we've removed our message as well</span>
+<span class="pl-k">const</span> <span class="pl-c1">Home</span> <span class="pl-k">=</span> () <span class="pl-k">=&gt;</span> (
+  <span class="pl-k">&lt;</span>div<span class="pl-k">&gt;</span>
+    <span class="pl-k">&lt;</span>h2<span class="pl-k">&gt;</span>Hello from Home<span class="pl-k">!</span><span class="pl-k">&lt;</span><span class="pl-k">/</span>h2<span class="pl-k">&gt;</span>
+    <span class="pl-k">&lt;</span>Link to<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>/counter<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>Go to Counter<span class="pl-k">!</span><span class="pl-k">&lt;</span><span class="pl-k">/</span>Link<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span><span class="pl-k">/</span>div<span class="pl-k">&gt;</span>
+);
+
+<span class="pl-k">export</span> <span class="pl-v">default</span> <span class="pl-smi">Home</span>;
+</pre></div>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// components/Counter/Counter.js</span>
+<span class="pl-k">import</span> <span class="pl-smi">React</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">Link</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-router<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">const</span> <span class="pl-c1">Counter</span> <span class="pl-k">=</span> () <span class="pl-k">=&gt;</span> (
+  <span class="pl-k">&lt;</span>div<span class="pl-k">&gt;</span>
+    <span class="pl-k">&lt;</span>h2<span class="pl-k">&gt;</span>Hello from Counter<span class="pl-k">!</span><span class="pl-k">&lt;</span><span class="pl-k">/</span>h2<span class="pl-k">&gt;</span>
+    <span class="pl-k">&lt;</span>Link to<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>/<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>Go Home<span class="pl-k">!</span><span class="pl-k">&lt;</span><span class="pl-k">/</span>Link<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span><span class="pl-k">/</span>div<span class="pl-k">&gt;</span>
+);
+
+<span class="pl-k">export</span> <span class="pl-v">default</span> <span class="pl-smi">Counter</span>;
+</pre></div>
+
+<p>Here we're using React Router <code>Link</code> components to navigate between our routes.  You should now be able to navigate back and forth between the two routes.</p>
+
+<h4>
+<a id="user-content-layout-component" class="anchor" href="#layout-component" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Layout Component</h4>
+
+<p>At this point our HMR is broken.  It works for our Home components, but not our Counter components.  We're going to fix it, but let's add a little consistency across our routes with a <code>Layout</code> component first.  </p>
+
+<p>This is where you would typically find a navigation bar and footer among other things.  Create a new file named "Layout.js" in components/Layout with the code below.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">React</span>, { <span class="pl-smi">PropTypes</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">const</span> <span class="pl-c1">Layout</span> <span class="pl-k">=</span> (<span class="pl-smi">props</span>) <span class="pl-k">=&gt;</span> (
+  <span class="pl-k">&lt;</span>div<span class="pl-k">&gt;</span>
+    <span class="pl-k">&lt;</span>div<span class="pl-k">&gt;</span>
+      <span class="pl-k">&lt;</span>h1<span class="pl-k">&gt;</span>React Starter Kit<span class="pl-k">&lt;</span><span class="pl-k">/</span>h1<span class="pl-k">&gt;</span>
+      {<span class="pl-smi">props</span>.<span class="pl-smi">children</span>}
+    <span class="pl-k">&lt;</span><span class="pl-k">/</span>div<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span><span class="pl-k">/</span>div<span class="pl-k">&gt;</span>
+);
+
+<span class="pl-smi">Layout</span>.<span class="pl-smi">propTypes</span> <span class="pl-k">=</span> {
+  children<span class="pl-k">:</span> <span class="pl-smi">PropTypes</span>.<span class="pl-smi">node</span>.<span class="pl-smi">isRequired</span>
+};
+
+<span class="pl-k">export</span> <span class="pl-v">default</span> <span class="pl-smi">Layout</span>;
+</pre></div>
+
+<p><code>props.children</code> are any nodes (React components or regular HTML elements) rendered within a component such as <code>&lt;Parent&gt;&lt;Child /&gt;&lt;/Parent&gt;</code>.  If you're wondering why there's an extra <code>div</code> in there, we'll need it later when we add some styling.</p>
+
+<h4>
+<a id="user-content-routes" class="anchor" href="#routes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Routes</h4>
+
+<p>We've got our <code>Layout</code> component in good order, but we want to make one more change first.  We're going to break our routes out into a separate file beside our "index.js".  Create the file below.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// src/routes.js</span>
+<span class="pl-k">import</span> <span class="pl-smi">React</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">IndexRoute</span>, <span class="pl-smi">Route</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-router<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">Layout</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./components/Layout/Layout<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">HomeContainer</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./containers/Home/HomeContainer<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">CounterContainer</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./containers/Counter/CounterContainer<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">const</span> <span class="pl-c1">routes</span> <span class="pl-k">=</span> (
+  <span class="pl-k">&lt;</span>Route path<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>/<span class="pl-pds">"</span></span> component<span class="pl-k">=</span>{Layout}<span class="pl-k">&gt;</span>
+    <span class="pl-k">&lt;</span>IndexRoute component<span class="pl-k">=</span>{HomeContainer} <span class="pl-k">/</span><span class="pl-k">&gt;</span>
+    <span class="pl-k">&lt;</span>Route path<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>/counter<span class="pl-pds">"</span></span> component<span class="pl-k">=</span>{CounterContainer} <span class="pl-k">/</span><span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span><span class="pl-k">/</span>Route<span class="pl-k">&gt;</span>
+);
+
+<span class="pl-k">export</span> <span class="pl-v">default</span> <span class="pl-smi">routes</span>;
+</pre></div>
+
+<p>We're now rendering our <code>Layout</code> component at the "/" path and our <code>HomeContainer</code> is rendered into a new <code>IndexRoute</code> component.  React Router will render the <code>HomeContainer</code> component as the child when at the "/" route.</p>
+
+<p>Finally, update your "index.js" file as shown below.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">React</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">render</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-dom<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">AppContainer</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-hot-loader<span class="pl-pds">'</span></span>; <span class="pl-c">// eslint-disable-line</span>
+<span class="pl-k">import</span> { <span class="pl-smi">browserHistory</span>, <span class="pl-smi">Router</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-router<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">routes</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./routes<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">const</span> <span class="pl-c1">MOUNT_NODE</span> <span class="pl-k">=</span> <span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>root<span class="pl-pds">'</span></span>);
+<span class="pl-k">const</span> <span class="pl-c1">App</span> <span class="pl-k">=</span> (
+  <span class="pl-k">&lt;</span>Router history<span class="pl-k">=</span>{browserHistory}<span class="pl-k">&gt;</span>
+    {routes}
+  <span class="pl-k">&lt;</span><span class="pl-k">/</span>Router<span class="pl-k">&gt;</span>
+);
+
+<span class="pl-en">render</span>(App, <span class="pl-c1">MOUNT_NODE</span>);
+
+<span class="pl-k">if</span> (<span class="pl-c1">module</span>.<span class="pl-smi">hot</span>) {
+  <span class="pl-c1">module</span>.<span class="pl-smi">hot</span>.<span class="pl-c1">accept</span>(<span class="pl-s"><span class="pl-pds">'</span>./routes<span class="pl-pds">'</span></span>, () <span class="pl-k">=&gt;</span> {
+    <span class="pl-en">render</span>(<span class="pl-k">&lt;</span>AppContainer<span class="pl-k">&gt;</span>{App}<span class="pl-k">&lt;</span><span class="pl-k">/</span>AppContainer<span class="pl-k">&gt;</span>, <span class="pl-c1">MOUNT_NODE</span>);
+  });
+}
+</pre></div>
+
+<p>HMR is now fixed and we have a layout for consistency between our routes.</p>
+
+<h4>
+<a id="user-content-adding-some-style" class="anchor" href="#adding-some-style" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Adding Some Style</h4>
+
+<p><a href="https://camo.githubusercontent.com/34fa5d36889afc6c89bc31caea0fbd96ae464b20/687474703a2f2f692e696d6775722e636f6d2f4d6a65716555502e676966" target="_blank"><img src="https://camo.githubusercontent.com/34fa5d36889afc6c89bc31caea0fbd96ae464b20/687474703a2f2f692e696d6775722e636f6d2f4d6a65716555502e676966" alt="Nyan Cat" data-canonical-src="http://i.imgur.com/MjeqeUP.gif" style="max-width:100%;"></a></p>
+
+<p>Our app looks awful so let's add a little CSS to make it look slightly better.  Create a new file named "Layout.scss" in the "Layout" folder as shown below.  Then add the class to the root <code>div</code> of your <code>Layout</code> component.</p>
+
+<div class="highlight highlight-source-css"><pre><span class="pl-e">.layout</span> {
+  <span class="pl-c">/* colors */</span>
+  <span class="pl-c1"><span class="pl-c1">background-color</span></span>: <span class="pl-c1">#3949ab</span>;
+  <span class="pl-c1"><span class="pl-c1">color</span></span>: <span class="pl-c1">#fff</span>;
+
+  <span class="pl-c">/* layout */</span>
+  <span class="pl-c1"><span class="pl-c1">display</span></span>: flex;
+  <span class="pl-c1"><span class="pl-c1">align</span>-items</span>: <span class="pl-c1">center</span>;
+  <span class="pl-c1"><span class="pl-c1">justify</span>-<span class="pl-c1">content</span></span>: <span class="pl-c1">center</span>;
+
+  <span class="pl-c">/* fill width and height */</span>
+  <span class="pl-c1"><span class="pl-c1">position</span></span>: <span class="pl-c1">absolute</span>;
+  <span class="pl-c1"><span class="pl-c1">top</span></span>: <span class="pl-c1">0</span>;
+  <span class="pl-c1"><span class="pl-c1">left</span></span>: <span class="pl-c1">0</span>;
+  <span class="pl-c1"><span class="pl-c1">height</span></span>: <span class="pl-c1">100<span class="pl-k">%</span></span>;
+  <span class="pl-c1"><span class="pl-c1">width</span></span>: <span class="pl-c1">100<span class="pl-k">%</span></span>;
+
+  <span class="pl-c">/* font */</span>
+  <span class="pl-c1"><span class="pl-c1">font-family</span></span>: <span class="pl-s"><span class="pl-pds">'</span>Lato<span class="pl-pds">'</span></span>;
+  <span class="pl-c1"><span class="pl-c1">text-align</span></span>: <span class="pl-c1">center</span>;
+
+  <span class="pl-c">/* make layout header uppercase */</span>
+  <span class="pl-c1">h</span>1 {
+    <span class="pl-c1"><span class="pl-c1">text-transform</span></span>: <span class="pl-c1">uppercase</span>;
+  }
+
+  <span class="pl-c">/* make link yellow and little bigger */</span>
+  <span class="pl-ent">a</span> {
+    <span class="pl-c1"><span class="pl-c1">color</span></span>: <span class="pl-c1">#fdd835</span> <span class="pl-k">!important</span>;
+    <span class="pl-c1"><span class="pl-c1">font-size</span></span>: <span class="pl-c1">1.2<span class="pl-k">rem</span></span>;
+  }
+}</pre></div>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// components/Layout.js</span>
+<span class="pl-k">import</span> <span class="pl-smi">React</span>, { <span class="pl-smi">PropTypes</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">classes</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./Layout.scss<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">const</span> <span class="pl-c1">Layout</span> <span class="pl-k">=</span> (<span class="pl-smi">props</span>) <span class="pl-k">=&gt;</span> (
+  <span class="pl-k">&lt;</span>div className<span class="pl-k">=</span>{<span class="pl-smi">classes</span>.<span class="pl-smi">layout</span>}<span class="pl-k">&gt;</span>
+    <span class="pl-k">&lt;</span>div<span class="pl-k">&gt;</span>
+      <span class="pl-k">&lt;</span>h1<span class="pl-k">&gt;</span>React Starter Kit<span class="pl-k">&lt;</span><span class="pl-k">/</span>h1<span class="pl-k">&gt;</span>
+      {<span class="pl-smi">props</span>.<span class="pl-smi">children</span>}
+    <span class="pl-k">&lt;</span><span class="pl-k">/</span>div<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span><span class="pl-k">/</span>div<span class="pl-k">&gt;</span>
+);
+
+<span class="pl-smi">Layout</span>.<span class="pl-smi">propTypes</span> <span class="pl-k">=</span> {
+  children<span class="pl-k">:</span> <span class="pl-smi">PropTypes</span>.<span class="pl-smi">node</span>.<span class="pl-smi">isRequired</span>
+};
+
+<span class="pl-k">export</span> <span class="pl-v">default</span> <span class="pl-smi">Layout</span>;
+</pre></div>
+
+<h4>
+<a id="user-content-better-font" class="anchor" href="#better-font" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Better Font</h4>
+
+<p>Add <code>&lt;link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet"&gt;</code> between the <code>&lt;head&gt;</code> tags in your "index.html" file.  This will download our Lato font we used in our SASS file.</p>
+
+<p>Does your app look like this?  Spectacular I must say.</p>
+
+<p><a href="../../images/styled-app.jpg" target="_blank"><img src="../../images/styled-app.jpg" alt="Styled App" style="max-width:100%;"></a></p>
+
+<h4>
+<a id="user-content-commit-our-changes" class="anchor" href="#commit-our-changes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Commit our changes</h4>
+
+<div class="highlight highlight-source-shell"><pre>git add <span class="pl-c1">.</span>
+git commit -m <span class="pl-s"><span class="pl-pds">'</span>added React and React Router...closes #5<span class="pl-pds">'</span></span>
+git push origin master</pre></div>
+
+<p><a href="https://github.com/bschnelle/react-starter-kit/tree/c91311b0c6e89e408431e38b6b8d743517943941">My repo after this commit</a></p>
+
+<h4>
+<a id="user-content-summary" class="anchor" href="#summary" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Summary</h4>
+
+<p>We now have React and React Router setup which lets us modularize the functionality of our app into multiple components as well as break our app up into separate routes for a better use experience.  In the next section we'll get our testing setup in place so we can take a <a href="https://en.wikipedia.org/wiki/Test-driven_development">Test Driven Development (TDD)</a> approach with the rest of our components.</p>

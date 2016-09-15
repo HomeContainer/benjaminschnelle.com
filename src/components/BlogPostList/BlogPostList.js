@@ -5,7 +5,12 @@ import Post from '../Post/Post';
 import classes from './BlogPostList.scss';
 
 export const BlogPostList = (props) => {
-  const sortedPosts = props.posts.sort((p1, p2) => p1.get('date') <= p2.get('date'));
+  const sortedPosts = props.posts.sort((p1, p2) => {
+    const p1Date = p1.get('date');
+    const p2Date = p2.get('date');
+    if (p1Date === p2Date) return 0;
+    return p1Date < p2Date ? 1 : -1;
+  });
   const mappedPosts = sortedPosts.map((post) => {
     const onClick = () => props.router.push(`/blog/${post.get('slug')}`);
     return <Post key={post.get('slug')} onClick={onClick} post={post} />;

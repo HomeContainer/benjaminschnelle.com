@@ -1,0 +1,649 @@
+<p>In the last part we created our project, added it to source control with Git and GitHub, initialized NPM for dependency management, and added ESLint so we can write well-formatted code.</p>
+
+<h2>
+<a id="user-content-5-configure-webpack-for-development" class="anchor" href="#5-configure-webpack-for-development" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>5. Configure Webpack for development</h2>
+
+<p>Webpack is a roided out bundling tool written with SPAs in mind.  Webpack by itself doesn't actually do much, the real power comes from <em>loaders</em> and <em>plugins</em>.</p>
+
+<p><a href="https://camo.githubusercontent.com/576d4302f2e135e13d45cd0b770636e13d967a38/687474703a2f2f692e696d6775722e636f6d2f6370746963637a2e676966" target="_blank"><img src="https://camo.githubusercontent.com/576d4302f2e135e13d45cd0b770636e13d967a38/687474703a2f2f692e696d6775722e636f6d2f6370746963637a2e676966" alt="Stewie Steroids" data-canonical-src="http://i.imgur.com/cpticcz.gif" style="max-width:100%;"></a></p>
+
+<blockquote>
+<h4>
+<a id="user-content-whats-a-bundling-tool" class="anchor" href="#whats-a-bundling-tool" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What's a bundling tool?</h4>
+
+<p>Writing all of our application code in separate <em>modules</em> makes development much more efficient and enjoyable, but when we actually deploy our code we want to optimize it as much as possible.  Reducing the number of files via bundling is a part of the optimization process.  Webpack enables us to do that among other things.</p>
+</blockquote>
+
+<h5>
+<a id="user-content-what-will-we-be-using-webpack-for-during-development" class="anchor" href="#what-will-we-be-using-webpack-for-during-development" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What will we be using Webpack for during development?</h5>
+
+<ul>
+<li>Web Server: Webpack has an installable development server, <code>webpack-dev-server</code>, powered by Node and <a href="https://expressjs.com/">Express</a> (a web framework for Node)
+
+<ul>
+<li>Hot module replacement: edit our application and see the changes in realtime <em>without</em> losing the current application state! (it isn't just an automatic page refresh) <g-emoji alias="astonished" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f632.png">😲</g-emoji>
+</li>
+</ul>
+</li>
+<li>Loaders: put files in, transform them, get bundle(s) out
+
+<ul>
+<li>
+<code>babel-loader</code>: JSX/ES6/ES7 (JSX is React specific syntax) --&gt; ES5 (old, but well supported JavaScript)</li>
+<li>
+<code>postcss-loader</code>: add browser/vendor prefixes where appropriate (PostCSS does more, but this is what we'll be using it for)</li>
+<li>
+<code>sass-loader</code>: SASS (supercharged CSS) --&gt; regular CSS</li>
+<li>
+<code>react-hot-loader</code>: enables us to use HMR with React</li>
+</ul>
+</li>
+<li>Plugins: add bundle related functionality
+
+<ul>
+<li>
+<code>ExtractTextPlugin</code>: create CSS bundle</li>
+<li>
+<code>HotModuleReplacementPlugin</code>: necessary for dev server HMR</li>
+<li>
+<code>HtmlWebpackPlugin</code>: dynamically create our HTML</li>
+</ul>
+</li>
+</ul>
+
+<blockquote>
+<h4>
+<a id="user-content-babel" class="anchor" href="#babel" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Babel</h4>
+
+<p><a href="https://babeljs.io/">Babel</a> is a powerful tool for transforming JavaScript.  We'll see it in action shortly.</p>
+</blockquote>
+
+<h4>
+<a id="user-content-getting-started" class="anchor" href="#getting-started" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Getting Started</h4>
+
+<p>Create an "index.html" file in your "src" directory with the code below.  This is telling the browser we'll be using English (<code>lang="en"</code>) and to use the <a href="http://www.w3schools.com/charsets/ref_html_utf8.asp">UTF-8</a> character set (<code>charset="utf-8"</code>).  The <code>&lt;div id="root"&gt;&lt;/div&gt;</code> tag is where we'll inject our React app later.</p>
+
+<div class="highlight highlight-text-html-basic"><pre>&lt;!doctype html&gt;
+&lt;<span class="pl-ent">html</span> <span class="pl-e">lang</span>=<span class="pl-s"><span class="pl-pds">"</span>en<span class="pl-pds">"</span></span>&gt;
+  &lt;<span class="pl-ent">head</span>&gt;
+    &lt;<span class="pl-ent">title</span>&gt;React Starter Kit!&lt;/<span class="pl-ent">title</span>&gt;
+    &lt;<span class="pl-ent">meta</span> <span class="pl-e">charset</span>=<span class="pl-s"><span class="pl-pds">"</span>utf-8<span class="pl-pds">"</span></span>&gt;
+  &lt;/<span class="pl-ent">head</span>&gt;
+  &lt;<span class="pl-ent">body</span>&gt;
+    &lt;<span class="pl-ent">div</span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>root<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">div</span>&gt;
+  &lt;/<span class="pl-ent">body</span>&gt;
+&lt;/<span class="pl-ent">html</span>&gt;</pre></div>
+
+<p>Remember that "index.js" file we created in our "src" directory in the last part?  Open that puppy back up and delete its contents then paste in the code below.  We've used the ES6 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions">arrow function</a> here to demonstrate how Webpack transpiles ES6 to ES5.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">const</span> <span class="pl-c1">setHTML</span> <span class="pl-k">=</span> () <span class="pl-k">=&gt;</span> {
+  <span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>root<span class="pl-pds">'</span></span>).<span class="pl-smi">innerHTML</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>Hey dude!<span class="pl-pds">'</span></span>;
+};
+
+<span class="pl-en">setHTML</span>();
+</pre></div>
+
+<h5>
+<a id="user-content-whats-going-on-here" class="anchor" href="#whats-going-on-here" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What's going on here?</h5>
+
+<ul>
+<li>
+<code>setHTML</code>: we're creating a <code>const</code> (a variable that cannot be changed) that holds an arrow function that calls the <code>getElementById</code> function on the global <code>document</code> object.  Remember in our ".eslintrc" file where we told it to ignore browser related variables?  This is one of those.  The <code>document</code> object is how you interact with the web page, such as getting a reference to a DOM node like we're doing here.</li>
+<li>
+<code>setHTML()</code>: call our function to actually change the <code>innerHTML</code> of the element with id of "root" to "Hey dude!".</li>
+</ul>
+
+<p>Ok, so now we have an HTML file that doesn't reference any JavaScript files and a JavaScript file that sets the inner html of our "root" <code>div</code> element.  How do we wire the two up?  Well we could just add a <code>script</code> tag to our "index.html" file to pull our JS in, but that doesn't give us much flexibility.  </p>
+
+<p>Using the <code>HtmlWebpackPlugin</code> we can have Webpack dynamically inject <code>script</code> and <code>link</code> tags for us and also have a hash appended to the name for cache busting (prevent the browser from using a cached file).</p>
+
+<h4>
+<a id="user-content-installation" class="anchor" href="#installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation</h4>
+
+<p>Let's install the packages we're going to need.  You'll see webpack installed twice, once locally, then again globally (with the <code>-g</code> option).  We need it installed locally because we'll need to use the package directly a little later and we need it and <code>webpack-dev-server</code> installed globally so that we can use them from the command line.</p>
+
+<div class="highlight highlight-source-shell"><pre>npm install --save webpack@2.1.0-beta.21 html-webpack-plugin \
+babel-core babel-loader babel-preset-es2015 babel-preset-react \
+babel-preset-stage-0
+npm install -g webpack@2.1.0-beta.21 webpack-dev-server@2.1.0-beta.0</pre></div>
+
+<blockquote>
+<p>We're installing specific versions of <code>webpack@2.1.0-beta.21</code> and <code>webpack-dev-server@2.1.0-beta.0</code> because we want to be able to take advantage of new features that are currently still in beta.  We'll touch on this more a little later.</p>
+</blockquote>
+
+<h5>
+<a id="user-content-babel-packages" class="anchor" href="#babel-packages" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Babel packages</h5>
+
+<ul>
+<li>
+<code>babel-core</code>: the main Babel engine</li>
+<li>
+<code>babel-loader</code>: use Babel with Webpack (discussed earlier)</li>
+<li>
+<code>babel-preset-es2015</code>: ES6 --&gt; ES5</li>
+<li>
+<code>babel-preset-react</code>: JSX --&gt; ES5</li>
+<li>
+<code>babel-preset-stage-0</code>: experimental ES7 --&gt; ES5</li>
+</ul>
+
+<h4>
+<a id="user-content-configuration" class="anchor" href="#configuration" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Configuration</h4>
+
+<p>Now we can go ahead and begin our Webpack setup.  Create a new file in the root of your project named "webpack.config.js" with the code below.  You'll notice that we're using <code>require</code> to import NPM packages here.  This file is going to be run by Node which currently doesn't support ES6 modules.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">const</span> <span class="pl-c1">HtmlWebpackPlugin</span> <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>html-webpack-plugin<span class="pl-pds">'</span></span>);
+<span class="pl-k">const</span> <span class="pl-c1">path</span> <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>path<span class="pl-pds">'</span></span>);
+
+<span class="pl-c1">module</span>.<span class="pl-smi">exports</span> <span class="pl-k">=</span> {
+  entry<span class="pl-k">:</span> {
+    app<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>./src/index.js<span class="pl-pds">'</span></span>
+  },
+
+  module<span class="pl-k">:</span> {
+    loaders<span class="pl-k">:</span> [
+      {
+        test<span class="pl-k">:</span><span class="pl-sr"> <span class="pl-pds">/</span><span class="pl-cce">\.</span>js<span class="pl-k">$</span><span class="pl-pds">/</span></span>,
+        exclude<span class="pl-k">:</span><span class="pl-sr"> <span class="pl-pds">/</span>node_modules<span class="pl-pds">/</span></span>,
+        loader<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>babel<span class="pl-pds">'</span></span>
+      }
+    ]
+  },
+
+  output<span class="pl-k">:</span> {
+    path<span class="pl-k">:</span> <span class="pl-smi">path</span>.<span class="pl-en">resolve</span>(<span class="pl-c1">__dirname</span>, <span class="pl-s"><span class="pl-pds">'</span>dist<span class="pl-pds">'</span></span>),
+    filename<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>[name]-[hash].js<span class="pl-pds">'</span></span>
+  },
+
+  plugins<span class="pl-k">:</span> [
+    <span class="pl-k">new</span> <span class="pl-en">HtmlWebpackPlugin</span>({
+      template<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>./src/index.html<span class="pl-pds">'</span></span>,
+      inject<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>body<span class="pl-pds">'</span></span>
+    })
+  ]
+};
+</pre></div>
+
+<h5>
+<a id="user-content-whats-going-on-here-1" class="anchor" href="#whats-going-on-here-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What's going on here?</h5>
+
+<ul>
+<li>
+<a href="https://github.com/ampedandwired/html-webpack-plugin">HtmlWebpackPlugin</a>: lets us dynamically create/augment our HTML file</li>
+<li>
+<a href="https://nodejs.org/api/path.html#path_path_resolve_path">path</a>: is a Node.js library for resolving file paths</li>
+<li>
+<code>module.exports</code>: <a href="https://webpack.github.io/docs/commonjs.html">CommonJS</a> style modules.  Webpack is a Node utility and Node uses CommonJS as their module system.
+
+<ul>
+<li>
+<code>entry</code>: tell Webpack where to enter our application when bundling (use <code>app</code> as the bundle's name)</li>
+<li>
+<code>module</code>: options affecting our modules (JS/JSX/SASS/etc.)</li>
+<li>
+<code>loaders</code>
+
+<ul>
+<li>
+<code>test</code>: which files do we want this loader to apply to (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions">RegEx</a> based)</li>
+<li>
+<code>exclude</code>: ignore files that match this RegEx</li>
+<li>
+<code>loader</code>: the actual loader to use to transform the matched files</li>
+</ul>
+</li>
+<li>
+<code>output</code>: where do we want Webpack to spit out the files it creates?</li>
+<li>
+<code>path</code>: directory to put the file(s) in (must be an absolute path)</li>
+<li>
+<code>filename</code>: use the name from <code>entry</code> (app) and append a hash to it</li>
+<li><code>plugins</code></li>
+<li>
+<code>HtmlWebpackPlugin</code>
+
+<ul>
+<li>
+<code>template</code>: starting point for our HTML file</li>
+<li>
+<code>inject</code>: which section of the "index.html" file should the plugin inject <code>script</code> tags into</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<p>So we're looking for files with a ".js" extension, that are <em>not</em> in the "node_modules" folder and then transforming them with the <code>babel</code> loader (we could also write it as <code>loader: 'babel-loader'</code>).  </p>
+
+<p>In order for Babel to do any transforms we need to tell it what transforms we want applied.  This is specified with Babel plugins or presets (groups of plugins).  You can configure Babel a few different ways: add a <code>"babel": {}</code>  section to your "package.json" file, specify it in your "webpack.config.js", or using a ".babelrc" file.  We'll use the last option, so create a file named ".babelrc" in the project root with the contents below.</p>
+
+<div class="highlight highlight-source-json"><pre>{
+  <span class="pl-s"><span class="pl-pds">"</span>presets<span class="pl-pds">"</span></span>: [<span class="pl-s"><span class="pl-pds">"</span>es2015<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>react<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>stage-0<span class="pl-pds">"</span></span>]
+}</pre></div>
+
+<h4>
+<a id="user-content-launch-the-app" class="anchor" href="#launch-the-app" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Launch the app</h4>
+
+<p>Go ahead and run the following command from the root of your project then open your browser and visit : (e.g. localhost:8080) to see your app.  If it worked correctly you should see "Hey dude!".</p>
+
+<div class="highlight highlight-source-shell"><pre>webpack-dev-server --content-base dist/</pre></div>
+
+<p>What just happened?  We started our <code>webpack-dev-server</code> which bundled up our application code into a file named something like "app-42d809adf5fa9e5d6ac5.js", put that in the "dist" folder, copied our src/index.html file into the "dist" folder, and then inserted a script tag into the <code>body</code> tag to load our bundle.  <code>--content-base dist/</code> tells our server to serve the contents of the "dist" directory.  Awesome!</p>
+
+<h4>
+<a id="user-content-build-the-app" class="anchor" href="#build-the-app" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Build the app</h4>
+
+<p>Hold on a minute.  I don't see a folder named "dist" in my project though.  That's because it is all done in memory!  Want to see the files with your own eyes?  Hop back over to the command line and kill the server with <code>control + C</code>.  Now run the command below and then jump back to your text editor after it finishes....voila, there it is!</p>
+
+<div class="highlight highlight-source-shell"><pre>webpack</pre></div>
+
+<h4>
+<a id="user-content-whats-going-on-in-our-bundle" class="anchor" href="#whats-going-on-in-our-bundle" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What's going on in our bundle?</h4>
+
+<p>Let's get even crazier.  Go ahead and open up the "app-42d809adf5fa9e5d6ac5.js" file in the "dist" directory.  It's pretty ugly and has a bunch of ESLint errors, let's fix those first.  Create a new file in the root of your project called ".eslintignore" and paste in the text below.  This tells ESLint to ignore everything in the "dist" directory.  If it doesn't fix your errors try reopening the file.</p>
+
+<pre><code>dist
+</code></pre>
+
+<p>The first 70 lines or so are all Webpack related stuff for module caching so that we don't load modules more than once.  If you scroll to the bottom you'll see our application code that just adds "Hey dude!" to a div.  If you look close you'll see that our arrow function is gone and has been replaced by a regular function.  That's the ES6 --&gt; ES5 transpilation that Babel does for us.  Wow.</p>
+
+<p><a href="https://camo.githubusercontent.com/467146cf0a4699e10b765250153ea48d5d3a2ae8/68747470733a2f2f6d656469612e67697068792e636f6d2f6d656469612f334c633755544b5542683030552f67697068792e676966" target="_blank"><img src="https://camo.githubusercontent.com/467146cf0a4699e10b765250153ea48d5d3a2ae8/68747470733a2f2f6d656469612e67697068792e636f6d2f6d656469612f334c633755544b5542683030552f67697068792e676966" alt="Wow" data-canonical-src="https://media.giphy.com/media/3Lc7UTKUBh00U/giphy.gif" style="max-width:100%;"></a></p>
+
+<h4>
+<a id="user-content-minification" class="anchor" href="#minification" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Minification</h4>
+
+<p>Pretty cool, but what about all those comments and whitespace?  We don't want to send all that crap to our users because they don't need it and it's only going to make their downloads take longer.  Let's get rid of it.  Update your "webpack.config.js" file to look like the one below.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">const</span> <span class="pl-c1">HtmlWebpackPlugin</span> <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>html-webpack-plugin<span class="pl-pds">'</span></span>);
+<span class="pl-k">const</span> <span class="pl-c1">path</span> <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>path<span class="pl-pds">'</span></span>);
+<span class="pl-k">const</span> <span class="pl-c1">webpack</span> <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>webpack<span class="pl-pds">'</span></span>); <span class="pl-c">// new</span>
+
+<span class="pl-c1">module</span>.<span class="pl-smi">exports</span> <span class="pl-k">=</span> {
+  entry<span class="pl-k">:</span> {
+    app<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>./src/index.js<span class="pl-pds">'</span></span>
+  },
+
+  module<span class="pl-k">:</span> {
+    loaders<span class="pl-k">:</span> [
+      {
+        test<span class="pl-k">:</span><span class="pl-sr"> <span class="pl-pds">/</span><span class="pl-cce">\.</span>js<span class="pl-k">$</span><span class="pl-pds">/</span></span>,
+        exclude<span class="pl-k">:</span><span class="pl-sr"> <span class="pl-pds">/</span>node_modules<span class="pl-pds">/</span></span>,
+        loader<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>babel<span class="pl-pds">'</span></span>
+      }
+    ]
+  },
+
+  output<span class="pl-k">:</span> {
+    path<span class="pl-k">:</span> <span class="pl-smi">path</span>.<span class="pl-en">resolve</span>(<span class="pl-c1">__dirname</span>, <span class="pl-s"><span class="pl-pds">'</span>dist<span class="pl-pds">'</span></span>),
+    filename<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>[name]-[hash].js<span class="pl-pds">'</span></span>
+  },
+
+  plugins<span class="pl-k">:</span> [
+    <span class="pl-k">new</span> <span class="pl-en">HtmlWebpackPlugin</span>({
+      template<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>./src/index.html<span class="pl-pds">'</span></span>,
+      inject<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>body<span class="pl-pds">'</span></span>
+    }),
+
+    <span class="pl-k">new</span> <span class="pl-en">webpack.optimize.UglifyJsPlugin</span>() <span class="pl-c">// new</span>
+  ],
+};
+</pre></div>
+
+<p>Delete the contents of the "dist" directory then run <code>webpack</code> again to rebuild the app.  We'll automate this command a little later.</p>
+
+<p>Open up "app-42d809adf5fa9e5d6ac5.js" again (it'll have a new hash now).  It's just a single line now and it's really hard to read, BUT it's really minimal which is great for performance!</p>
+
+<p>We have two problems now: during development our beautiful ES6 source code now has to be debugged in minified ES5 which is tough to say the least.  If you were to view the source code from your browser's <a href="https://developer.chrome.com/devtools">developer tools</a> (open with <code>option + command + i</code> on OSX) you would see the same thing.  We can do better.</p>
+
+<h4>
+<a id="user-content-source-maps" class="anchor" href="#source-maps" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Source maps</h4>
+
+<p>Add <code>devtool: 'source-map',</code> just above the <code>entry</code> property of your "webpack.config.js" file.  This tells Webpack to create a source map which bridges the gap between your source code and the transpiled/uglified code.  Most modern browsers support source maps for debugging...I'm using Chrome, but most browsers should perform similarly.  </p>
+
+<p>Fire up your dev server again with <code>webpack-dev-server -d --content-base dist/</code>, (note the new <code>-d</code> option) open up your browser dev tools, then refresh the page.  If you go to the "Sources" tab of the dev tools window you should see something similar to the images below.</p>
+
+<p>Minified
+<a href="../../images/dev-tools-minified.jpg" target="_blank"><img src="../../images/dev-tools-minified.jpg" alt="Chrome Dev Tools Minified" style="max-width:100%;"></a></p>
+
+<p>Original via source maps
+<a href="../../images/dev-tools-source-map.jpg" target="_blank"><img src="../../images/dev-tools-source-map.jpg" alt="Chrome Dev Tools Source Maps" style="max-width:100%;"></a></p>
+
+<p>If you want to build the source maps to disk you'll need to run <code>webpack -d</code>.</p>
+
+<h4>
+<a id="user-content-convenience-scripts" class="anchor" href="#convenience-scripts" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Convenience scripts</h4>
+
+<p>Manually deleting the contents of the "dist" folder is a pain in the ass.  Let's fix that.  Install <code>rimraf</code>, a library that makes it easy to delete the contents of our "dist" folder.</p>
+
+<div class="highlight highlight-source-shell"><pre>npm install --save rimraf</pre></div>
+
+<p>Next, update the <code>scripts</code> section of your "package.json" file as shown below.  The <code>build</code> script deletes the contents of "dist", sets NODE_ENV to "production", then builds our app.  Later on we'll use the value of NODE_ENV to conditionally apply Webpack config.  We've also added a <code>start</code> script to make starting our dev server a little easier.</p>
+
+<div class="highlight highlight-source-json"><pre>{
+  <span class="pl-s"><span class="pl-pds">"</span>build<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>rimraf dist &amp;&amp; NODE_ENV=production webpack<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>lint<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>eslint src test<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>start<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>webpack-dev-server -d --content-base dist/<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>echo <span class="pl-cce">\"</span>Error: no test specified<span class="pl-cce">\"</span> &amp;&amp; exit 1<span class="pl-pds">"</span></span>
+}</pre></div>
+
+<p>You can now run these commands with <code>npm run &lt;command&gt;</code>.  <code>start</code> is a default NPM script so you can run it with <code>npm start</code> or <code>npm run start</code>.</p>
+
+<h4>
+<a id="user-content-tree-shaking" class="anchor" href="#tree-shaking" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Tree-shaking</h4>
+
+<p>Webpack 2 has a new feature known as <em>tree-shaking</em> which removes unused code during the minification step.  To demonstrate how this works create a new file named "setHTML.js" with the contents below and update "index.js" as shown.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// src/setHTML.js</span>
+
+<span class="pl-k">const</span> <span class="pl-c1">setHTML</span> <span class="pl-k">=</span> () <span class="pl-k">=&gt;</span> {
+  <span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>root<span class="pl-pds">'</span></span>).<span class="pl-smi">innerHTML</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>Hey dude!<span class="pl-pds">'</span></span>;
+};
+
+<span class="pl-k">export</span> <span class="pl-v">default</span> <span class="pl-smi">setHTML</span>;
+<span class="pl-k">export</span> <span class="pl-k">const</span> <span class="pl-c1">woof</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>woof<span class="pl-pds">'</span></span>;
+</pre></div>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// src/index.js</span>
+
+<span class="pl-k">import</span> <span class="pl-smi">setHTML</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./setHTML<span class="pl-pds">'</span></span>;
+
+<span class="pl-en">setHTML</span>();</pre></div>
+
+<p>We've moved our <code>setHTML</code> function to a new file where it is being exported (default).  We've also added a named export of <code>woof</code>.  In "index.js" we're importing <code>setHTML</code>, but <em>NOT</em> importing <code>woof</code> so it isn't actually being used anywhere.</p>
+
+<p>Run <code>npm run build</code> to create our bundle, then open it up and search for "woof".  There are two occurrences of it, despite the fact that it doesn't actually do anything.  </p>
+
+<p>The <code>UglifyJsPlugin</code> attempts to do dead code elimination (tree-shaking) by default, but our configuration is preventing that from happening.  By default, Babel transpiles ES6 modules to CommonJS modules which <a href="http://www.2ality.com/2015/12/webpack-tree-shaking.html">prevents</a> tree-shaking from working so we just need to tell Babel not to use CommonJS modules.  Update your ".babelrc" file as shown below.</p>
+
+<div class="highlight highlight-source-json"><pre>{
+  <span class="pl-s"><span class="pl-pds">"</span>presets<span class="pl-pds">"</span></span>: [[<span class="pl-s"><span class="pl-pds">"</span>es2015<span class="pl-pds">"</span></span>, { <span class="pl-s"><span class="pl-pds">"</span>modules<span class="pl-pds">"</span></span>: <span class="pl-c1">false</span> }], <span class="pl-s"><span class="pl-pds">"</span>react<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>stage-0<span class="pl-pds">"</span></span>]
+}</pre></div>
+
+<p>Go ahead and build your app again then search for "woof" in the bundle.  It's gone! <g-emoji alias="smiley" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f603.png">😃</g-emoji></p>
+
+<p>For now, I'm going to comment out the <code>UglifyJsPlugin</code> line since it's just going to add overhead during development.  Later when we setup our production build we'll add it back.</p>
+
+<h4>
+<a id="user-content-stylezzz-sasscss" class="anchor" href="#stylezzz-sasscss" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Stylezzz (SASS/CSS)</h4>
+
+<p>Wouldn't it be really awesome if we could make our div display "Hey dude!" in blue instead of black?  Hell yeah!  Wouldn't it be even more awesome if we could use something better than regular CSS to write it?</p>
+
+<p><a href="https://camo.githubusercontent.com/7ba48686ba8462b090e0c431031aa239baac7cb8/687474703a2f2f692e696d6775722e636f6d2f5a436a4443744e2e676966" target="_blank"><img src="https://camo.githubusercontent.com/7ba48686ba8462b090e0c431031aa239baac7cb8/687474703a2f2f692e696d6775722e636f6d2f5a436a4443744e2e676966" alt="Oh Yeah!" data-canonical-src="http://i.imgur.com/ZCjDCtN.gif" style="max-width:100%;"></a></p>
+
+<p>We're going to use <a href="http://sass-lang.com/">SASS</a> to write our styles, compile those to CSS, add vendor prefixes, locally scope our classes, bundle our styles into an external style sheet, then import those styles via our "index.html" file.  SASS makes writing CSS much more enjoyable and has some nice built in features like variables and functions.</p>
+
+<p>CSS is global by default which makes class naming a pain in the ass, but some really smart guys came up with the idea of <a href="https://github.com/css-modules/css-modules">CSS Modules</a> which locally scopes all CSS (via the Webpack css-loader) allowing you to reuse class names in different modules without conflict!</p>
+
+<p>Let's install the necessary packages</p>
+
+<div class="highlight highlight-source-shell"><pre>npm install --save node-sass sass-loader postcss-loader autoprefixer \
+css-loader extract-text-webpack-plugin@2.0.0-beta.3 style-loader</pre></div>
+
+<h5>
+<a id="user-content-packages" class="anchor" href="#packages" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Packages</h5>
+
+<ul>
+<li>
+<code>node-sass</code>: SASS --&gt; CSS</li>
+<li>
+<code>sass-loader</code>: use node-sass with Webpack</li>
+<li>
+<code>postcss-loader</code>: tool to perform various transforms on CSS, we're using it to apply vendor prefixes with autoprefixer</li>
+<li>
+<code>autoprefixer</code>: vendor prefixes</li>
+<li>
+<code>css-loader</code>: bundle CSS and scope classes locally</li>
+<li>
+<code>extract-text-webpack-plugin</code>: create a CSS file from bundled CSS</li>
+<li>
+<code>style-loader</code>: inject CSS into <code>&lt;style&gt;</code> tag in our HTML</li>
+</ul>
+
+<p>We've got the packages we need, but now we need to tell Webpack to use them.  Update your "webpack.config.js" file to mirror the one below.  We've added new entries to <code>loaders</code> and <code>plugins</code>.  </p>
+
+<p>The new <code>loaders</code> entry will match both ".css" and ".scss" files and apply our loaders from right to left ending with <code>ExtractTextPlugin.extract</code>.  We're passing three options to our <code>css-loader</code>: <code>modules</code> enables CSS Modules (local scoping), <code>sourceMap</code> creates a source map for our compiled SASS, and finally <code>importLoaders=1</code> is a requirement to use <code>css-loader</code> with <code>postcss-loader</code>.</p>
+
+<p>In the <code>plugins</code> section we're telling ExtractTextPlugin to name our bundled CSS file something like  "styles-ecb5dd1230609d11ec6b295438519a2d.css".</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">const</span> <span class="pl-c1">autoprefixer</span> <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>autoprefixer<span class="pl-pds">'</span></span>);
+<span class="pl-k">const</span> <span class="pl-c1">ExtractTextPlugin</span> <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>extract-text-webpack-plugin<span class="pl-pds">'</span></span>);
+<span class="pl-k">const</span> <span class="pl-c1">HtmlWebpackPlugin</span> <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>html-webpack-plugin<span class="pl-pds">'</span></span>);
+<span class="pl-k">const</span> <span class="pl-c1">path</span> <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>path<span class="pl-pds">'</span></span>);
+<span class="pl-c">// const webpack = require('webpack');</span>
+
+<span class="pl-c1">module</span>.<span class="pl-smi">exports</span> <span class="pl-k">=</span> {
+  devtool<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>source-map<span class="pl-pds">'</span></span>,
+
+  entry<span class="pl-k">:</span> {
+    app<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>./src/index.js<span class="pl-pds">'</span></span>
+  },
+
+  module<span class="pl-k">:</span> {
+    loaders<span class="pl-k">:</span> [
+      {
+        test<span class="pl-k">:</span><span class="pl-sr"> <span class="pl-pds">/</span><span class="pl-cce">\.</span>js<span class="pl-k">$</span><span class="pl-pds">/</span></span>,
+        exclude<span class="pl-k">:</span><span class="pl-sr"> <span class="pl-pds">/</span>node_modules<span class="pl-pds">/</span></span>,
+        loader<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>babel<span class="pl-pds">'</span></span>
+      },
+      {
+        test<span class="pl-k">:</span><span class="pl-sr"> <span class="pl-pds">/</span><span class="pl-cce">\.</span>(css<span class="pl-k">|</span>scss)<span class="pl-k">$</span><span class="pl-pds">/</span></span>,
+        loader<span class="pl-k">:</span> <span class="pl-smi">ExtractTextPlugin</span>.<span class="pl-en">extract</span>([
+          <span class="pl-s"><span class="pl-pds">'</span>css?modules&amp;sourceMap&amp;importLoaders=1&amp;minimize<span class="pl-pds">'</span></span>,
+          <span class="pl-s"><span class="pl-pds">'</span>postcss<span class="pl-pds">'</span></span>,
+          <span class="pl-s"><span class="pl-pds">'</span>sass<span class="pl-pds">'</span></span>
+        ])
+      }
+    ]
+  },
+
+  output<span class="pl-k">:</span> {
+    path<span class="pl-k">:</span> <span class="pl-smi">path</span>.<span class="pl-en">resolve</span>(<span class="pl-c1">__dirname</span>, <span class="pl-s"><span class="pl-pds">'</span>dist<span class="pl-pds">'</span></span>),
+    filename<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>[name]-[hash].js<span class="pl-pds">'</span></span>
+  },
+
+  plugins<span class="pl-k">:</span> [
+    <span class="pl-k">new</span> <span class="pl-en">ExtractTextPlugin</span>(<span class="pl-s"><span class="pl-pds">'</span>styles-[contenthash].css<span class="pl-pds">'</span></span>), <span class="pl-c">// new</span>
+
+    <span class="pl-k">new</span> <span class="pl-en">HtmlWebpackPlugin</span>({
+      template<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>./src/index.html<span class="pl-pds">'</span></span>,
+      inject<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>body<span class="pl-pds">'</span></span>
+    })
+
+    <span class="pl-c">// new webpack.optimize.UglifyJsPlugin(),</span>
+  ],
+
+  postcss<span class="pl-k">:</span> [autoprefixer] <span class="pl-c">// new</span>
+};
+</pre></div>
+
+<p>Now create a new file named "classes.scss" in the "src" directory and put the code below into it.</p>
+
+<div class="highlight highlight-source-css"><pre><span class="pl-e">.title</span> {
+  <span class="pl-c1"><span class="pl-c1">color</span></span>: <span class="pl-c1">blue</span>;
+}</pre></div>
+
+<p>Finally, make the changes below to your "setHTML.js" file to add our ".title" class.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">classes</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./classes.scss<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">const</span> <span class="pl-c1">setHTML</span> <span class="pl-k">=</span> () <span class="pl-k">=&gt;</span> {
+  <span class="pl-k">const</span> <span class="pl-c1">root</span> <span class="pl-k">=</span> <span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>root<span class="pl-pds">'</span></span>);
+  <span class="pl-smi">root</span>.<span class="pl-smi">innerHTML</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>Hey dude!<span class="pl-pds">'</span></span>;
+  <span class="pl-smi">root</span>.<span class="pl-c1">className</span> <span class="pl-k">=</span> <span class="pl-smi">classes</span>.<span class="pl-c1">title</span>;
+};
+
+<span class="pl-k">export</span> <span class="pl-v">default</span> <span class="pl-smi">setHTML</span>;
+</pre></div>
+
+<blockquote>
+<h4>
+<a id="user-content-webpack-v2" class="anchor" href="#webpack-v2" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Webpack v2</h4>
+
+<p>In your <code>start</code> script change <code>-d</code> to <code>--debug</code>, they're supposed to be synonyms, but CSS source maps don't appear to build unless the change is made.  This is likely a v2 beta quirk.</p>
+</blockquote>
+
+<p>Go ahead and fire up your dev server again and enjoy your beautiful blue font.  If you inspect the <code>div</code> we added the ".title" class to you'll see it has been converted to a unique identifier and source maps have been created to map those new classes back to the original classes.</p>
+
+<h4>
+<a id="user-content-hot-module-replacement-hmr" class="anchor" href="#hot-module-replacement-hmr" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Hot Module Replacement (HMR)</h4>
+
+<p>Currently if you make changes to your source code while your development server is running you have to manually refresh your browser to see the changes.  That's entirely too much work, let's make it update automagically.</p>
+
+<p>HMR is a feature of Webpack that lets us inject updated modules into our running application without a page refresh (via <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API">websockets</a>).  This allows us to make changes to our running application <em>without</em> losing the application's state!  If that doesn't make any sense to you, don't worry, let's look at an example.</p>
+
+<p>First we'll add auto-refreshing, then we'll add HMR to demonstrate the differences.  Remember how we installed <code>webpack-dev-server</code> globally earlier?  Now we need to install it locally as well, so let's go ahead and do that and save it in <code>devDependencies</code>.  In order to use auto-refreshing and HMR Webpack needs to add a little code to our bundle.</p>
+
+<div class="highlight highlight-source-shell"><pre>npm install --save-dev webpack-dev-server@2.1.0-beta.0</pre></div>
+
+<p>Update the <code>entry</code> property of your "webpack.config.js" file as shown below.  This adds a bit of code to our bundle that enables auto-refreshing.</p>
+
+<div class="highlight highlight-source-js"><pre>{
+  <span class="pl-c">// more config...</span>
+  entry<span class="pl-k">:</span> {
+    app<span class="pl-k">:</span> [
+      <span class="pl-s"><span class="pl-pds">'</span>webpack-dev-server/client?http://localhost:8080<span class="pl-pds">'</span></span>,
+      <span class="pl-s"><span class="pl-pds">'</span>./src/index.js<span class="pl-pds">'</span></span>
+    ]
+  },
+  <span class="pl-c">// more config...</span>
+}</pre></div>
+
+<p>Go ahead and restart your dev server, refresh your browser, then change "Hey dude!" to "Hey man!" in "setHTML.js" and save your file.  Your browser should refresh itself now.  Neat!</p>
+
+<p>What if we had a text input on the page though?  Let's see what happens in that case.  Add the new line below.</p>
+
+<div class="highlight highlight-text-html-basic"><pre>&lt;!doctype html&gt;
+&lt;<span class="pl-ent">html</span> <span class="pl-e">lang</span>=<span class="pl-s"><span class="pl-pds">"</span>en<span class="pl-pds">"</span></span>&gt;
+  &lt;<span class="pl-ent">head</span>&gt;
+    &lt;<span class="pl-ent">title</span>&gt;Benjamin Schnelle&lt;/<span class="pl-ent">title</span>&gt;
+    &lt;<span class="pl-ent">meta</span> <span class="pl-e">charset</span>=<span class="pl-s"><span class="pl-pds">"</span>utf-8<span class="pl-pds">"</span></span>&gt;
+  &lt;/<span class="pl-ent">head</span>&gt;
+  &lt;<span class="pl-ent">body</span>&gt;
+    &lt;<span class="pl-ent">div</span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>root<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">div</span>&gt;
+    &lt;<span class="pl-ent">input</span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>text<span class="pl-pds">"</span></span> /&gt; <span class="pl-c">&lt;!-- this is new --&gt;</span>
+  &lt;/<span class="pl-ent">body</span>&gt;
+&lt;/<span class="pl-ent">html</span>&gt;
+</pre></div>
+
+<p>Go back to the browser, type something in the text input, then jump back to your "setHTML.js" file and add a few exclamation marks to "Hey man!" and save your file.  If you're watching the browser you should see it refresh, but the value that was in the input is lost.  Bummer.</p>
+
+<p>HMR to the rescue!  We need to add a few config options to our "webpack.config.js" file.  Make the changes below.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">const</span> <span class="pl-c1">autoprefixer</span> <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>autoprefixer<span class="pl-pds">'</span></span>);
+<span class="pl-c">// const ExtractTextPlugin = require('extract-text-webpack-plugin');</span>
+<span class="pl-k">const</span> <span class="pl-c1">HtmlWebpackPlugin</span> <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>html-webpack-plugin<span class="pl-pds">'</span></span>);
+<span class="pl-k">const</span> <span class="pl-c1">path</span> <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>path<span class="pl-pds">'</span></span>);
+<span class="pl-k">const</span> <span class="pl-c1">webpack</span> <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>webpack<span class="pl-pds">'</span></span>); <span class="pl-c">// uncomment</span>
+
+<span class="pl-c1">module</span>.<span class="pl-smi">exports</span> <span class="pl-k">=</span> {
+  <span class="pl-c">// new section</span>
+  devServer<span class="pl-k">:</span> {
+    hot<span class="pl-k">:</span> <span class="pl-c1">true</span>,
+  },
+
+  devtool<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>source-map<span class="pl-pds">'</span></span>,
+
+  entry<span class="pl-k">:</span> {
+    app<span class="pl-k">:</span> [
+      <span class="pl-s"><span class="pl-pds">'</span>webpack-dev-server/client?http://localhost:8080<span class="pl-pds">'</span></span>,
+      <span class="pl-s"><span class="pl-pds">'</span>webpack/hot/only-dev-server<span class="pl-pds">'</span></span>, <span class="pl-c">// new line</span>
+      <span class="pl-s"><span class="pl-pds">'</span>./src/index.js<span class="pl-pds">'</span></span>
+    ],
+  },
+
+  module<span class="pl-k">:</span> {
+    loaders<span class="pl-k">:</span> [
+      {
+        test<span class="pl-k">:</span><span class="pl-sr"> <span class="pl-pds">/</span><span class="pl-cce">\.</span>js<span class="pl-k">$</span><span class="pl-pds">/</span></span>,
+        exclude<span class="pl-k">:</span><span class="pl-sr"> <span class="pl-pds">/</span>node_modules<span class="pl-pds">/</span></span>,
+        loader<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>babel<span class="pl-pds">'</span></span>
+      },
+      {
+        test<span class="pl-k">:</span><span class="pl-sr"> <span class="pl-pds">/</span><span class="pl-cce">\.</span>(css<span class="pl-k">|</span>scss)<span class="pl-k">$</span><span class="pl-pds">/</span></span>,
+        <span class="pl-c">// updated</span>
+        loaders<span class="pl-k">:</span> [
+          <span class="pl-s"><span class="pl-pds">'</span>style<span class="pl-pds">'</span></span>,
+          <span class="pl-s"><span class="pl-pds">'</span>css?modules&amp;sourceMap&amp;importLoaders=1&amp;minimize<span class="pl-pds">'</span></span>,
+          <span class="pl-s"><span class="pl-pds">'</span>postcss<span class="pl-pds">'</span></span>,
+          <span class="pl-s"><span class="pl-pds">'</span>sass<span class="pl-pds">'</span></span>
+        ]
+      },
+    ],
+  },
+
+  output<span class="pl-k">:</span> {
+    path<span class="pl-k">:</span> <span class="pl-smi">path</span>.<span class="pl-en">resolve</span>(<span class="pl-c1">__dirname</span>, <span class="pl-s"><span class="pl-pds">'</span>dist<span class="pl-pds">'</span></span>),
+    filename<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>[name]-[hash].js<span class="pl-pds">'</span></span>
+  },
+
+  plugins<span class="pl-k">:</span> [
+    <span class="pl-c">// removed</span>
+
+    <span class="pl-k">new</span> <span class="pl-en">webpack.HotModuleReplacementPlugin</span>(), <span class="pl-c">// new line</span>
+
+    <span class="pl-k">new</span> <span class="pl-en">HtmlWebpackPlugin</span>({
+      template<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>./src/index.html<span class="pl-pds">'</span></span>,
+      inject<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>body<span class="pl-pds">'</span></span>
+    })
+
+    <span class="pl-c">// new webpack.optimize.UglifyJsPlugin(),</span>
+  ],
+
+  postcss<span class="pl-k">:</span> [autoprefixer]
+};
+</pre></div>
+
+<h5>
+<a id="user-content-whats-going-on-here--we-made-4-changes" class="anchor" href="#whats-going-on-here--we-made-4-changes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What's going on here?  We made 4 changes.</h5>
+
+<ul>
+<li>
+<code>webpack</code>: uncomment webpack import</li>
+<li>
+<code>devServer</code>: this property is for config options related to our development server...we add the <code>hot</code> flag so the server knows we want to use HMR</li>
+<li>
+<code>entry</code>: we added <code>'webpack/hot/only-dev-server'</code> to add more client code to facilitate HMR which will <em>not</em> fallback to auto-refreshing if an HMR update fails...if you would prefer your app to auto-refresh when HMR updates fail add <code>'webpack/hot/dev-server'</code> instead</li>
+<li>
+<code>module</code>: we updated the <code>loaders</code> key for our CSS file because <code>ExtractTextPlugin</code> doesn't work with HMR, but <code>style-loader</code> does so we'll add the former back when we configure our production build.</li>
+<li>
+<code>plugins</code>: <code>new webpack.HotModuleReplacementPlugin()</code> required for HMR to work and removed <code>ExtractTextPlugin</code> as noted above.</li>
+</ul>
+
+<p>Right, so now we have our Webpack config updated to use HMR, but we need to explicitly enable HMR at the module level of our app.  Let's update the contents of "index.js" as shown below.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// index.js</span>
+
+<span class="pl-k">import</span> <span class="pl-smi">setHTML</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./setHTML<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">if</span> (<span class="pl-c1">module</span>.<span class="pl-smi">hot</span>) {
+  <span class="pl-c1">module</span>.<span class="pl-smi">hot</span>.<span class="pl-c1">accept</span>(<span class="pl-s"><span class="pl-pds">'</span>./setHTML<span class="pl-pds">'</span></span>, () <span class="pl-k">=&gt;</span> <span class="pl-en">setHTML</span>());
+}
+
+<span class="pl-en">setHTML</span>();
+</pre></div>
+
+<p>As you can see, we've added an <code>if</code> block that only fires if some <code>module</code> object has a <a href="http://james.padolsey.com/javascript/truthy-falsey/">truthy</a> <code>hot</code> property on it.  It than calls an <code>accept</code> function with the path to our <code>setHTML</code> file and a function that calls it.</p>
+
+<p>Let's take it step by step.  Via Babel, Webpack transpiles our ES6 modules into ones currently supported by browsers which is where the global object <code>module</code> comes from.  <code>module.hot</code> is only defined if HMR is enabled.  The <code>accept</code> function is how we tell HMR which modules we want updated when they change, so here we're saying update our app when you detect a change in the "setHTML.js" file (or any of its children).  When you do detect a change call <code>setHTML</code> again.</p>
+
+<p>Damn Ben, that was a lot of stuff.  What are we even getting out of this?</p>
+
+<p>Restart your dev server and reload your application from the browser.  Type some stuff in the input, then update your "setHTML.js" file to add/remove a few exclamation marks to "Hey man!" then watch the browser as you save the file.  Your changes come through <em>AND</em> your application retains its state!</p>
+
+<p><a href="https://camo.githubusercontent.com/dd6ab239a86bd3c999d3fe0cd2a5d06034499cd9/68747470733a2f2f6d656469612e67697068792e636f6d2f6d656469612f645247574949326e444e3144322f67697068792e676966" target="_blank"><img src="https://camo.githubusercontent.com/dd6ab239a86bd3c999d3fe0cd2a5d06034499cd9/68747470733a2f2f6d656469612e67697068792e636f6d2f6d656469612f645247574949326e444e3144322f67697068792e676966" alt="Oh Shit!" data-canonical-src="https://media.giphy.com/media/dRGWII2nDN1D2/giphy.gif" style="max-width:100%;"></a></p>
+
+<p>Ok, maybe you don't think it's that great, but when you're working with application state that takes a while to reach (filling out a form/walking through a wizard) it makes developing/debugging a lot more enjoyable.</p>
+
+<h4>
+<a id="user-content-commit-our-changes" class="anchor" href="#commit-our-changes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Commit our changes</h4>
+
+<div class="highlight highlight-source-shell"><pre>git add <span class="pl-c1">.</span>
+git commit -m <span class="pl-s"><span class="pl-pds">'</span>added Webpack development config...closes #3<span class="pl-pds">'</span></span>
+git push origin master</pre></div>
+
+<p><a href="https://github.com/bschnelle/react-starter-kit/tree/351a065fb5a0dec0d95c1f29b9b80c0f5c0e73a3">My repo after this commit</a></p>
+
+<h4>
+<a id="user-content-summary" class="anchor" href="#summary" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Summary</h4>
+
+<p>We covered a lot here and we'll continue to update our Webpack config in the next section where we'll update it for production.</p>

@@ -1,0 +1,162 @@
+<p>We configured Webpack for development in the last part.  In this part we're going to keep working with Webpack and make the changes necessary to create our production bundles.</p>
+
+<h2>
+<a id="user-content-6-configure-webpack-for-production" class="anchor" href="#6-configure-webpack-for-production" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>6. Configure Webpack for production</h2>
+
+<p>As mentioned in the last part we want to apply any optimizations we can to our application prior to deploying it to give the user the best experience possible.  First, we need to know if we're in a "production" environment so we can tell Webpack how to behave.</p>
+
+<p>Create a new directory and file in config/index.js.  We'll use this file to store global config options. <code>process</code> is a global Node.js object with information related to the currently executing Node process.  We're concerned with the <code>env</code> property which includes the user's environment variables.  </p>
+
+<p>Below we're getting references to your <code>HOST</code> and <code>PORT</code> environment variables which we'll use to determine where to run your dev server.  If they're not provided we'll fallback to "localhost:8080" which is what we've been using thus far.  We're also checking <code>NODE_ENV</code> and setting a boolean <code>production</code> property we'll use in "webpack.config.js".</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c1">module</span>.<span class="pl-smi">exports</span> <span class="pl-k">=</span> {
+  host<span class="pl-k">:</span> <span class="pl-c1">process</span>.<span class="pl-smi">env</span>.<span class="pl-c1">HOST</span> <span class="pl-k">||</span> <span class="pl-s"><span class="pl-pds">'</span>localhost<span class="pl-pds">'</span></span>,
+  port<span class="pl-k">:</span> <span class="pl-c1">process</span>.<span class="pl-smi">env</span>.<span class="pl-c1">PORT</span> <span class="pl-k">||</span> <span class="pl-s"><span class="pl-pds">'</span>8080<span class="pl-pds">'</span></span>,
+  production<span class="pl-k">:</span> <span class="pl-c1">process</span>.<span class="pl-smi">env</span>.<span class="pl-c1">NODE_ENV</span> <span class="pl-k">===</span> <span class="pl-s"><span class="pl-pds">'</span>production<span class="pl-pds">'</span></span>
+};</pre></div>
+
+<blockquote>
+<h4>
+<a id="user-content-transmission-control-protocol-tcp-and-internet-protocol-ip" class="anchor" href="#transmission-control-protocol-tcp-and-internet-protocol-ip" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Transmission Control Protocol (TCP) and Internet Protocol (IP)</h4>
+
+<p>Oversimplification: in <a href="https://en.wikipedia.org/wiki/Internet_protocol_suite">TCP/IP</a> a <em>host</em> is a unique computer on a network and a <em>port</em> is a unique process (e.g., a web server) on that host.</p>
+</blockquote>
+
+<p>Update "webpack.config.js" as shown below.  Notice that we've added several options to <code>devServer</code> including ones we were specifying in our <code>start</code> script.  This means we can update it to <code>"start": "webpack-dev-server"</code>.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">const</span> <span class="pl-c1">autoprefixer</span> <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>autoprefixer<span class="pl-pds">'</span></span>);
+<span class="pl-k">const</span> <span class="pl-c1">path</span> <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>path<span class="pl-pds">'</span></span>);
+<span class="pl-k">const</span> <span class="pl-c1">ExtractTextPlugin</span> <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>extract-text-webpack-plugin<span class="pl-pds">'</span></span>);
+<span class="pl-k">const</span> <span class="pl-c1">HtmlWebpackPlugin</span> <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>html-webpack-plugin<span class="pl-pds">'</span></span>);
+<span class="pl-k">const</span> <span class="pl-c1">webpack</span> <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>webpack<span class="pl-pds">'</span></span>);
+<span class="pl-k">const</span> <span class="pl-c1">config</span> <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>./config<span class="pl-pds">'</span></span>);
+
+<span class="pl-k">const</span> <span class="pl-c1">webpackConfig</span> <span class="pl-k">=</span> {
+  devServer<span class="pl-k">:</span> {
+    <span class="pl-c">// option changes</span>
+    contentBase<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>./dist<span class="pl-pds">'</span></span>,
+    host<span class="pl-k">:</span> <span class="pl-smi">config</span>.<span class="pl-c1">host</span>,
+    port<span class="pl-k">:</span> <span class="pl-smi">config</span>.<span class="pl-c1">port</span>
+  },
+
+  <span class="pl-c">// remove devtool</span>
+
+  entry<span class="pl-k">:</span> {
+    app<span class="pl-k">:</span> [
+      <span class="pl-c">// remove lines here</span>
+      <span class="pl-s"><span class="pl-pds">'</span>./src/index.js<span class="pl-pds">'</span></span>
+    ]
+  },
+
+  module<span class="pl-k">:</span> {
+    loaders<span class="pl-k">:</span> [
+      {
+        test<span class="pl-k">:</span><span class="pl-sr"> <span class="pl-pds">/</span><span class="pl-cce">\.</span>js<span class="pl-k">$</span><span class="pl-pds">/</span></span>,
+        exclude<span class="pl-k">:</span><span class="pl-sr"> <span class="pl-pds">/</span>node_modules<span class="pl-pds">/</span></span>,
+        loader<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>babel<span class="pl-pds">'</span></span>
+      }
+      <span class="pl-c">// remove css/scss</span>
+    ]
+  },
+
+  output<span class="pl-k">:</span> {
+    path<span class="pl-k">:</span> <span class="pl-smi">path</span>.<span class="pl-en">resolve</span>(<span class="pl-c1">__dirname</span>, <span class="pl-s"><span class="pl-pds">'</span>dist<span class="pl-pds">'</span></span>),
+    filename<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>[name]-[hash].js<span class="pl-pds">'</span></span>
+  },
+
+  plugins<span class="pl-k">:</span> [
+    <span class="pl-c">// remove HotModuleReplacementPlugin</span>
+
+    <span class="pl-k">new</span> <span class="pl-en">HtmlWebpackPlugin</span>({
+      template<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>./src/index.html<span class="pl-pds">'</span></span>,
+      inject<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>body<span class="pl-pds">'</span></span>,
+      <span class="pl-c">// new config</span>
+      minify<span class="pl-k">:</span> {
+        collapseWhitespace<span class="pl-k">:</span> <span class="pl-c1">true</span>
+      }
+    })
+  ],
+
+  postcss<span class="pl-k">:</span> [autoprefixer]
+};
+
+<span class="pl-c">// new section to apply config based on our environment (dev or prod)</span>
+<span class="pl-k">if</span> (<span class="pl-smi">config</span>.<span class="pl-smi">production</span>) {
+  <span class="pl-c">// add css loader with ExtractTextPlugin</span>
+  <span class="pl-smi">webpackConfig</span>.<span class="pl-smi">module</span>.<span class="pl-smi">loaders</span>.<span class="pl-c1">push</span>({
+    test<span class="pl-k">:</span><span class="pl-sr"> <span class="pl-pds">/</span><span class="pl-cce">\.</span>(css<span class="pl-k">|</span>scss)<span class="pl-k">$</span><span class="pl-pds">/</span></span>,
+    loader<span class="pl-k">:</span> <span class="pl-smi">ExtractTextPlugin</span>.<span class="pl-en">extract</span>([
+      <span class="pl-s"><span class="pl-pds">'</span>css?modules&amp;importLoaders=1&amp;minimize<span class="pl-pds">'</span></span>,
+      <span class="pl-s"><span class="pl-pds">'</span>postcss<span class="pl-pds">'</span></span>,
+      <span class="pl-s"><span class="pl-pds">'</span>sass<span class="pl-pds">'</span></span>
+    ])
+  });
+  <span class="pl-c">// add optimizations</span>
+  <span class="pl-smi">webpackConfig</span>.<span class="pl-c1">plugins</span>.<span class="pl-c1">push</span>(
+    <span class="pl-k">new</span> <span class="pl-en">ExtractTextPlugin</span>(<span class="pl-s"><span class="pl-pds">'</span>styles-[contenthash].css<span class="pl-pds">'</span></span>),
+    <span class="pl-k">new</span> <span class="pl-en">webpack.optimize.DedupePlugin</span>(), <span class="pl-c">// remove duplicate code</span>
+    <span class="pl-k">new</span> <span class="pl-en">webpack.optimize.OccurrenceOrderPlugin</span>(), <span class="pl-c">// webpack optimization</span>
+    <span class="pl-k">new</span> <span class="pl-en">webpack.optimize.UglifyJsPlugin</span>({
+      comments<span class="pl-k">:</span> <span class="pl-c1">false</span>, <span class="pl-c">// remove comments</span>
+      compress<span class="pl-k">:</span> {
+        warnings<span class="pl-k">:</span> <span class="pl-c1">false</span> <span class="pl-c">// disable command line warnings</span>
+      }
+    }),
+    <span class="pl-c">// create global constants at compile time...</span>
+    <span class="pl-c">// this enables the minification step to remove</span>
+    <span class="pl-c">// entire environment specific code blocks (React.js)</span>
+    <span class="pl-k">new</span> <span class="pl-en">webpack.DefinePlugin</span>({
+      <span class="pl-s"><span class="pl-pds">'</span>process.env<span class="pl-pds">'</span></span><span class="pl-k">:</span> {
+        NODE_ENV<span class="pl-k">:</span> <span class="pl-c1">JSON</span>.<span class="pl-en">stringify</span>(<span class="pl-s"><span class="pl-pds">'</span>production<span class="pl-pds">'</span></span>)
+      }
+    })
+  );
+} <span class="pl-k">else</span> {
+  <span class="pl-c">// devServer options</span>
+  <span class="pl-smi">webpackConfig</span>.<span class="pl-smi">devServer</span>.<span class="pl-smi">debug</span> <span class="pl-k">=</span> <span class="pl-c1">true</span>;
+  <span class="pl-smi">webpackConfig</span>.<span class="pl-smi">devServer</span>.<span class="pl-smi">hot</span> <span class="pl-k">=</span> <span class="pl-c1">true</span>;
+  <span class="pl-c">// source maps</span>
+  <span class="pl-smi">webpackConfig</span>.<span class="pl-smi">devtool</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>source-map<span class="pl-pds">'</span></span>;
+  <span class="pl-c">// add css loader</span>
+  <span class="pl-smi">webpackConfig</span>.<span class="pl-smi">module</span>.<span class="pl-smi">loaders</span>.<span class="pl-c1">push</span>({
+    test<span class="pl-k">:</span><span class="pl-sr"> <span class="pl-pds">/</span><span class="pl-cce">\.</span>(css<span class="pl-k">|</span>scss)<span class="pl-k">$</span><span class="pl-pds">/</span></span>,
+    loaders<span class="pl-k">:</span> [
+      <span class="pl-s"><span class="pl-pds">'</span>style<span class="pl-pds">'</span></span>,
+      <span class="pl-s"><span class="pl-pds">'</span>css?modules&amp;sourceMap&amp;importLoaders=1<span class="pl-pds">'</span></span>,
+      <span class="pl-s"><span class="pl-pds">'</span>postcss<span class="pl-pds">'</span></span>,
+      <span class="pl-s"><span class="pl-pds">'</span>sass<span class="pl-pds">'</span></span>
+    ]
+  });
+  <span class="pl-c">// add HMR</span>
+  <span class="pl-smi">webpackConfig</span>.<span class="pl-smi">entry</span>.<span class="pl-smi">app</span>.<span class="pl-c1">unshift</span>(
+    <span class="pl-s"><span class="pl-pds">`</span>webpack-dev-server/client?http://<span class="pl-s1"><span class="pl-pse">${</span><span class="pl-smi">config</span>.<span class="pl-c1">host</span><span class="pl-pse">}</span></span>:<span class="pl-s1"><span class="pl-pse">${</span><span class="pl-smi">config</span>.<span class="pl-c1">port</span><span class="pl-pse">}</span></span><span class="pl-pds">`</span></span>,
+    <span class="pl-s"><span class="pl-pds">'</span>webpack/hot/only-dev-server<span class="pl-pds">'</span></span>
+  );
+  <span class="pl-smi">webpackConfig</span>.<span class="pl-c1">plugins</span>.<span class="pl-c1">push</span>(
+    <span class="pl-k">new</span> <span class="pl-en">webpack.HotModuleReplacementPlugin</span>()
+  );
+}
+
+<span class="pl-c">// export our config variable</span>
+<span class="pl-c1">module</span>.<span class="pl-smi">exports</span> <span class="pl-k">=</span> webpackConfig;
+</pre></div>
+
+<p>If you'll remember from our last post we already created a <code>build</code> script in our "package.json".</p>
+
+<p>Run the <code>build</code> script now and inspect the contents of the "dist" folder, you'll see everything has been nicely minified/uglified for optimal distribution to our users!  Great!</p>
+
+<p>Start up your dev server and make sure HMR and source maps are still working correctly as well.</p>
+
+<h4>
+<a id="user-content-commit-our-changes" class="anchor" href="#commit-our-changes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Commit our changes</h4>
+
+<div class="highlight highlight-source-shell"><pre>git add <span class="pl-c1">.</span>
+git commit -m <span class="pl-s"><span class="pl-pds">'</span>added Webpack production config...closes #4<span class="pl-pds">'</span></span>
+git push origin master</pre></div>
+
+<p><a href="https://github.com/bschnelle/react-starter-kit/tree/d4b5ccc63c9f795f3f97525cfd159cedc7c52017">My repo after this commit</a></p>
+
+<h4>
+<a id="user-content-summary" class="anchor" href="#summary" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Summary</h4>
+
+<p>That wraps up our major Webpack config for now.  We'll continue to update it as necessary when we add additional features.  In the next section we get into React.</p>

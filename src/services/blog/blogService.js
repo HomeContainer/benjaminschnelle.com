@@ -6,7 +6,7 @@ class BlogService {
   }
 
   getPost(id) {
-    const url = `${this.url}${id}.md`;
+    const url = `${this.url}${id}.html`;
     return fetch.default(url)
       .then(fetch.handleError)
       .then(fetch.getText);

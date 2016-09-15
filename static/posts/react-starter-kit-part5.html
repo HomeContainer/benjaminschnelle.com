@@ -1,0 +1,255 @@
+<p>In the last part we setup React and React Router, now we're going to look at how we can test our application.</p>
+
+<h2>
+<a id="user-content-8-testing-setup" class="anchor" href="#8-testing-setup" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>8. Testing Setup</h2>
+
+<p>What is a test?  It's a way for us to make assertions about the expected behavior of our application and then verify that those assertions hold based on the behavior of the application.</p>
+
+<p>Why write tests for our application?  Isn't it just doubling our work?  </p>
+
+<p>Once our code has been tested we can make changes to it, rerun the tests, and if they all pass it gives us a reasonable amount of confidence that we didn't break anything.  Tests give you organization and force you to put more thought into what you're going to be building ahead of time.  <a href="http://stackoverflow.com/a/67500/2482993">This</a> StackOverflow answer does a great job of summarizing the benefits of testing.  </p>
+
+<p>Convinced?  Me too.</p>
+
+<h5>
+<a id="user-content-heres-a-recap-of-the-tools-well-be-using" class="anchor" href="#heres-a-recap-of-the-tools-well-be-using" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Here's a recap of the tools we'll be using.</h5>
+
+<ul>
+<li>
+<a href="https://mochajs.org/">Mocha</a>: testing framework/test runner</li>
+<li>
+<a href="http://chaijs.com/">Chai</a>: test assertions</li>
+<li>
+<a href="http://sinonjs.org/">Sinon</a>: spies, stubs, and mocks (helpers that making testing easier)</li>
+<li>
+<a href="http://airbnb.io/enzyme/">Enzyme</a>: Airbnb powered React specific testing utilities</li>
+<li>
+<a href="https://github.com/tmpvar/jsdom">JSDom</a>: a JavaScript implementation of the DOM</li>
+<li>
+<a href="https://github.com/gotwarlost/istanbul">Istanbul</a>: code coverage...how much of our code has been tested?</li>
+</ul>
+
+<p>Installation!</p>
+
+<div class="highlight highlight-source-shell"><pre>npm install --save-dev mocha chai chai-immutable sinon sinon-chai \
+enzyme react-addons-test-utils jsdom istanbul@1.1.0-alpha.1</pre></div>
+
+<p>Whoa, wait a second, you slipped three extra libraries in there.  <code>chai-immutable</code> lets us make assertions when using Immutable.js (to be added a little later) and <code>sinon-chai</code> lets us make more elegant assertions when using <code>sinon</code>.  <code>react-addons-test-utils</code> is required for <code>enzyme</code>.</p>
+
+<h4>
+<a id="user-content-initial-setup" class="anchor" href="#initial-setup" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Initial Setup</h4>
+
+<p>Go ahead and create a "test" folder in the root of your project then create "setup.js" in it.  Paste in the code below.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> { <span class="pl-smi">jsdom</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>jsdom<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">chai</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>chai<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">chaiImmutable</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>chai-immutable<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">sinonChai</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>sinon-chai<span class="pl-pds">'</span></span>;
+
+<span class="pl-c">// create a fake DOM (browser) in memory</span>
+<span class="pl-c1">global</span>.<span class="pl-smi">document</span> <span class="pl-k">=</span> <span class="pl-en">jsdom</span>(<span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>);
+<span class="pl-c1">global</span>.<span class="pl-smi">window</span> <span class="pl-k">=</span> <span class="pl-c1">document</span>.<span class="pl-c1">defaultView</span>;
+
+<span class="pl-c1">Object</span>.<span class="pl-c1">keys</span>(<span class="pl-c1">window</span>).<span class="pl-c1">forEach</span>((<span class="pl-smi">key</span>) <span class="pl-k">=&gt;</span> {
+  <span class="pl-k">if</span> (<span class="pl-k">!</span>(key <span class="pl-k">in</span> <span class="pl-c1">global</span>)) {
+    <span class="pl-c1">global</span>[key] <span class="pl-k">=</span> <span class="pl-c1">window</span>[key];
+  }
+});
+
+<span class="pl-c">// add chai plugins</span>
+<span class="pl-smi">chai</span>.<span class="pl-en">use</span>(chaiImmutable);
+<span class="pl-smi">chai</span>.<span class="pl-en">use</span>(sinonChai);
+</pre></div>
+
+<p>Next, the code creates a fake DOM so that we can test our client code on the server (without a browser).  If you wanted you could also run your test suite from one or more browsers, but it is generally less efficient.  It then creates all of the global variables you would typically find in a browser based JavaScript environment.  At the bottom of the file we're adding our Chai plugins.</p>
+
+<p>ESLint will be giving you some errors at this point - we're going to fix them shortly.</p>
+
+<h4>
+<a id="user-content-mocha-config" class="anchor" href="#mocha-config" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Mocha Config</h4>
+
+<p>Next we need to provide a few config options to Mocha, our testing framework.  Create a file named "mocha.opts" in the "test" directory.</p>
+
+<pre><code>--compilers js:babel-core/register
+--require test/setup.js
+test/**/*.spec.js
+</code></pre>
+
+<h5>
+<a id="user-content-what-are-these-options-doing" class="anchor" href="#what-are-these-options-doing" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What are these options doing?</h5>
+
+<ul>
+<li>
+<code>compilers</code> tell Mocha to use <code>babel-core/register</code> to transpile ".js" files to ES5 prior to running tests (remember in the testing context Webpack won't be doing anything for us, but we still need to convert our files written in ES6/ES7/JSX to ES5)</li>
+<li>the <code>require</code> option is telling Mocha to run the "setup.js" file prior to running the tests</li>
+<li>the last option is a <a href="https://github.com/isaacs/node-glob">glob</a> which tells Mocha what files to execute as tests...here we're saying find any tests in the "test" directory, at any depth, that end in ".spec.js".</li>
+</ul>
+
+<h4>
+<a id="user-content-babel" class="anchor" href="#babel" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Babel</h4>
+
+<p>We need to make a change to our ".babelrc" file as shown below.  We've added a new <code>env</code> section that will determine which options to use based on the value of <code>process.env.NODE_ENV</code>.  </p>
+
+<p>Here we're using <code>react-hot-loader</code> in "development", disabling CommonJS modules in "development" and "production", and doing neither in "test".</p>
+
+<div class="highlight highlight-source-json"><pre>{
+  <span class="pl-s"><span class="pl-pds">"</span>env<span class="pl-pds">"</span></span>: {
+    <span class="pl-s"><span class="pl-pds">"</span>development<span class="pl-pds">"</span></span>: {
+      <span class="pl-s"><span class="pl-pds">"</span>presets<span class="pl-pds">"</span></span>: [[<span class="pl-s"><span class="pl-pds">"</span>es2015<span class="pl-pds">"</span></span>, { <span class="pl-s"><span class="pl-pds">"</span>modules<span class="pl-pds">"</span></span>: <span class="pl-c1">false</span> }], <span class="pl-s"><span class="pl-pds">"</span>react<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>stage-0<span class="pl-pds">"</span></span>],
+      <span class="pl-s"><span class="pl-pds">"</span>plugins<span class="pl-pds">"</span></span>: [<span class="pl-s"><span class="pl-pds">"</span>react-hot-loader/babel<span class="pl-pds">"</span></span>]
+    },
+    <span class="pl-s"><span class="pl-pds">"</span>production<span class="pl-pds">"</span></span>: {
+      <span class="pl-s"><span class="pl-pds">"</span>presets<span class="pl-pds">"</span></span>: [[<span class="pl-s"><span class="pl-pds">"</span>es2015<span class="pl-pds">"</span></span>, { <span class="pl-s"><span class="pl-pds">"</span>modules<span class="pl-pds">"</span></span>: <span class="pl-c1">false</span> }], <span class="pl-s"><span class="pl-pds">"</span>react<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>stage-0<span class="pl-pds">"</span></span>]
+    },
+    <span class="pl-s"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span>: {
+      <span class="pl-s"><span class="pl-pds">"</span>presets<span class="pl-pds">"</span></span>: [<span class="pl-s"><span class="pl-pds">"</span>es2015<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>react<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>stage-0<span class="pl-pds">"</span></span>]
+    }
+  }
+}</pre></div>
+
+<h4>
+<a id="user-content-eslint" class="anchor" href="#eslint" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>ESLint</h4>
+
+<p>Given our new testing context, we need to modify a few ESLint rules so that we aren't dealing with linting errors constantly.  Create a new ".eslintrc" file in the "test" folder.</p>
+
+<div class="highlight highlight-source-js"><pre>{
+  <span class="pl-s"><span class="pl-pds">"</span>env<span class="pl-pds">"</span></span><span class="pl-k">:</span> {
+    <span class="pl-s"><span class="pl-pds">"</span>mocha<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">true</span>
+  },
+  <span class="pl-s"><span class="pl-pds">"</span>extends<span class="pl-pds">"</span></span> <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>../.eslintrc<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>rules<span class="pl-pds">"</span></span><span class="pl-k">:</span> {
+    <span class="pl-s"><span class="pl-pds">"</span>import/no-extraneous-dependencies<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">0</span>,
+    <span class="pl-s"><span class="pl-pds">"</span>no-unused-expressions<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">0</span>
+  }
+}</pre></div>
+
+<p>Here we're extending our existing ESLint config, setting our environment to Mocha (for certain global variables), and ignoring two rules that would throw errors on some of our test files.</p>
+
+<h4>
+<a id="user-content-istanbul" class="anchor" href="#istanbul" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Istanbul</h4>
+
+<p>One final config file we need is ".istanbul.yml" at the <em>root</em> of our project as shown below.  This file tells Istanbul that the files we want to test are in our "src" directory and to include all JavaScript files anywhere in that directory when determining code coverage.</p>
+
+<div class="highlight highlight-source-yaml"><pre><span class="pl-ent">instrumentation:</span>
+  <span class="pl-ent">root:</span> <span class="pl-s">src</span>
+  <span class="pl-ent">include-all-sources:</span> <span class="pl-c1">true</span></pre></div>
+
+<h4>
+<a id="user-content-scripts" class="anchor" href="#scripts" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Scripts</h4>
+
+<p>We have all of our config files in place, now we just need to add a few new scripts to our "package.json" file to make testing easier.  Add the two lines below to the <code>scripts</code> section of your "package.json".  You can delete the placeholder <code>test</code> script that was already in there.</p>
+
+<div class="highlight highlight-source-json"><pre>{
+  <span class="pl-s"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>NODE_ENV=test istanbul cover _mocha<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>test:dev<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>NODE_ENV=test mocha --watch<span class="pl-pds">"</span></span>
+}</pre></div>
+
+<blockquote>
+<p>Why are we using <code>_mocha</code> instead of <code>mocha</code> in <code>test:cover</code>? See <a href="https://github.com/gotwarlost/istanbul/issues/44#issuecomment-16093330">here</a></p>
+</blockquote>
+
+<p>Now we have an option for running our tests and generating a coverage report or continually running our tests during development.</p>
+
+<h4>
+<a id="user-content-lets-create-our-first-test" class="anchor" href="#lets-create-our-first-test" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Let's create our first test!</h4>
+
+<p>We'll mirror our "src" directory structure in our "test" directory with test files corresponding to all source files.  Create the directories necessary and file at "test/components/Home/Home.spec.js".  The ".spec.js" extension is just a testing convention.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">React</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">expect</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>chai<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">shallow</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>enzyme<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">Link</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-router<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">Home</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>../../../src/components/Home/Home<span class="pl-pds">'</span></span>;
+
+<span class="pl-en">describe</span>(<span class="pl-s"><span class="pl-pds">'</span>Home<span class="pl-pds">'</span></span>, () <span class="pl-k">=&gt;</span> {
+  <span class="pl-en">it</span>(<span class="pl-s"><span class="pl-pds">'</span>renders a Link with "Go to Counter!"<span class="pl-pds">'</span></span>, () <span class="pl-k">=&gt;</span> {
+    <span class="pl-k">const</span> <span class="pl-c1">wrapper</span> <span class="pl-k">=</span> <span class="pl-en">shallow</span>(<span class="pl-k">&lt;</span>Home <span class="pl-k">/</span><span class="pl-k">&gt;</span>);
+    <span class="pl-en">expect</span>(<span class="pl-smi">wrapper</span>.<span class="pl-c1">contains</span>(<span class="pl-k">&lt;</span>Link to<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>/counter<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>Go to Counter<span class="pl-k">!</span><span class="pl-k">&lt;</span><span class="pl-k">/</span>Link<span class="pl-k">&gt;</span>)).<span class="pl-smi">to</span>.<span class="pl-smi">be</span>.<span class="pl-smi">true</span>;
+  });
+});
+</pre></div>
+
+<p>Here we're using <code>shallow</code> rendering which only renders a component one level deep.  So in this case the <code>Link</code> component is not actually evaluated so we can test that the rendered output contains <code>&lt;Link to="/counter"&gt;Go to Counter!&lt;/Link&gt;</code> which is exactly what we're doing above.  The <code>describe</code> block provides scoping and context, the <code>it</code> block is the actual test, and <code>expect</code> provides our assertion.  Depending on the outcome of our assertion the test passes or fails.</p>
+
+<h4>
+<a id="user-content-code-coverage" class="anchor" href="#code-coverage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Code Coverage</h4>
+
+<p>Jump over to the terminal and run <code>npm test</code> which will execute our test and generate a code coverage report (directory) in the root of your project called "coverage".  Your command line output should look similar to the image below.</p>
+
+<p><a href="../../images/test-results-coverage.jpg" target="_blank"><img src="../../images/test-results-coverage.jpg" alt="Test Results With Coverage" style="max-width:100%;"></a></p>
+
+<p>Before we go any further lets add that directory to our ".gitignore" file so we don't accidentally commit it.</p>
+
+<p>Our code coverage is looking pretty crummy at under 11%, let's take a closer look.  Open up the "index.html" file in coverage/lcov-report.  It should look similar to the image below.  You can explore your source files to see which are tested and which aren't.</p>
+
+<p><a href="../../images/coverage-report.jpg" target="_blank"><img src="../../images/coverage-report.jpg" alt="Coverage Report" style="max-width:100%;"></a></p>
+
+<h4>
+<a id="user-content-reorganization" class="anchor" href="#reorganization" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Reorganization</h4>
+
+<p>While having a separate directory for test files works and used to be my preference, I've since had a change of heart.  An alternative to this approach is to put our test files beside our source files, in the same directory.  I think this lends itself to more modular code and makes refactors simpler as we're not maintaining two directories that mirror one another.  </p>
+
+<p>This is strictly personal preference and if you prefer the approach we've already taken you can skip the following changes.</p>
+
+<p>Update your "mocha.opts" file as shown below to find our ".spec.js" files in our "src" directory.</p>
+
+<pre><code>--compilers js:babel-core/register
+--require test/setup.js
+src/**/*.spec.js
+</code></pre>
+
+<p>Delete the ".eslintrc" file in the "test" directory and update the ".eslintrc" file in the root of your project as shown below.  We've moved our test related config into our global ESLint config file so it will be applied to both our source and test files which isn't ideal.  Unfortunately, ESLint doesn't currently provide a way for us to apply rules based on file extension so this is as good as it gets for now.</p>
+
+<div class="highlight highlight-source-js"><pre>{
+  <span class="pl-s"><span class="pl-pds">"</span>parser<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>babel-eslint<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>env<span class="pl-pds">"</span></span><span class="pl-k">:</span> {
+    <span class="pl-s"><span class="pl-pds">"</span>browser<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">true</span>,
+    <span class="pl-s"><span class="pl-pds">"</span>mocha<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">true</span> <span class="pl-c">// remove when eslint adds glob matching</span>
+  },
+  <span class="pl-s"><span class="pl-pds">"</span>extends<span class="pl-pds">"</span></span> <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>airbnb<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>rules<span class="pl-pds">"</span></span><span class="pl-k">:</span> {
+    <span class="pl-s"><span class="pl-pds">"</span>comma-dangle<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">0</span>,
+    <span class="pl-s"><span class="pl-pds">"</span>import/no-extraneous-dependencies<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">0</span>, <span class="pl-c">// remove when eslint adds glob matching</span>
+    <span class="pl-s"><span class="pl-pds">"</span>no-unused-expressions<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">0</span>, <span class="pl-c">// remove when eslint adds glob matching</span>
+    <span class="pl-s"><span class="pl-pds">"</span>react/jsx-filename-extension<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">0</span>
+  }
+}</pre></div>
+
+<p>Update your ".istanbul.yml" config file as shown below so that we don't include our ".spec.js" files when determining code coverage.</p>
+
+<div class="highlight highlight-source-yaml"><pre><span class="pl-ent">instrumentation:</span>
+  <span class="pl-ent">root:</span> <span class="pl-s">src</span>
+  <span class="pl-ent">include-all-sources:</span> <span class="pl-c1">true</span>
+  <span class="pl-ent">excludes:</span> <span class="pl-s">['*.spec.js']</span></pre></div>
+
+<p>Finally move the "Home.spec.js" file from test/components/Home to src/components/Home and update it as shown below.  Also, delete the "components" subdirectory of "test".</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">React</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">expect</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>chai<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">shallow</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>enzyme<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">Link</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-router<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">Home</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./Home<span class="pl-pds">'</span></span>; <span class="pl-c">// update our import location</span>
+
+<span class="pl-en">describe</span>(<span class="pl-s"><span class="pl-pds">'</span>Home<span class="pl-pds">'</span></span>, () <span class="pl-k">=&gt;</span> {
+  <span class="pl-en">it</span>(<span class="pl-s"><span class="pl-pds">'</span>renders a Link with "Go to Counter!"<span class="pl-pds">'</span></span>, () <span class="pl-k">=&gt;</span> {
+    <span class="pl-k">const</span> <span class="pl-c1">wrapper</span> <span class="pl-k">=</span> <span class="pl-en">shallow</span>(<span class="pl-k">&lt;</span>Home <span class="pl-k">/</span><span class="pl-k">&gt;</span>);
+    <span class="pl-en">expect</span>(<span class="pl-smi">wrapper</span>.<span class="pl-c1">contains</span>(<span class="pl-k">&lt;</span>Link to<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>/counter<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>Go to Counter<span class="pl-k">!</span><span class="pl-k">&lt;</span><span class="pl-k">/</span>Link<span class="pl-k">&gt;</span>)).<span class="pl-smi">to</span>.<span class="pl-smi">be</span>.<span class="pl-smi">true</span>;
+  });
+});
+</pre></div>
+
+<p>Make sure your test still run successfully with <code>npm test</code>.</p>
+
+<h4>
+<a id="user-content-commit-our-changes" class="anchor" href="#commit-our-changes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Commit our changes</h4>
+
+<div class="highlight highlight-source-shell"><pre>git add <span class="pl-c1">.</span>
+git commit -m <span class="pl-s"><span class="pl-pds">'</span>added testing setup...closes #6<span class="pl-pds">'</span></span>
+git push origin master</pre></div>
+
+<p><a href="https://github.com/bschnelle/react-starter-kit/tree/227fc6b61d30d0addf6b000375c9ea71fe2754e0">My repo after this commit</a></p>
+
+<h4>
+<a id="user-content-summary" class="anchor" href="#summary" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Summary</h4>
+
+<p>Our testing setup is looking pretty good and we've written our first test.  Stellar progress!  Let's head to the next part where we'll see what Redux is all about.</p>

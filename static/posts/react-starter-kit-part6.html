@@ -1,0 +1,667 @@
+<p>Last time we saw how to setup our testing environment and a couple different ways to organize our tests.</p>
+
+<h2>
+<a id="user-content-9-redux" class="anchor" href="#9-redux" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>9. Redux</h2>
+
+<p>React has got our UI covered, but what about application <a href="http://stackoverflow.com/a/8102731/2482993">state</a>?  How should we manage that?  <a href="http://redux.js.org/">Redux</a>!</p>
+
+<p>Redux is a simplified implementation of the <a href="http://facebook.github.io/flux/">Flux</a> pattern created/used by Facebook.  Flux and Redux take a different approach than more traditional design patterns like MVC (<a href="http://stackoverflow.com/questions/33447710/mvc-vs-flux-bidirectional-vs-unidirectional">client MVC</a>).</p>
+
+<p>Many client frameworks like Ember and Angular 1 implement two-way data binding which means that your data model can update your view (UI) and your view can update your model.  This type of binding can be convenient and results in less boilerplate code, but there are also performance implications in complex applications and it can make reasoning about your app more difficult.</p>
+
+<p>Redux takes a different approach (borrowing from Flux concepts) which makes it easier to reason about.  In Redux all state is maintained by a central <code>store</code> and your application can <code>subscribe</code> to changes so that anytime your state is changed in the <code>store</code> your application is notified and can respond accordingly.  </p>
+
+<p>So how do you actually change the data in the <code>store</code>?  You <code>dispatch</code> an <code>action</code> via the <code>store</code> which updates the state using a <code>reducer</code> which is a <a href="http://www.nicoespeon.com/en/2015/01/pure-functions-javascript/">pure</a> function (a function that doesn't have side effects...if you call it with the same arguments over and over it will always return the same value) that takes the old state + your <code>action</code> and returns the next state.  All data flow is one-way.</p>
+
+<p>We'll see how this all works below in the context of React, <strong>BUT</strong> you do not <em>have</em> to use Redux with React.  It can be used entirely on its own, with any other view library, or you can write your own views using raw HTML and JavaScript.</p>
+
+<p>Let's install the libraries we'll need.</p>
+
+<div class="highlight highlight-source-shell"><pre>npm install --save redux react-redux react-router-redux</pre></div>
+
+<h5>
+<a id="user-content-what-are-those" class="anchor" href="#what-are-those" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What are those?</h5>
+
+<ul>
+<li>
+<code>redux</code>: self-explanatory</li>
+<li>
+<code>react-redux</code>: bindings between React and Redux.</li>
+<li>
+<code>react-router-redux</code>: sync React Router with Redux</li>
+</ul>
+
+<p>Back in the initial discussion of React I mentioned we would cover the concepts of <code>state</code> and <code>context</code> in this post.  Let's cover <code>state</code> now.</p>
+
+<h4>
+<a id="user-content-component-state" class="anchor" href="#component-state" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Component State</h4>
+
+<p>In React you can store data that changes over time as component <code>state</code>.  Anytime a change is made to your component's <code>state</code> the component rerenders and the UI is updated to reflect those changes.  Let's demonstrate how that would work.</p>
+
+<p>We'll add a button to our <code>Counter</code> component that will call an <code>increment</code> function when clicked.  Both <code>increment</code> and the current <code>count</code> value will be passed by <code>CounterContainer</code> to <code>Counter</code> for use/display.</p>
+
+<h4>
+<a id="user-content-test-driven-development-tdd---counter" class="anchor" href="#test-driven-development-tdd---counter" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Test Driven Development (TDD) - Counter</h4>
+
+<p>As mentioned in the last post, we're going to build our components using a TDD approach going forward (for the most part).  Let's start by writing the tests for <code>Counter</code> to cover existing functionality as well as our new features.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// components/Counter/Counter.spec.js</span>
+<span class="pl-k">import</span> <span class="pl-smi">React</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">expect</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>chai<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">shallow</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>enzyme<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">Link</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-router<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">Counter</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./Counter<span class="pl-pds">'</span></span>;
+
+<span class="pl-en">describe</span>(<span class="pl-s"><span class="pl-pds">'</span>Counter<span class="pl-pds">'</span></span>, () <span class="pl-k">=&gt;</span> {
+  <span class="pl-en">it</span>(<span class="pl-s"><span class="pl-pds">'</span>renders an h2, Link, button, and div<span class="pl-pds">'</span></span>, () <span class="pl-k">=&gt;</span> {
+    <span class="pl-k">const</span> <span class="pl-c1">count</span> <span class="pl-k">=</span> <span class="pl-c1">10</span>;
+    <span class="pl-k">const</span> <span class="pl-c1">increment</span> <span class="pl-k">=</span> () <span class="pl-k">=&gt;</span> {};
+    <span class="pl-k">const</span> <span class="pl-c1">wrapper</span> <span class="pl-k">=</span> <span class="pl-en">shallow</span>(<span class="pl-k">&lt;</span>Counter count<span class="pl-k">=</span>{count} increment<span class="pl-k">=</span>{increment} <span class="pl-k">/</span><span class="pl-k">&gt;</span>);
+
+    <span class="pl-en">expect</span>(<span class="pl-smi">wrapper</span>.<span class="pl-en">containsAllMatchingElements</span>([
+      <span class="pl-k">&lt;</span>h2<span class="pl-k">&gt;</span>Hello from Counter<span class="pl-k">!</span><span class="pl-k">&lt;</span><span class="pl-k">/</span>h2<span class="pl-k">&gt;</span>,
+      <span class="pl-k">&lt;</span>Link to<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>/<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>Go Home<span class="pl-k">!</span><span class="pl-k">&lt;</span><span class="pl-k">/</span>Link<span class="pl-k">&gt;</span>,
+      <span class="pl-k">&lt;</span>button<span class="pl-k">&gt;</span>Increment<span class="pl-k">&lt;</span><span class="pl-k">/</span>button<span class="pl-k">&gt;</span>,
+      <span class="pl-k">&lt;</span>div<span class="pl-k">&gt;</span>{count}<span class="pl-k">&lt;</span><span class="pl-k">/</span>div<span class="pl-k">&gt;</span>
+    ])).<span class="pl-smi">to</span>.<span class="pl-smi">be</span>.<span class="pl-smi">true</span>;
+  });
+});
+</pre></div>
+
+<p>Our first test is checking if the <code>Counter</code> component renders the right elements/components.  Here we're checking that an <code>h2</code>, <code>Link</code>, <code>button</code>, and <code>div</code> are rendered.  We're also checking that <code>props.count</code> is rendered into the <code>div</code>.  <code>props.increment</code> will be required so we pass in a "no-op" (no operation) function so that our test doesn't throw an error.</p>
+
+<p>We also want our component to call <code>props.increment</code> whenever the button is clicked so let's add one more test to verify that.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// components/Counter/Counter.spec.js</span>
+<span class="pl-k">import</span> <span class="pl-smi">React</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">expect</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>chai<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">sinon</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>sinon<span class="pl-pds">'</span></span>; <span class="pl-c">// new import</span>
+<span class="pl-k">import</span> { <span class="pl-smi">shallow</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>enzyme<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">Link</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-router<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">Counter</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./Counter<span class="pl-pds">'</span></span>;
+
+<span class="pl-en">describe</span>(<span class="pl-s"><span class="pl-pds">'</span>Counter<span class="pl-pds">'</span></span>, () <span class="pl-k">=&gt;</span> {
+  <span class="pl-c">// ...other test</span>
+
+  <span class="pl-en">it</span>(<span class="pl-s"><span class="pl-pds">'</span>clicking the button calls props.increment<span class="pl-pds">'</span></span>, () <span class="pl-k">=&gt;</span> {
+    <span class="pl-k">const</span> <span class="pl-c1">count</span> <span class="pl-k">=</span> <span class="pl-c1">10</span>;
+    <span class="pl-k">const</span> <span class="pl-c1">increment</span> <span class="pl-k">=</span> <span class="pl-smi">sinon</span>.<span class="pl-en">stub</span>();
+    <span class="pl-k">const</span> <span class="pl-c1">wrapper</span> <span class="pl-k">=</span> <span class="pl-en">shallow</span>(<span class="pl-k">&lt;</span>Counter count<span class="pl-k">=</span>{count} increment<span class="pl-k">=</span>{increment} <span class="pl-k">/</span><span class="pl-k">&gt;</span>);
+    <span class="pl-smi">wrapper</span>.<span class="pl-c1">find</span>(<span class="pl-s"><span class="pl-pds">'</span>button<span class="pl-pds">'</span></span>).<span class="pl-en">simulate</span>(<span class="pl-s"><span class="pl-pds">'</span>click<span class="pl-pds">'</span></span>);
+
+    <span class="pl-en">expect</span>(increment).<span class="pl-smi">to</span>.<span class="pl-smi">have</span>.<span class="pl-smi">been</span>.<span class="pl-smi">calledOnce</span>;
+  });
+});
+</pre></div>
+
+<p>In this test we're using <code>sinon</code> to create a <code>stub</code> function for <code>increment</code>.  This allows us to check whether or not <code>increment</code> was called, how many times, with what values, etc.  After we shallow render <code>Counter</code> we simulate a <code>click</code> event on the <code>button</code>, then check if <code>increment</code> was called once.  </p>
+
+<blockquote>
+<p>Remember <code>sinon-chai</code> from earlier?  If we hadn't included that, we would have had to write our test like this instead <code>expect(increment.calledOnce).to.be.true</code>.  This works, it just doesn't read as well.</p>
+</blockquote>
+
+<p>If you run your tests now, they'll both fail.  Let's create our component and add the necessary features to make those lights go green!</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// components/Counter/Counter.js</span>
+<span class="pl-k">import</span> <span class="pl-smi">React</span>, { <span class="pl-smi">PropTypes</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">Link</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-router<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">const</span> <span class="pl-c1">Counter</span> <span class="pl-k">=</span> (<span class="pl-smi">props</span>) <span class="pl-k">=&gt;</span> (
+  <span class="pl-k">&lt;</span>div<span class="pl-k">&gt;</span>
+    <span class="pl-k">&lt;</span>h2<span class="pl-k">&gt;</span>Hello from Counter<span class="pl-k">!</span><span class="pl-k">&lt;</span><span class="pl-k">/</span>h2<span class="pl-k">&gt;</span>
+    <span class="pl-k">&lt;</span>Link to<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>/<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>Go Home<span class="pl-k">!</span><span class="pl-k">&lt;</span><span class="pl-k">/</span>Link<span class="pl-k">&gt;</span>
+    <span class="pl-k">&lt;</span>button onClick<span class="pl-k">=</span>{<span class="pl-smi">props</span>.<span class="pl-smi">increment</span>}<span class="pl-k">&gt;</span>Increment<span class="pl-k">&lt;</span><span class="pl-k">/</span>button<span class="pl-k">&gt;</span>
+    <span class="pl-k">&lt;</span>div<span class="pl-k">&gt;</span>{<span class="pl-smi">props</span>.<span class="pl-smi">count</span>}<span class="pl-k">&lt;</span><span class="pl-k">/</span>div<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span><span class="pl-k">/</span>div<span class="pl-k">&gt;</span>
+);
+
+<span class="pl-smi">Counter</span>.<span class="pl-smi">propTypes</span> <span class="pl-k">=</span> {
+  count<span class="pl-k">:</span> <span class="pl-smi">PropTypes</span>.<span class="pl-smi">number</span>,
+  increment<span class="pl-k">:</span> <span class="pl-smi">PropTypes</span>.<span class="pl-smi">func</span>.<span class="pl-smi">isRequired</span>
+};
+
+<span class="pl-k">export</span> <span class="pl-v">default</span> <span class="pl-smi">Counter</span>;
+</pre></div>
+
+<p>This component fulfills our requirements of displaying an <code>h2</code>, <code>Link</code> to "/", a <code>button</code> that calls <code>props.increment</code> <code>onClick</code>, and displays <code>props.count</code> in a <code>div</code>.  If you had your tests running in development mode with <code>npm run test:dev</code> they should all be passing now!</p>
+
+<h4>
+<a id="user-content-test-driven-development-tdd---countercontainer" class="anchor" href="#test-driven-development-tdd---countercontainer" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Test Driven Development (TDD) - CounterContainer</h4>
+
+<p>Next we want to test our <code>CounterContainer</code>.  It should be initialized with <code>state.count</code> set to zero, it should have an <code>increment</code> function that increases <code>count</code> by one every time the function is called, and it should pass both <code>state.count</code> and <code>increment</code> to <code>Counter</code>.</p>
+
+<p>Go ahead and create the test file.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// containers/Counter/CounterContainer.spec.js</span>
+<span class="pl-k">import</span> <span class="pl-smi">React</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">expect</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>chai<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">shallow</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>enzyme<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">CounterContainer</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./CounterContainer<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">Counter</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>../../components/Counter/Counter<span class="pl-pds">'</span></span>;
+
+<span class="pl-en">describe</span>(<span class="pl-s"><span class="pl-pds">'</span>CounterContainer<span class="pl-pds">'</span></span>, () <span class="pl-k">=&gt;</span> {
+  <span class="pl-en">it</span>(<span class="pl-s"><span class="pl-pds">'</span>is initialized with state.count set to zero<span class="pl-pds">'</span></span>, () <span class="pl-k">=&gt;</span> {
+    <span class="pl-k">const</span> <span class="pl-c1">wrapper</span> <span class="pl-k">=</span> <span class="pl-en">shallow</span>(<span class="pl-k">&lt;</span>CounterContainer <span class="pl-k">/</span><span class="pl-k">&gt;</span>);
+    <span class="pl-en">expect</span>(<span class="pl-smi">wrapper</span>.<span class="pl-en">state</span>(<span class="pl-s"><span class="pl-pds">'</span>count<span class="pl-pds">'</span></span>)).<span class="pl-smi">to</span>.<span class="pl-en">equal</span>(<span class="pl-c1">0</span>);
+  });
+
+  <span class="pl-en">it</span>(<span class="pl-s"><span class="pl-pds">'</span>has an increment function that increases state.count by one when called<span class="pl-pds">'</span></span>, () <span class="pl-k">=&gt;</span> {
+    <span class="pl-k">const</span> <span class="pl-c1">wrapper</span> <span class="pl-k">=</span> <span class="pl-en">shallow</span>(<span class="pl-k">&lt;</span>CounterContainer <span class="pl-k">/</span><span class="pl-k">&gt;</span>);
+    <span class="pl-smi">wrapper</span>.<span class="pl-en">instance</span>().<span class="pl-en">increment</span>();
+    <span class="pl-en">expect</span>(<span class="pl-smi">wrapper</span>.<span class="pl-en">state</span>(<span class="pl-s"><span class="pl-pds">'</span>count<span class="pl-pds">'</span></span>)).<span class="pl-smi">to</span>.<span class="pl-en">equal</span>(<span class="pl-c1">1</span>);
+  });
+
+  <span class="pl-en">it</span>(<span class="pl-s"><span class="pl-pds">'</span>passes state.count and increment as props to Counter<span class="pl-pds">'</span></span>, () <span class="pl-k">=&gt;</span> {
+    <span class="pl-k">const</span> <span class="pl-c1">wrapper</span> <span class="pl-k">=</span> <span class="pl-en">shallow</span>(<span class="pl-k">&lt;</span>CounterContainer <span class="pl-k">/</span><span class="pl-k">&gt;</span>);
+    <span class="pl-en">expect</span>(<span class="pl-k">typeof</span> <span class="pl-smi">wrapper</span>.<span class="pl-en">prop</span>(<span class="pl-s"><span class="pl-pds">'</span>count<span class="pl-pds">'</span></span>)).<span class="pl-smi">to</span>.<span class="pl-en">equal</span>(<span class="pl-s"><span class="pl-pds">'</span>number<span class="pl-pds">'</span></span>);
+    <span class="pl-en">expect</span>(<span class="pl-k">typeof</span> <span class="pl-smi">wrapper</span>.<span class="pl-en">prop</span>(<span class="pl-s"><span class="pl-pds">'</span>increment<span class="pl-pds">'</span></span>)).<span class="pl-smi">to</span>.<span class="pl-en">equal</span>(<span class="pl-s"><span class="pl-pds">'</span>function<span class="pl-pds">'</span></span>);
+    <span class="pl-en">expect</span>(<span class="pl-smi">wrapper</span>.<span class="pl-c1">type</span>()).<span class="pl-smi">to</span>.<span class="pl-en">equal</span>(Counter);
+  });
+});
+</pre></div>
+
+<p>We have three tests that verify our component requirements we stated a moment ago.  In the first test we call <code>wrapper.state('count')</code> to get the initial <code>state.counter</code> value and verify it is zero.  </p>
+
+<p>The second test calls <code>wrapper.instance().increment()</code>, then we verify that <code>state.count</code> is one rather than zero.  </p>
+
+<p>Finally, we test the <code>props</code> of <code>wrapper</code> to ensure it receives both <code>count</code> and <code>increment</code>, then we verify that the rendered component is of type <code>Counter</code>.</p>
+
+<blockquote>
+<h4>
+<a id="user-content-why-did-we-call-instance-in-our-second-test" class="anchor" href="#why-did-we-call-instance-in-our-second-test" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Why did we call <code>instance</code> in our second test?</h4>
+
+<p>The <code>wrapper</code> object is just that, a wrapper <em>around</em> our component.  So if we want to access the component itself we first need to call <code>instance</code>.</p>
+</blockquote>
+
+<p>Let's create our component and make our tests pass now!</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// containers/Counter/CounterContainer.js</span>
+<span class="pl-k">import</span> <span class="pl-smi">React</span>, { <span class="pl-smi">Component</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">Counter</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>../../components/Counter/Counter<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">class</span> <span class="pl-en">CounterContainer</span> <span class="pl-k">extends</span> <span class="pl-e">Component</span> {
+  <span class="pl-en">constructor</span>(<span class="pl-smi">props</span>) {
+    <span class="pl-v">super</span>(props);
+    <span class="pl-v">this</span>.<span class="pl-smi">state</span> <span class="pl-k">=</span> { count<span class="pl-k">:</span> <span class="pl-c1">0</span> };
+    <span class="pl-v">this</span>.<span class="pl-smi">increment</span> <span class="pl-k">=</span> <span class="pl-v">this</span>.<span class="pl-smi">increment</span>.<span class="pl-en">bind</span>(<span class="pl-v">this</span>);
+  }
+
+  <span class="pl-en">increment</span>() {
+    <span class="pl-v">this</span>.<span class="pl-en">setState</span>({ count<span class="pl-k">:</span> <span class="pl-v">this</span>.<span class="pl-smi">state</span>.<span class="pl-smi">count</span> <span class="pl-k">+</span> <span class="pl-c1">1</span> });
+  }
+
+  <span class="pl-en">render</span>() {
+    <span class="pl-k">return</span> <span class="pl-k">&lt;</span>Counter count<span class="pl-k">=</span>{<span class="pl-v">this</span>.<span class="pl-smi">state</span>.<span class="pl-smi">count</span>} increment<span class="pl-k">=</span>{<span class="pl-v">this</span>.<span class="pl-smi">increment</span>} <span class="pl-k">/</span><span class="pl-k">&gt;</span>;
+  }
+}
+
+<span class="pl-k">export</span> <span class="pl-v">default</span> <span class="pl-smi">CounterContainer</span>;
+</pre></div>
+
+<h5>
+<a id="user-content-whats-going-on-here" class="anchor" href="#whats-going-on-here" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What's going on here?</h5>
+
+<ul>
+<li>
+<code>constructor</code>: called when the class is instantiated to <em>construct</em> the instance.  We first call <code>super</code> which calls the parent class' constructor (<code>React.Component</code>).  Next we set our initial <code>state</code> to an object with one key of <code>count</code> equal to zero.  Here the <code>props</code> object would be any properties passed into <code>CounterContainer</code> by the component that rendered it.  The final line in our constructor is binding our <code>increment</code> function to our <code>CounterContainer</code> component so that when we pass it down to our <code>Counter</code> the function can still be called.</li>
+<li>
+<code>increment</code>: calls <code>setState</code>, a function inherited from <code>React.Component</code> that is used to update our component's <code>state</code>.  You <strong>never</strong> want to directly modify <code>state</code> with anything like <code>this.state.count = 10;</code>, so anytime you need to update <code>state</code> you'll want to create a new object or clone the existing one and update that.  React is written under the assumption that existing <code>state</code> is never mutated.</li>
+<li>
+<code>render</code>: covered previously.</li>
+</ul>
+
+<blockquote>
+<p>The <code>this</code> keyword in JavaScript can be confusing, if it is foreign to you I would suggest reading more <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this">here</a>.</p>
+</blockquote>
+
+<h4>
+<a id="user-content-spring-cleaning" class="anchor" href="#spring-cleaning" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Spring Cleaning</h4>
+
+<p>Start your dev server and open up your browser to "/counter".  First things first - that button looks like shit.  Add a new file "Counter.scss" in components/Counter with the contents below.  Then import the SASS file into "Counter.js" and add the class as shown further down.</p>
+
+<div class="highlight highlight-source-css"><pre>$red: <span class="pl-e">#ff1744</span>;
+
+<span class="pl-e">.button</span> {
+  <span class="pl-c1"><span class="pl-c1">background-color</span></span>: $<span class="pl-c1">red</span>;
+
+  <span class="pl-c">/* round corners */</span>
+  <span class="pl-c1"><span class="pl-c1">border-radius</span></span>: <span class="pl-c1">3<span class="pl-k">px</span></span>;
+
+  <span class="pl-c">/* remove border */</span>
+  <span class="pl-c1"><span class="pl-c1">border</span></span>: <span class="pl-c1">none</span>;
+
+  <span class="pl-c">/* force button onto next line */</span>
+  <span class="pl-c1"><span class="pl-c1">display</span></span>: <span class="pl-c1">block</span>;
+
+  <span class="pl-c">/* font */</span>
+  <span class="pl-c1"><span class="pl-c1">color</span></span>: <span class="pl-c1">white</span>;
+  <span class="pl-c1"><span class="pl-c1">font-size</span></span>: <span class="pl-c1">1.2<span class="pl-k">rem</span></span>;
+
+  <span class="pl-c">/* turn cursor into a hand */</span>
+  <span class="pl-c1"><span class="pl-c1">cursor</span></span>: <span class="pl-c1">pointer</span>;
+
+  <span class="pl-c">/* add space around and inside of button */</span>
+  <span class="pl-c1"><span class="pl-c1">margin</span></span>: <span class="pl-c1">15<span class="pl-k">px</span></span> <span class="pl-c1">auto</span>;
+  <span class="pl-c1"><span class="pl-c1">padding</span></span>: <span class="pl-c1">7<span class="pl-k">px</span></span> <span class="pl-c1">15<span class="pl-k">px</span></span>;
+
+  <span class="pl-c">/* remove outline when button is focused */</span>
+  &amp;:focus {
+    outline: <span class="pl-c1">none</span>;
+  }
+
+  <span class="pl-c">/* lighten background on click */</span>
+  &amp;<span class="pl-e">:active</span> {
+    <span class="pl-c1"><span class="pl-c1">background-color</span></span>: lighten($<span class="pl-c1">red</span>, <span class="pl-c1">15<span class="pl-k">%</span></span>);
+  }
+}</pre></div>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// components/Counter/Counter.js</span>
+<span class="pl-k">import</span> <span class="pl-smi">React</span>, { <span class="pl-smi">PropTypes</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">Link</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-router<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">classes</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./Counter.scss<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">const</span> <span class="pl-c1">Counter</span> <span class="pl-k">=</span> (<span class="pl-smi">props</span>) <span class="pl-k">=&gt;</span> (
+  <span class="pl-k">&lt;</span>div<span class="pl-k">&gt;</span>
+    <span class="pl-k">&lt;</span>h2<span class="pl-k">&gt;</span>Hello from Counter<span class="pl-k">!</span><span class="pl-k">&lt;</span><span class="pl-k">/</span>h2<span class="pl-k">&gt;</span>
+    <span class="pl-k">&lt;</span>Link to<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>/<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>Go Home<span class="pl-k">!</span><span class="pl-k">&lt;</span><span class="pl-k">/</span>Link<span class="pl-k">&gt;</span>
+    <span class="pl-k">&lt;</span>button className<span class="pl-k">=</span>{<span class="pl-smi">classes</span>.<span class="pl-smi">button</span>} onClick<span class="pl-k">=</span>{<span class="pl-smi">props</span>.<span class="pl-smi">increment</span>}<span class="pl-k">&gt;</span>
+      Increment
+    <span class="pl-k">&lt;</span><span class="pl-k">/</span>button<span class="pl-k">&gt;</span>
+    <span class="pl-k">&lt;</span>div<span class="pl-k">&gt;</span>{<span class="pl-smi">props</span>.<span class="pl-smi">count</span>}<span class="pl-k">&lt;</span><span class="pl-k">/</span>div<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span><span class="pl-k">/</span>div<span class="pl-k">&gt;</span>
+);
+
+<span class="pl-smi">Counter</span>.<span class="pl-smi">propTypes</span> <span class="pl-k">=</span> {
+  count<span class="pl-k">:</span> <span class="pl-smi">PropTypes</span>.<span class="pl-smi">number</span>,
+  increment<span class="pl-k">:</span> <span class="pl-smi">PropTypes</span>.<span class="pl-smi">func</span>.<span class="pl-smi">isRequired</span>
+};
+
+<span class="pl-k">export</span> <span class="pl-v">default</span> <span class="pl-smi">Counter</span>;
+</pre></div>
+
+<p>Let's make sure our tests are still working after adding our CSS import.  Run <code>npm test</code>...and we have an error now of "Unexpected character '#'".  </p>
+
+<p>Remember when we setup Webpack and used several CSS loaders to compile SASS to CSS and enable CSS Modules?  During testing, Webpack isn't doing anything for us so we need to be able to handle our SASS import statements in our JavaScript files.  We can fix that with the <code>css-modules-require-hook</code> library which will perform the tasks we need.  </p>
+
+<div class="highlight highlight-source-shell"><pre>npm install --save-dev css-modules-require-hook</pre></div>
+
+<p>Now update your test/setup.js file as shown below so that our ".scss" files are compiled to CSS and CSS Modules via Node's <code>require</code> function.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// ...more imports</span>
+<span class="pl-k">import</span> <span class="pl-smi">hook</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>css-modules-require-hook<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">sass</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>node-sass<span class="pl-pds">'</span></span>;
+
+<span class="pl-c">// ...more config...</span>
+
+<span class="pl-c">// compile CSS Modules via require()</span>
+<span class="pl-en">hook</span>({
+  extensions<span class="pl-k">:</span> [<span class="pl-s"><span class="pl-pds">'</span>.scss<span class="pl-pds">'</span></span>],
+  <span class="pl-en">preprocessCss</span><span class="pl-k">:</span> <span class="pl-smi">data</span> <span class="pl-k">=&gt;</span> <span class="pl-smi">sass</span>.<span class="pl-en">renderSync</span>({ data }).<span class="pl-smi">css</span>
+});
+</pre></div>
+
+<p>If you rerun your tests now, they should all be passing again!</p>
+
+<p><a href="https://camo.githubusercontent.com/1a4b5eea0abe2d72c9af40967526017dd0b181ea/68747470733a2f2f692e696d6775722e636f6d2f656650637773582e676966" target="_blank"><img src="https://camo.githubusercontent.com/1a4b5eea0abe2d72c9af40967526017dd0b181ea/68747470733a2f2f692e696d6775722e636f6d2f656650637773582e676966" alt="Dancing Kid" data-canonical-src="https://i.imgur.com/efPcwsX.gif" style="max-width:100%;"></a></p>
+
+<h4>
+<a id="user-content-does-the-button-work-kind-of" class="anchor" href="#does-the-button-work-kind-of" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Does the button work? Kind of.</h4>
+
+<p>Fire up your server and visit "/counter" again.  Click the button and watch the number go up.  Now click the link to Home then back to Counter and you'll notice that our counter is back at zero.  Shoot, we wanted to keep our hard work.</p>
+
+<p>The reason it reset is that when you navigated to "/" our <code>CounterContainer</code> was unmounted which removed it from the DOM and hence any data associated with it was lost.  Then when you went back to "/counter" it was recreated and <code>state.count</code> was reinitialized to zero.</p>
+
+<p>There are situations where this is completely appropriate, but there are also situations where you want to persist your application state.  That's where Redux comes in.  Because we're going to be using Redux with React we need to first discuss React <code>context</code> which can be thought of as implicit <code>props</code>.  </p>
+
+<p><code>context</code> allows you to pass data from a parent component to a descendent, the number of levels deep doesn't matter.  This can be convenient when you don't want to explicitly pass it from component to component through <code>props</code> all the way down the chain, but it can also make it more difficult to reason about because of the fact that data is "magically" available.  We'll see <code>context</code> in action shortly.</p>
+
+<h4>
+<a id="user-content-redux--react-redux-react-redux" class="anchor" href="#redux--react-redux-react-redux" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Redux + React Redux (react-redux)</h4>
+
+<p>Open up your "index.js" file in "src" and make the changes below.  We're not testing our "index.js" file for now since it is difficult to do so and if it wasn't rendering our app that would be very obvious.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">React</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">render</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-dom<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">createStore</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>redux<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">Provider</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-redux<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">AppContainer</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-hot-loader<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">browserHistory</span>, <span class="pl-smi">Router</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-router<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">routes</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./routes<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">const</span> <span class="pl-c1">MOUNT_NODE</span> <span class="pl-k">=</span> <span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>root<span class="pl-pds">'</span></span>);
+<span class="pl-k">const</span> <span class="pl-c1">reducer</span> <span class="pl-k">=</span> (<span class="pl-smi">state</span>) <span class="pl-k">=&gt;</span> state;
+<span class="pl-k">const</span> <span class="pl-c1">initialState</span> <span class="pl-k">=</span> { count<span class="pl-k">:</span> <span class="pl-c1">10</span> };
+<span class="pl-k">const</span> <span class="pl-c1">store</span> <span class="pl-k">=</span> <span class="pl-en">createStore</span>(reducer, initialState);
+
+<span class="pl-k">const</span> <span class="pl-c1">App</span> <span class="pl-k">=</span> (
+  <span class="pl-k">&lt;</span>Provider store<span class="pl-k">=</span>{store}<span class="pl-k">&gt;</span>
+    <span class="pl-k">&lt;</span>Router history<span class="pl-k">=</span>{browserHistory}<span class="pl-k">&gt;</span>
+      {routes}
+    <span class="pl-k">&lt;</span><span class="pl-k">/</span>Router<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span><span class="pl-k">/</span>Provider<span class="pl-k">&gt;</span>
+);
+
+<span class="pl-en">render</span>(App, <span class="pl-c1">MOUNT_NODE</span>);
+
+<span class="pl-k">if</span> (<span class="pl-c1">module</span>.<span class="pl-smi">hot</span>) {
+  <span class="pl-c1">module</span>.<span class="pl-smi">hot</span>.<span class="pl-c1">accept</span>(<span class="pl-s"><span class="pl-pds">'</span>./routes<span class="pl-pds">'</span></span>, () <span class="pl-k">=&gt;</span> {
+    <span class="pl-en">render</span>(<span class="pl-k">&lt;</span>AppContainer<span class="pl-k">&gt;</span>{App}<span class="pl-k">&lt;</span><span class="pl-k">/</span>AppContainer<span class="pl-k">&gt;</span>, <span class="pl-c1">MOUNT_NODE</span>);
+  });
+}
+</pre></div>
+
+<p>Here we've added two new imports: <code>createStore</code> from <code>redux</code> and <code>Provider</code> from <code>react-redux</code>.  We're then creating a <code>reducer</code> that just returns the first argument passed to it, <code>state</code>, and an <code>initialState</code> object for our <code>count</code>.  Next we call <code>createStore</code> with our <code>reducer</code> and <code>initialState</code>.</p>
+
+<p>What we have done is create a Redux <code>store</code> with a default state of <code>initialState</code> and a <code>reducer</code> that just returns our old state.  Later we'll update our <code>reducer</code> so it actually does something, but I wanted to start with a simple example to show how the Redux store is used in components.</p>
+
+<p>We've wrapped our <code>Router</code> component with <code>Provider</code> and passed our store to it as a property.  Remember a little while ago when I talked about React <code>context</code>?  That is the mechanism used by <code>Provider</code> to pass the <code>store</code> down the component hierarchy which enables us to extract data (our <code>count</code> value) at any depth we please.  Let's see how we would access our store.</p>
+
+<p>At this point we're going to pause our TDD approach because we're going to be make several changes back to back and it would be a waste of time to keep rewriting our tests.  Feel free to implement the tests necessary to get coverage to 100%.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// containers/Counter/CounterContainer.js</span>
+
+<span class="pl-c">// ...dependencies</span>
+<span class="pl-k">class</span> <span class="pl-en">CounterContainer</span> <span class="pl-k">extends</span> <span class="pl-e">Component</span> {
+  <span class="pl-k">static</span> contextTypes <span class="pl-k">=</span> {
+    store<span class="pl-k">:</span> <span class="pl-smi">React</span>.<span class="pl-smi">PropTypes</span>.<span class="pl-c1">object</span>,
+  }
+
+  <span class="pl-en">constructor</span>(<span class="pl-smi">props</span>, <span class="pl-smi">context</span>) {
+    <span class="pl-v">super</span>(props);
+    <span class="pl-v">this</span>.<span class="pl-smi">state</span> <span class="pl-k">=</span> { count<span class="pl-k">:</span> <span class="pl-smi">context</span>.<span class="pl-smi">store</span>.<span class="pl-en">getState</span>().<span class="pl-smi">count</span> };
+    <span class="pl-v">this</span>.<span class="pl-smi">increment</span> <span class="pl-k">=</span> <span class="pl-v">this</span>.<span class="pl-smi">increment</span>.<span class="pl-en">bind</span>(<span class="pl-v">this</span>);
+
+    <span class="pl-c">// delete this after you have a chance to see</span>
+    <span class="pl-c">// what context/store look like</span>
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>context<span class="pl-pds">'</span></span>, context);
+  }
+
+  <span class="pl-c">// increment &amp; render...</span>
+}
+</pre></div>
+
+<blockquote>
+<h5>
+<a id="user-content-console" class="anchor" href="#console" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Console</h5>
+
+<p>There's a "Console" tab in your developer tools where you can output strings, objects, etc. with <code>console.log</code> statements in your code</p>
+</blockquote>
+
+<p>What have we changed?  So we added <code>contextTypes</code> with a <code>store</code> property that looks just like <code>propTypes</code> as we've already seen.  That's because it <em>is</em> very similar...we're just defining our <code>context</code> instead of our <code>props</code>.</p>
+
+<p>In our <code>constructor</code> we've added a new argument for <code>context</code>.  Then we call <code>context.store.getState()</code> which returns the current state from the Redux <code>store</code>.  Finally, we're accessing the <code>count</code> property on that state.  A little further down we've added a <code>console.log</code> statement so that we can inspect the <code>context</code> object, specifically the <code>store</code> property.</p>
+
+<p><a href="../../images/redux-store.jpg" target="_blank"><img src="../../images/redux-store.jpg" alt="Redux Store" style="max-width:100%;"></a></p>
+
+<p>We're concerned with three functions exposed on the <code>store</code> object: <code>dispatch</code>, <code>getState</code>, and <code>subscribe</code>.  <code>dispatch</code> is how we tell the <code>store</code> to update itself, we already discussed <code>getState</code>, and <code>subscribe</code> is how we listen for changes in the <code>store</code>.</p>
+
+<p>If you look at your app you'll notice that <code>state.count</code> starts at 10 now because that's the default value in the Redux store.  Click the button a few times and you'll see your number increment as before, then click the link to leave the page and come back again.  We're back to 10...dammit.  We have the same issue as before because our <code>increment</code> function is updating the local component <code>state</code> rather than the Redux <code>store</code>.  </p>
+
+<p>How do we update the Redux store <code>count</code> value?  Our <code>reducer</code> of course!  Time to make our <code>reducer</code> actually do something.  Make the changes shown below.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// src/index.js</span>
+
+<span class="pl-c">// ...more stuff</span>
+<span class="pl-k">const</span> <span class="pl-c1">reducer</span> <span class="pl-k">=</span> (<span class="pl-smi">state</span>, <span class="pl-smi">action</span>) <span class="pl-k">=&gt;</span> {
+  <span class="pl-k">if</span> (<span class="pl-smi">action</span>.<span class="pl-c1">type</span> <span class="pl-k">===</span> <span class="pl-s"><span class="pl-pds">'</span>INCREMENT<span class="pl-pds">'</span></span>) {
+    <span class="pl-k">return</span> { count<span class="pl-k">:</span> <span class="pl-smi">state</span>.<span class="pl-smi">count</span> <span class="pl-k">+</span> <span class="pl-smi">action</span>.<span class="pl-smi">increment</span> };
+  }
+  <span class="pl-k">return</span> state;
+};
+<span class="pl-c">// more stuff...</span></pre></div>
+
+<p>We've added a new <code>action</code> argument to our <code>reducer</code> which will be passed to the <code>reducer</code> anytime we <code>dispatch</code> an <code>action</code>.  If <code>action.type</code> equals "INCREMENT" then the <code>reducer</code> returns a new object with <code>count</code> set to its old value plus <code>action.increment</code>, otherwise return the old <code>state</code>.</p>
+
+<p>Let's update our <code>CounterContainer</code>'s <code>increment</code> function to dispatch an "INCREMENT" action instead of updating its local <code>state</code>.</p>
+
+<div class="highlight highlight-source-js"><pre>{
+  <span class="pl-c">// ...constructor</span>
+
+  <span class="pl-en">componentWillMount</span>() {
+    <span class="pl-v">this</span>.<span class="pl-smi">context</span>.<span class="pl-smi">store</span>.<span class="pl-en">subscribe</span>(() <span class="pl-k">=&gt;</span> {
+      <span class="pl-v">this</span>.<span class="pl-en">setState</span>({ count<span class="pl-k">:</span> <span class="pl-v">this</span>.<span class="pl-smi">context</span>.<span class="pl-smi">store</span>.<span class="pl-en">getState</span>().<span class="pl-smi">count</span> });
+    });
+  }
+
+  <span class="pl-en">increment</span>() {
+    <span class="pl-k">const</span> <span class="pl-c1">action</span> <span class="pl-k">=</span> { type<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>INCREMENT<span class="pl-pds">'</span></span>, increment<span class="pl-k">:</span> <span class="pl-c1">2</span> };
+    <span class="pl-v">this</span>.<span class="pl-smi">context</span>.<span class="pl-smi">store</span>.<span class="pl-en">dispatch</span>(action);
+  }
+
+  <span class="pl-c">// render...</span>
+}</pre></div>
+
+<p>Here we've made two changes.  Let's look at <code>increment</code> first.  Instead of updating <code>CounterContainer</code>'s local <code>state</code> with <code>setState</code> we're now creating an <code>action</code> object with <code>type</code> of "INCREMENT" and setting <code>increment</code> to 2.  </p>
+
+<p><code>componentWillMount</code> is a component lifecycle hook that allows us to run code at certain times during the component's lifecycle.  In this case <code>constructor</code> and <code>componentWillMount</code> are essentially identical, but I've separated them for clarity.  Via the <code>subscribe</code> method on the <code>store</code> object we're able to respond to changes in our Redux store's <code>state</code>.  Here we're just updating our <em>local</em> <code>state.count</code> to the corresponding property in our Redux store when a change occurs.</p>
+
+<p>Fire up your app again if it isn't already running and click the button a few times, then navigate between routes and you should see <code>count</code> retain its value.  Awesome!  Increment it again after you switched routes and check the console, we have an error...ugh.</p>
+
+<p><a href="../../images/setState-error.jpg" target="_blank"><img src="../../images/setState-error.jpg" alt="setState error" style="max-width:100%;"></a></p>
+
+<p>Why are we getting this and what does it mean?  Well if we read it tells us exactly what the problem is.  We're calling <code>setState</code> on an unmounted component which is a no-no.  </p>
+
+<p>How is this happening?  Remember earlier when I said our component is unmounted when we change routes (which is why we were losing our <code>count</code> state)?  Well that is still happening, but that listener we added to the Redux store with <code>subscribe</code> in our <code>componentWillMount</code> hook is still there long after our component unmounts.  So we need to <code>unsubscribe</code> from the store before our component unmounts.  How?</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// containers/Counter/CounterContainer.js</span>
+
+<span class="pl-c">// ...more stuff</span>
+
+<span class="pl-en">componentWillMount</span>() {
+  <span class="pl-v">this</span>.<span class="pl-smi">unsubscribe</span> <span class="pl-k">=</span> <span class="pl-v">this</span>.<span class="pl-smi">context</span>.<span class="pl-smi">store</span>.<span class="pl-en">subscribe</span>(() <span class="pl-k">=&gt;</span> {
+    <span class="pl-v">this</span>.<span class="pl-en">setState</span>({ count<span class="pl-k">:</span> <span class="pl-v">this</span>.<span class="pl-smi">context</span>.<span class="pl-smi">store</span>.<span class="pl-en">getState</span>().<span class="pl-smi">count</span> });
+  });
+}
+
+<span class="pl-en">componentWillUnmount</span>() {
+  <span class="pl-v">this</span>.<span class="pl-en">unsubscribe</span>();
+}
+
+<span class="pl-c">// more stuff...</span></pre></div>
+
+<p>When we call <code>subscribe</code> it returns an <code>unsubscribe</code> object we can call to remove the listener from the store.  Simple as that.  <code>componentWillUnmount</code> is, you guessed it, another lifecycle hook.</p>
+
+<p>Now click the button all you want and go back and forth between routes.  No errors!</p>
+
+<h4>
+<a id="user-content-react-redux-connect" class="anchor" href="#react-redux-connect" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>React Redux connect</h4>
+
+<p>If you're thinking there has to be a better way to go about getting data from the store, you would be correct.  I just wanted to show you how things are implemented manually first.</p>
+
+<p><code>react-redux</code> exposes a <code>connect</code> function in addition to the <code>Provider</code> component.  Let's see how we can simplify our component using that.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// containers/Counter/CounterContainer.js</span>
+
+<span class="pl-k">import</span> <span class="pl-smi">React</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">connect</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-redux<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">Counter</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>../../components/Counter/Counter<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">const</span> <span class="pl-c1">CounterContainer</span> <span class="pl-k">=</span> (<span class="pl-smi">props</span>) <span class="pl-k">=&gt;</span> (
+  <span class="pl-k">&lt;</span>Counter count<span class="pl-k">=</span>{<span class="pl-smi">props</span>.<span class="pl-smi">count</span>} increment<span class="pl-k">=</span>{<span class="pl-smi">props</span>.<span class="pl-smi">increment</span>} <span class="pl-k">/</span><span class="pl-k">&gt;</span>
+);
+
+<span class="pl-smi">CounterContainer</span>.<span class="pl-smi">propTypes</span> <span class="pl-k">=</span> {
+  count<span class="pl-k">:</span> <span class="pl-smi">React</span>.<span class="pl-smi">PropTypes</span>.<span class="pl-smi">number</span>.<span class="pl-smi">isRequired</span>,
+  increment<span class="pl-k">:</span> <span class="pl-smi">React</span>.<span class="pl-smi">PropTypes</span>.<span class="pl-smi">func</span>.<span class="pl-smi">isRequired</span>,
+};
+
+<span class="pl-k">const</span> <span class="pl-c1">stateToProps</span> <span class="pl-k">=</span> (<span class="pl-smi">state</span>) <span class="pl-k">=&gt;</span> ({ count<span class="pl-k">:</span> <span class="pl-smi">state</span>.<span class="pl-smi">count</span> });
+<span class="pl-k">const</span> <span class="pl-c1">dispatchToProps</span> <span class="pl-k">=</span> {
+  <span class="pl-en">increment</span><span class="pl-k">:</span> () <span class="pl-k">=&gt;</span> ({ type<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>INCREMENT<span class="pl-pds">'</span></span>, increment<span class="pl-k">:</span> <span class="pl-c1">2</span> }),
+};
+
+<span class="pl-k">export</span> <span class="pl-v">default</span> <span class="pl-smi">connect</span>(stateToProps, dispatchToProps)(CounterContainer);
+</pre></div>
+
+<p>We're importing <code>connect</code> from <code>react-redux</code> and using it at the very bottom.  <code>connect</code> is what's known as a <a href="https://medium.com/@franleplant/react-higher-order-components-in-depth-cf9032ee6c3e#.70hzkn6mh">higher order component</a> which is a component that wraps another component and augments it with new <code>props</code>.  All of the interactions we were doing with <code>context</code> are handled for us by <code>connect</code> now, we just have to tell <code>connect</code> what data we want from the <code>store</code> and what actions we want to be able to <code>dispatch</code>.  It then maps those pieces of state and action creators to <code>props</code> on our component.</p>
+
+<p><code>connect</code> accepts two main arguments <code>mapStateToProps</code> and <code>mapDispatchToProps</code> (we've abbreviated slightly).  The first is how we access data from the <code>store</code> and the <code>second</code> is how we <code>dispatch</code> actions to the store.  We've created two <code>props</code>: <code>count</code> and <code>increment</code>.  Now when we call <code>props.increment</code> it will update the <code>count</code> value in Redux, then pass the updated value to our components as <code>props.count</code> and we just pass that along to our presentational component for rendering.  Much more elegant.</p>
+
+<h4>
+<a id="user-content-reorganization" class="anchor" href="#reorganization" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Reorganization</h4>
+
+<p>Update/create the files below and then we'll discuss what we've done here.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// src/index.js</span>
+
+<span class="pl-k">import</span> <span class="pl-smi">React</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">render</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-dom<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">Provider</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-redux<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">AppContainer</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-hot-loader<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">browserHistory</span>, <span class="pl-smi">Router</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-router<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">syncHistoryWithStore</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-router-redux<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">store</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./redux/store<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">routes</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./routes<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">const</span> <span class="pl-c1">MOUNT_NODE</span> <span class="pl-k">=</span> <span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>root<span class="pl-pds">'</span></span>);
+<span class="pl-k">const</span> <span class="pl-c1">history</span> <span class="pl-k">=</span> <span class="pl-en">syncHistoryWithStore</span>(browserHistory, store);
+
+<span class="pl-k">const</span> <span class="pl-c1">App</span> <span class="pl-k">=</span> (
+  <span class="pl-k">&lt;</span>Provider store<span class="pl-k">=</span>{store}<span class="pl-k">&gt;</span>
+    <span class="pl-k">&lt;</span>Router history<span class="pl-k">=</span>{history}<span class="pl-k">&gt;</span>
+      {routes}
+    <span class="pl-k">&lt;</span><span class="pl-k">/</span>Router<span class="pl-k">&gt;</span>
+  <span class="pl-k">&lt;</span><span class="pl-k">/</span>Provider<span class="pl-k">&gt;</span>
+);
+
+<span class="pl-en">render</span>(App, <span class="pl-c1">MOUNT_NODE</span>);
+
+<span class="pl-k">if</span> (<span class="pl-c1">module</span>.<span class="pl-smi">hot</span>) {
+  <span class="pl-c1">module</span>.<span class="pl-smi">hot</span>.<span class="pl-c1">accept</span>(<span class="pl-s"><span class="pl-pds">'</span>./routes<span class="pl-pds">'</span></span>, () <span class="pl-k">=&gt;</span> {
+    <span class="pl-en">render</span>(<span class="pl-k">&lt;</span>AppContainer<span class="pl-k">&gt;</span>{App}<span class="pl-k">&lt;</span><span class="pl-k">/</span>AppContainer<span class="pl-k">&gt;</span>, <span class="pl-c1">MOUNT_NODE</span>);
+  });
+}
+</pre></div>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// src/redux/modules/counter/counterModule.js</span>
+
+<span class="pl-c">// Actions</span>
+<span class="pl-k">const</span> <span class="pl-c1">INCREMENT</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>counter/INCREMENT<span class="pl-pds">'</span></span>;
+
+<span class="pl-c">// Reducer</span>
+<span class="pl-k">export</span> <span class="pl-v">default</span> (<span class="pl-smi">state</span> <span class="pl-k">=</span> { count<span class="pl-k">:</span> <span class="pl-c1">10</span> }, <span class="pl-smi">action</span>) <span class="pl-k">=&gt;</span> {
+  <span class="pl-k">if</span> (<span class="pl-smi">action</span>.<span class="pl-c1">type</span> <span class="pl-k">===</span> <span class="pl-c1">INCREMENT</span>) {
+    <span class="pl-k">return</span> { count<span class="pl-k">:</span> <span class="pl-smi">state</span>.<span class="pl-smi">count</span> <span class="pl-k">+</span> <span class="pl-smi">action</span>.<span class="pl-smi">increment</span> };
+  }
+  <span class="pl-k">return</span> state;
+};
+
+<span class="pl-c">// Action Creators</span>
+<span class="pl-k">export</span> <span class="pl-k">function</span> <span class="pl-en">increment</span>() {
+  <span class="pl-k">return</span> { type<span class="pl-k">:</span> <span class="pl-c1">INCREMENT</span>, increment<span class="pl-k">:</span> <span class="pl-c1">2</span> };
+}
+</pre></div>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// src/redux/combinedReducer.js</span>
+
+<span class="pl-k">import</span> { <span class="pl-smi">combineReducers</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>redux<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">routerReducer</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-router-redux<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">import</span> <span class="pl-smi">counter</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./modules/counter/counterModule<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">export</span> <span class="pl-v">default</span> <span class="pl-smi">combineReducers</span>({
+  counter,
+  routing<span class="pl-k">:</span> routerReducer,
+});
+</pre></div>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// src/redux/store.js</span>
+
+<span class="pl-k">import</span> { <span class="pl-smi">createStore</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>redux<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">combinedReducer</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./combinedReducer<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">export</span> <span class="pl-v">default</span> <span class="pl-smi">createStore</span>(combinedReducer);
+</pre></div>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// src/containers/Counter/CounterContainer.js</span>
+
+<span class="pl-k">import</span> <span class="pl-smi">React</span>, { <span class="pl-smi">PropTypes</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">connect</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-redux<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">increment</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>../../redux/modules/counter/counterModule<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">Counter</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>../../components/Counter/Counter<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">export</span> <span class="pl-k">const</span> <span class="pl-c1">CounterContainer</span> <span class="pl-k">=</span> (<span class="pl-smi">props</span>) <span class="pl-k">=&gt;</span> (
+  <span class="pl-k">&lt;</span>Counter count<span class="pl-k">=</span>{<span class="pl-smi">props</span>.<span class="pl-smi">count</span>} increment<span class="pl-k">=</span>{<span class="pl-smi">props</span>.<span class="pl-smi">increment</span>} <span class="pl-k">/</span><span class="pl-k">&gt;</span>
+);
+
+<span class="pl-smi">CounterContainer</span>.<span class="pl-smi">propTypes</span> <span class="pl-k">=</span> {
+  count<span class="pl-k">:</span> <span class="pl-smi">PropTypes</span>.<span class="pl-smi">number</span>.<span class="pl-smi">isRequired</span>,
+  increment<span class="pl-k">:</span> <span class="pl-smi">PropTypes</span>.<span class="pl-smi">func</span>.<span class="pl-smi">isRequired</span>,
+};
+
+<span class="pl-k">export</span> <span class="pl-k">const</span> <span class="pl-c1">stateToProps</span> <span class="pl-k">=</span> (<span class="pl-smi">state</span>) <span class="pl-k">=&gt;</span> ({ count<span class="pl-k">:</span> <span class="pl-smi">state</span>.<span class="pl-smi">counter</span>.<span class="pl-smi">count</span> });
+<span class="pl-k">export</span> <span class="pl-k">const</span> <span class="pl-c1">dispatchToProps</span> <span class="pl-k">=</span> { increment };
+
+<span class="pl-k">export</span> <span class="pl-v">default</span> <span class="pl-smi">connect</span>(stateToProps, dispatchToProps)(CounterContainer);
+
+</pre></div>
+
+<p>In src/index.js we've moved our <code>reducer</code> and <code>store</code> into external files and we're now creating a <code>history</code> object.  If you remember earlier when we talked about <code>react-router-redux</code> we said we needed to sync <code>react-router</code> with <code>redux</code> which is what we're doing here.  We then pass <code>history</code> to our <code>Router</code> instead of our raw <code>browserHistory</code> object.</p>
+
+<p>Next we've created a new "redux" directory where all of our Redux related code will go to keep things better organized.  </p>
+
+<p>Nested in this folder is another named "modules" which is where we'll keep all of our reducers (we'll combine multiple reducers into a single one we pass to the <code>store</code>).  Additionally, we'll keep our action definitions (<code>INCREMENT</code>), and our action creators (<code>increment</code>), in the same file.  </p>
+
+<p>This approach was suggested by Erik Rasmussen, which he calls <a href="https://github.com/erikras/ducks-modular-redux">Ducks</a>.  The reason we've nested the file in a "counter" directory is so that if the file gets unruly we can split it up into multiple files without changing our imports all over our codebase.  </p>
+
+<p>The action definition is scoped ("counter/INCREMENT") for better clarity when viewing historical actions taken by the user.  You can see in our <code>reducer</code> that we're now applying our <code>initialState</code> as a default value to the <code>state</code> argument (<code>state = { count: 10 }</code>).  We also have a new action creator called <code>increment</code> that we can import anywhere in our code where we want to increment our counter (in case we wanted to do that in multiple places).</p>
+
+<p>The next new file is src/redux/combinedReducer.js which is where we're combining all of our reducers into a single <code>reducer</code>.  You'll notice another import from <code>react-router-redux</code> of <code>routerReducer</code> which is also necessary to sync <code>react-router</code> with <code>redux</code>.  One other thing to note is that we're now putting our old reducer on a new <code>counter</code> key.  The Redux <code>combineReducers</code> function is self-explanatory.</p>
+
+<p>In src/redux/store.js we're just creating our <code>store</code> as before using our new, combined <code>reducer</code>.</p>
+
+<p>Finally, we make the necessary changes to get <code>CounterContainer</code> working again.  We now need to map <code>state.counter.count</code> to our <code>props</code> instead of <code>state.count</code>.  We also import our <code>increment</code> action creator from our "counterModule" "duck" rather than defining it locally.  Also, note that we're exporting <code>CounterContainer</code>, <code>stateToProps</code>, and <code>dispatchToProps</code> as well as our <code>connect</code>ed component for testing purposes.</p>
+
+<h4>
+<a id="user-content-test-fixes" class="anchor" href="#test-fixes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Test Fixes</h4>
+
+<p>We've obviously broken our <code>CounterContainer</code> tests and have many other files we need to test as well.  We're just going to fix the <code>CounterContainer</code> tests right now, later on I'll add more tests for the other components.</p>
+
+<p>Update your test as shown below.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// containers/Counter/CounterContainer.spec.js</span>
+
+<span class="pl-k">import</span> <span class="pl-smi">React</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">expect</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>chai<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">shallow</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>enzyme<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> { <span class="pl-smi">CounterContainer</span>, <span class="pl-smi">dispatchToProps</span>, <span class="pl-smi">stateToProps</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./CounterContainer<span class="pl-pds">'</span></span>;
+<span class="pl-k">import</span> <span class="pl-smi">Counter</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>../../components/Counter/Counter<span class="pl-pds">'</span></span>;
+
+<span class="pl-en">describe</span>(<span class="pl-s"><span class="pl-pds">'</span>CounterContainer<span class="pl-pds">'</span></span>, () <span class="pl-k">=&gt;</span> {
+  <span class="pl-en">it</span>(<span class="pl-s"><span class="pl-pds">'</span>passes props.count and props.increment to Counter<span class="pl-pds">'</span></span>, () <span class="pl-k">=&gt;</span> {
+    <span class="pl-k">const</span> <span class="pl-c1">count</span> <span class="pl-k">=</span> <span class="pl-c1">5</span>;
+    <span class="pl-k">const</span> <span class="pl-c1">increment</span> <span class="pl-k">=</span> () <span class="pl-k">=&gt;</span> {};
+    <span class="pl-k">const</span> <span class="pl-c1">wrapper</span> <span class="pl-k">=</span> <span class="pl-en">shallow</span>(<span class="pl-k">&lt;</span>CounterContainer count<span class="pl-k">=</span>{count} increment<span class="pl-k">=</span>{increment} <span class="pl-k">/</span><span class="pl-k">&gt;</span>);
+    <span class="pl-en">expect</span>(<span class="pl-smi">wrapper</span>.<span class="pl-en">prop</span>(<span class="pl-s"><span class="pl-pds">'</span>count<span class="pl-pds">'</span></span>)).<span class="pl-smi">to</span>.<span class="pl-en">equal</span>(count);
+    <span class="pl-en">expect</span>(<span class="pl-smi">wrapper</span>.<span class="pl-en">prop</span>(<span class="pl-s"><span class="pl-pds">'</span>increment<span class="pl-pds">'</span></span>)).<span class="pl-smi">to</span>.<span class="pl-en">equal</span>(increment);
+    <span class="pl-en">expect</span>(<span class="pl-smi">wrapper</span>.<span class="pl-c1">type</span>()).<span class="pl-smi">to</span>.<span class="pl-en">equal</span>(Counter);
+  });
+
+  <span class="pl-en">describe</span>(<span class="pl-s"><span class="pl-pds">'</span>stateToProps<span class="pl-pds">'</span></span>, () <span class="pl-k">=&gt;</span> {
+    <span class="pl-en">it</span>(<span class="pl-s"><span class="pl-pds">'</span>maps state.counter.count to props.count<span class="pl-pds">'</span></span>, () <span class="pl-k">=&gt;</span> {
+      <span class="pl-k">const</span> <span class="pl-c1">state</span> <span class="pl-k">=</span> { counter<span class="pl-k">:</span> { count<span class="pl-k">:</span> <span class="pl-c1">5</span> } };
+      <span class="pl-en">expect</span>(<span class="pl-en">stateToProps</span>(state).<span class="pl-smi">count</span>).<span class="pl-smi">to</span>.<span class="pl-en">equal</span>(<span class="pl-smi">state</span>.<span class="pl-smi">counter</span>.<span class="pl-smi">count</span>);
+    });
+  });
+
+  <span class="pl-en">describe</span>(<span class="pl-s"><span class="pl-pds">'</span>dispatchToProps<span class="pl-pds">'</span></span>, () <span class="pl-k">=&gt;</span> {
+    <span class="pl-en">it</span>(<span class="pl-s"><span class="pl-pds">'</span>has an increment key of type function<span class="pl-pds">'</span></span>, () <span class="pl-k">=&gt;</span> {
+      <span class="pl-en">expect</span>(<span class="pl-k">typeof</span> <span class="pl-smi">dispatchToProps</span>.<span class="pl-smi">increment</span>).<span class="pl-smi">to</span>.<span class="pl-en">equal</span>(<span class="pl-s"><span class="pl-pds">'</span>function<span class="pl-pds">'</span></span>);
+    });
+  });
+});
+</pre></div>
+
+<h4>
+<a id="user-content-commit-our-changes" class="anchor" href="#commit-our-changes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Commit our changes</h4>
+
+<div class="highlight highlight-source-shell"><pre>git add <span class="pl-c1">.</span>
+git commit -m <span class="pl-s"><span class="pl-pds">'</span>added Redux...closes #7<span class="pl-pds">'</span></span>
+git push origin master</pre></div>
+
+<p><a href="https://github.com/bschnelle/react-starter-kit/tree/ca9a677ee902684cbe0bc1d8b11179c8bece8c38">My repo after this commit</a></p>
+
+<h4>
+<a id="user-content-summary" class="anchor" href="#summary" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Summary</h4>
+
+<p>We've got our Redux store all setup now and ready to hold our application state.  Next we'll look at Immutable.js and the benefits it brings to the table.</p>

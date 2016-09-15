@@ -1,0 +1,439 @@
+<p>Welcome to our first multipart post!  We'll be describing in detail how you would go about creating a React.js starter kit for building a single page application (SPA) from scratch.  We'll be using lots of different tools found in the React ecosystem.</p>
+
+<blockquote>
+<h4>
+<a id="user-content-whats-a-single-page-application-spa" class="anchor" href="#whats-a-single-page-application-spa" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What's a Single Page Application (SPA)?</h4>
+
+<p>Traditionally web applications fetch a new HTML page anytime the user changes routes (e.g. <a href="https://benjaminschnelle.com">https://benjaminschnelle.com</a> --&gt; <a href="https://benjaminschnelle.com/blog">https://benjaminschnelle.com/blog</a>).  This creates a full page refresh which causes a flicker on the screen.</p>
+
+<p>With SPAs the page is only loaded once, then as you navigate around new data is fetched with JavaScript, asynchronously, and then the page is updated when the request completes.  The data fetching (think blog posts or user profile information) is typically done via an <a href="https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol">HTTP (Hypertext Transfer Protocol)</a> request to a remote server which sends the data back in some agreed upon format, <a href="http://www.json.org/">JSON (JavaScript Object Notation)</a> being the most common these days.</p>
+
+<p>In general SPAs make for a better user experience as the application feels more <em>native</em>.</p>
+</blockquote>
+
+<h4>
+<a id="user-content-tools" class="anchor" href="#tools" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Tools</h4>
+
+<p>We'll be using a <em>lot</em> of different libraries and frameworks to compose our starter kit.  Some of the tools we'll see aren't directly related to the project, but are helpful for project management and other concerns.</p>
+
+<h5>
+<a id="user-content-whats-in-our-toolbox" class="anchor" href="#whats-in-our-toolbox" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What's in our toolbox?</h5>
+
+<ul>
+<li>
+<a href="https://git-scm.com/">Git</a>: version control</li>
+<li>
+<a href="https://github.com/">GitHub</a>: our Git repository (where our source code lives) host</li>
+<li>
+<a href="https://nodejs.org/en/">Node</a>: server side Javascript runtime</li>
+<li>
+<a href="https://www.npmjs.com/">NPM</a>: Node's package manager</li>
+<li>
+<a href="http://eslint.org/">ESLint</a>: make sure we write consistent, well-formatted code</li>
+<li>
+<a href="https://webpack.github.io/">Webpack</a>: module bundler which takes many files and combines them into one or more files...WARNING: docs are no bueno <g-emoji alias="cry" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f622.png">😢</g-emoji>
+</li>
+<li>Testing
+
+<ul>
+<li>
+<a href="https://mochajs.org/">Mocha</a>: testing framework/test runner</li>
+<li>
+<a href="http://chaijs.com/">Chai</a>: test assertions (does this equal that?)</li>
+<li>
+<a href="http://sinonjs.org/">Sinon</a>: spies, stubs, and mocks (helpers that making testing easier)</li>
+<li>
+<a href="http://airbnb.io/enzyme/">Enzyme</a>: Airbnb powered React specific testing utilities</li>
+<li>
+<a href="https://github.com/tmpvar/jsdom">JSDom</a>: a JavaScript implementation of the Document Object Model (DOM, the browser)...this creates a fake DOM which allows us to test browser code from the command line (terminal)</li>
+<li>
+<a href="https://github.com/gotwarlost/istanbul">Istanbul</a>: code coverage...how much of our code has been tested?</li>
+</ul>
+</li>
+<li>
+<a href="https://facebook.github.io/react/">React</a>: view layer of our app (just the user interface)</li>
+<li>
+<a href="http://redux.js.org/">Redux</a>: data layer (state management)</li>
+<li>
+<a href="https://facebook.github.io/immutable-js/">Immutable.js</a>: data structures that cannot be changed (mutated) after creation</li>
+</ul>
+
+<h4>
+<a id="user-content-browser-js-vs-nodejs" class="anchor" href="#browser-js-vs-nodejs" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Browser JS vs Node.js</h4>
+
+<p>JS was originally created for the browser and for many years that's the only place it worked.  Then a really sharp <g-emoji alias="cat" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f431.png">🐱</g-emoji> named Ryan Dahl ported JS to the server and thus gave the world Node.  </p>
+
+<p>Node.js operates similarly to JS in the browser, just in a different environment so it allows you to do things you cannot do in the browser and vice versa.  For example, you can read files from your filesystem or create a web server with Node, but you cannot perform browser specific functionality with it.</p>
+
+<p>We'll be using JavaScript in both contexts (browser + Node), so I'll do my best to point out when it is running on the <a href="https://en.wikipedia.org/wiki/Client%E2%80%93server_model">client</a> (browser) or <a href="https://en.wikipedia.org/wiki/Client%E2%80%93server_model">server</a> (Node) as it can be easy to get confused when our project operates in both.</p>
+
+<h5>
+<a id="user-content-steps-were-going-to-take" class="anchor" href="#steps-were-going-to-take" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Steps we're going to take</h5>
+
+<ol>
+<li>Create our project</li>
+<li>Add version control with Git and use Github as our repo host</li>
+<li>Initialize Node Package Manager (NPM)</li>
+<li>Setup ESLint</li>
+<li>Configure Webpack for development</li>
+<li>Configure Webpack for production</li>
+<li>React and React Router</li>
+<li>Testing setup</li>
+<li>Redux</li>
+<li>Immutable.js</li>
+<li>Misc development tools</li>
+<li>Reorganization</li>
+</ol>
+
+<p>I'll be doing all development from Mac OSX so if you're on a different platform your mileage may vary.  Have questions? Just ask!</p>
+
+<p><a href="https://camo.githubusercontent.com/7b0dca133516ca52456082f183799e25f52d7efb/687474703a2f2f692e696d6775722e636f6d2f3444536d3539332e676966" target="_blank"><img src="https://camo.githubusercontent.com/7b0dca133516ca52456082f183799e25f52d7efb/687474703a2f2f692e696d6775722e636f6d2f3444536d3539332e676966" alt="Anchorman Question" data-canonical-src="http://i.imgur.com/4DSm593.gif" style="max-width:100%;"></a></p>
+
+<h2>
+<a id="user-content-1-create-our-project" class="anchor" href="#1-create-our-project" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>1. Create our project</h2>
+
+<p>Open up your terminal.  You can use <code>command + space</code> to open Spotlight Search on OSX and search for "terminal".</p>
+
+<p><a href="../../images/terminal.jpg" target="_blank"><img src="../../images/terminal.jpg" alt="Terminal" style="max-width:100%;"></a></p>
+
+<p>To get started we need to create a directory for our application.  You can create it anywhere, but I like to put all of my projects in a folder named "dev" under my home directory.  If you type <code>pwd</code> (print working directory) and hit enter the output will tell you what the working directory is (where you "are").  When you first open your terminal you'll be in your "home" directory such as "/Users/bschnelle".</p>
+
+<p>Read through the list below to understand what the commands that follow are doing, then run them from your terminal (one at a time) to create your application directory and first app file.</p>
+
+<h5>
+<a id="user-content-step-by-step-commands-below" class="anchor" href="#step-by-step-commands-below" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Step by step commands below</h5>
+
+<ol>
+<li>Creates a new directory (<code>mkdir</code> = make directory) named "dev".</li>
+<li>Changes the working directory (<code>cd</code> = change directory) to "/Users/bschnelle/dev".</li>
+<li>Create another new directory named "react-starter-kit" inside the "dev" directory.</li>
+<li>Changes the working directory to "/Users/bschnelle/dev/react-starter-kit".</li>
+<li>Makes a directory named "src" where our source code will live.</li>
+<li>Prints "React ecosystem starter kit" into a new file named "README.md" which is just a nice convention to follow that provides more information about your project.  GitHub will display the contents of this file by default on the homepage of your project.
+
+<ul>
+<li>
+<code>printf</code> prints text to the terminal or into a file (with <code>&gt;</code>)</li>
+</ul>
+</li>
+</ol>
+
+<div class="highlight highlight-source-shell"><pre>mkdir dev
+<span class="pl-c1">cd</span> dev
+mkdir react-starter-kit
+<span class="pl-c1">cd</span> react-starter-kit
+mkdir src
+<span class="pl-c1">printf</span> <span class="pl-s"><span class="pl-pds">"</span>React ecosystem starter kit<span class="pl-pds">"</span></span> <span class="pl-k">&gt;</span> README.md</pre></div>
+
+<blockquote>
+<h4>
+<a id="user-content-markdown" class="anchor" href="#markdown" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Markdown</h4>
+
+<p>The ".md" extension is used for markdown files.  <a href="http://www.markdowntutorial.com/">Markdown</a> is a groovy markup language for writing.  This blog is written using markdown!</p>
+</blockquote>
+
+<p>We can now add our project to version control!</p>
+
+<h2>
+<a id="user-content-2-add-version-control-with-git-and-use-github-as-our-repo-host" class="anchor" href="#2-add-version-control-with-git-and-use-github-as-our-repo-host" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>2. Add version control with Git and use Github as our repo host</h2>
+
+<p>To get our version control with Git/GitHub setup you'll need 2 things: Git (installed locally) and a GitHub account.  Head over <a href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git">here</a> for Git and <a href="https://github.com/">here</a> to create a GitHub account.</p>
+
+<p><a href="https://git-scm.com/">Git</a> is a version control system that allows us to "commit" (snapshot) our project at any point in time.  Then if we need to rollback changes or create a new branch to add a feature we can do so.  GitHub will be our repository <em>host</em>.</p>
+
+<p>Once you have Git installed and have created a GitHub account, go to your GitHub page and follow the steps below.</p>
+
+<h5>
+<a id="user-content-create-a-github-repository" class="anchor" href="#create-a-github-repository" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Create a GitHub repository</h5>
+
+<ol>
+<li>Click the <g-emoji alias="heavy_plus_sign" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2795.png">➕</g-emoji> (plus) sign at the top right and select "New repository"</li>
+<li>Type 'react-starter-kit' in the "Repository name" field</li>
+<li>Click the "Create repository" button</li>
+<li>From the screen you're redirected to make sure 'HTTPS' is selected, then click the button on the right to copy your repository URL.</li>
+</ol>
+
+<p><a href="../../images/github-repository.jpg" target="_blank"><img src="../../images/github-repository.jpg" alt="GitHub Repo" style="max-width:100%;"></a></p>
+
+<p>Now that you've created a repository it's time to link it to our local project we created a moment ago.  From the project root ("react-starter-kit" directory) run the commands below in your terminal plugging in your repository URL (the value you just copied) in place of mine.</p>
+
+<div class="highlight highlight-source-shell"><pre><span class="pl-c1">printf</span> <span class="pl-s"><span class="pl-pds">"</span>node_modules\ndist\nnpm-debug.log<span class="pl-pds">"</span></span> <span class="pl-k">&gt;</span> .gitignore
+git init
+git add --all
+git commit -m <span class="pl-s"><span class="pl-pds">'</span>initial commit<span class="pl-pds">'</span></span>
+git remote add origin https://github.com/bschnelle/react-starter-kit.git
+git push -u origin master</pre></div>
+
+<p><a href="https://github.com/bschnelle/react-starter-kit/tree/8e659743a23dd7b73be1eab9925cb026c266bcf4">My repo after this commit</a></p>
+
+<h5>
+<a id="user-content-whats-going-on-above" class="anchor" href="#whats-going-on-above" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What's going on above?</h5>
+
+<ol>
+<li>Prints two directory names, "node_modules" (where NPM installs packages) and "dist" (where Webpack will spit out its files), and a file named "npm-debug.log" (automatically generated by NPM when the CLI encounters an error) file into a new file named ".gitignore".  The <code>\n</code> is a new line (the same as pressing enter/return at the end of a sentence).  It just tells Git to ignore those directories when tracking files.</li>
+<li>Initialize Git in the current directory.</li>
+<li>Stage all files (excluding those in our ".gitignore" file) so that they can be committed.</li>
+<li>Commit all of our staged files...described above.</li>
+<li>Set our remote repository to the one we just created on GitHub.  This is where we're going to push our local repo to.  That way if we spill water on our laptop or want to share the repo with someone else it can just be cloned/downloaded from GitHub.</li>
+<li>Push our local repository to the master branch on GitHub and set the upstream repository to our GitHub repo.  You'll be prompted for your GitHub credentials when this command is run.
+
+<ul>
+<li>When typing in your password it doesn't look like you're typing anything, but you actually are!</li>
+</ul>
+</li>
+</ol>
+
+<blockquote>
+<h4>
+<a id="user-content-running-into-issues" class="anchor" href="#running-into-issues" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Running into issues?</h4>
+
+<p>WARNING: the command below will delete <strong>EVERYTHING</strong> in the directory you target so be <em>careful</em>!</p>
+
+<p>If you think something got messed up and want to start all over with the Git process (from <code>git init</code>) run <code>rm -rf .git</code> from your project directory.  </p>
+</blockquote>
+
+<p>You should now be able to refresh the repo on GitHub and see your local project's files!</p>
+
+<h4>
+<a id="user-content-project-management" class="anchor" href="#project-management" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Project Management</h4>
+
+<p>GitHub has some nice tools that make managing a project easier.  You can create milestones as longer term goals and then add issues to your milestone as "todo" items.  Once all your issues have been completed your milestone can be considered complete and closed out.</p>
+
+<p>From your repository on GitHub click the "Issues" tab and you should see a "Milestones" button as shown below.  Click that button.</p>
+
+<p><a href="../../images/github-issues.jpg" target="_blank"><img src="../../images/github-issues.jpg" alt="GitHub Issues" style="max-width:100%;"></a></p>
+
+<p>You should now see a blank page with a "New milestone" button on the righthand side.  Create a new milestone with a title of "0.1.0 - Initial Release" which is going to be our first release of the starter kit.  If you want to give it a due date you can do that as well.</p>
+
+<p>Once you've created the milestone, you should be redirected to a page listing all your project milestones.  Click the milestone title which will take you to that milestone's homepage where it will inform you that there are currently no issues assigned to the milestone.  Let's change that.</p>
+
+<p>Click the "New Issue" button on the right to create your first issue.  In the title type "Initialize Node Package Manager (NPM)" which is our next step from the list earlier in this post.  You can leave the description blank and submit the new issue.</p>
+
+<p>You'll be taken to the page for the issue you just created where the full issue history will be shown with any comments or changes.  On the right will be the "New Issue" button again.  Create new issues for all of the items in the list below, but make sure you add the "0.1.0 - Initial Release" milestone to each one - there is an option to do so on the righthand side of the issue creation screen.</p>
+
+<h5>
+<a id="user-content-issues" class="anchor" href="#issues" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Issues</h5>
+
+<ul>
+<li>Setup ESLint</li>
+<li>Configure Webpack for development</li>
+<li>Configure Webpack for production</li>
+<li>React and React Router</li>
+<li>Testing setup</li>
+<li>Redux</li>
+<li>Immutable.js</li>
+<li>Misc development tools</li>
+</ul>
+
+<p>When you're finished return to the overview screen for our new milestone.  It should look similar to the one below and you should have 9 open issues.</p>
+
+<p><a href="../../images/github-0.1.0-milestone.jpg" target="_blank"><img src="../../images/github-0.1.0-milestone.jpg" alt="GitHub 0.1.0 Milestone" style="max-width:100%;"></a></p>
+
+<p>Now we have a tool to guide our work and track our progress.</p>
+
+<h2>
+<a id="user-content-3-initialize-node-package-manager-npm" class="anchor" href="#3-initialize-node-package-manager-npm" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>3. Initialize Node Package Manager (NPM)</h2>
+
+<p>NPM is <em>the</em> JavaScript package manager.  What's a package manager?  It's a way for people to package up code and share it with others.  Thousands of individuals and organizations give away their hard work everyday to help others solve their problems more easily.  This is known as <em>open source</em>.</p>
+
+<p>We'll use NPM to download packages (from the terminal) for various reasons during our time together.  So how do we get NPM?  We install Node.js which comes with NPM!  So cruise over to the <a href="https://nodejs.org/en/download/">Node</a> site and follow the download/installation instructions.</p>
+
+<p>All done?  Awesome.</p>
+
+<p>Let's install stuff!  Wait, how do we do that?  Well first we need to initialize our project with NPM so that we can use it to manage our dependencies.  Run the command below.  It'll ask you a bunch of questions to which you can either accept the default (by pressing enter) or provide your own values.  If you screw something up, don't worry.  You can change all of the values afterwards.</p>
+
+<div class="highlight highlight-source-shell"><pre>npm init</pre></div>
+
+<p>This command will generate a "package.json" file in the root of our project containing our answers to the questions asked and some other stuff.  This file is magical.  It is how we'll manage all of our dependencies.  You can either edit it manually or the NPM command line interface (CLI) will edit it for you when you run certain commands.  We'll see how to do that shortly.  </p>
+
+<p>Open up your project in a text editor and see how your file compares with mine (I answered some of the questions so our files might be a little different).</p>
+
+<blockquote>
+<h4>
+<a id="user-content-text-editor" class="anchor" href="#text-editor" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Text Editor</h4>
+
+<p>If you don't already have a text editor GitHub has an option source one named <a href="https://atom.io/">Atom</a>.  It is awesome.</p>
+</blockquote>
+
+<div class="highlight highlight-source-json"><pre>{
+  <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>react-starter-kit<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>version<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>0.0.1<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>description<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>React ecosystem starter kit<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>main<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>index.js<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>scripts<span class="pl-pds">"</span></span>: {
+    <span class="pl-s"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>echo <span class="pl-cce">\"</span>Error: no test specified<span class="pl-cce">\"</span> &amp;&amp; exit 1<span class="pl-pds">"</span></span>
+  },
+  <span class="pl-s"><span class="pl-pds">"</span>repository<span class="pl-pds">"</span></span>: {
+    <span class="pl-s"><span class="pl-pds">"</span>type<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>git<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>url<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>git+https://github.com/bschnelle/react-starter-kit.git<span class="pl-pds">"</span></span>
+  },
+  <span class="pl-s"><span class="pl-pds">"</span>keywords<span class="pl-pds">"</span></span>: [
+    <span class="pl-s"><span class="pl-pds">"</span>react<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>redux<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>webpack<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>babel<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>mocha<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>chai<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>sinon<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>enzyme<span class="pl-pds">"</span></span>
+  ],
+  <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Benjamin Schnelle &lt;benjamin.schnelle@gmail.com&gt; (https://github.com/bschnelle)<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>license<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>MIT<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>bugs<span class="pl-pds">"</span></span>: {
+    <span class="pl-s"><span class="pl-pds">"</span>url<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>https://github.com/bschnelle/react-starter-kit/issues<span class="pl-pds">"</span></span>
+  },
+  <span class="pl-s"><span class="pl-pds">"</span>homepage<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>https://github.com/bschnelle/react-starter-kit#readme<span class="pl-pds">"</span></span>
+}
+</pre></div>
+
+<h4>
+<a id="user-content-committing" class="anchor" href="#committing" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Committing</h4>
+
+<p>Since we now have our project under version control, you're free to commit anytime you see fit.  There aren't really any downsides to committing frequently and doing so gives you more flexibility if you need to rollback for any reason.  Also, smaller changes make it easier for others to follow when trying to get up to speed on your project.  </p>
+
+<p>Remember our GitHub issues we need to knock out to reach our first 0.1.0 milestone?  We get to close one!  You can automatically close issues using keywords (close, fix, resolve) in your commit messages.  </p>
+
+<p>Assuming you created your issues in the same order as the list above and didn't delete/recreate any our issue numbers should match, but double check them just in case.  You can get the issue number by visiting the issue page on GitHub.</p>
+
+<p>Go ahead and run the commands below to commit your changes and automatically close issue #1 on GitHub.</p>
+
+<div class="highlight highlight-source-shell"><pre>git add <span class="pl-c1">.</span> <span class="pl-c">## a period is a shortcut for --all</span>
+git commit -m <span class="pl-s"><span class="pl-pds">'</span>initialized NPM...closes #1<span class="pl-pds">'</span></span>
+git push origin master</pre></div>
+
+<p><a href="https://github.com/bschnelle/react-starter-kit/tree/571c7e0e1697d678bcbd4e61382c9f26612c8fab">My repo after this commit</a></p>
+
+<p>If you go back to the overview of your milestone on GitHub you should see that issue #1 has been closed and you have a little bit of progress on your milestone! <g-emoji alias="smiley" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f603.png">😃</g-emoji></p>
+
+<h2>
+<a id="user-content-4-setup-eslint" class="anchor" href="#4-setup-eslint" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>4. Setup ESLint</h2>
+
+<p>If you're unfamiliar with hinting/linting it's just the idea of following certain conventions when writing code so that things are standardized and good practices are followed.  It's especially helpful when working on a team of developers so that you don't run into a scenario where one person is using tabs to indent and another is using spaces (for example).  Consistency good, inconsistency bad.</p>
+
+<p>ESLint makes it easy for us to enforce those rules.  ESLint + Atom makes it easy to get <em>realtime</em> feedback right in our editor.  There are many preconfigured sets of rules available for ESLint and Airbnb provides a pretty good one so we'll use that.  If you/me/we decide we want to change something later we can do that also!</p>
+
+<blockquote>
+<h4>
+<a id="user-content-side-note-on-npm" class="anchor" href="#side-note-on-npm" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Side note on NPM</h4>
+
+<p>NPM packages can be saved in multiple ways, but the two we're concerned with are as <code>devDependencies</code> (development) or <code>dependencies</code> (production) with the <code>--save-dev</code> and <code>--save</code> arguments, respectively.  </p>
+
+<p>NPM was originally intended to be a server side development tool (for Node), but is now widely used for client side development and the use cases between the two are a little different.  In the case of server development one should be able to clone the repository from GitHub (or wherever) and run <code>NODE_ENV=production npm install</code> (NODE_ENV is a common <a href="https://en.wikipedia.org/wiki/Environment_variable">environment variable</a> used in Node to dictate how things should behave) which will only install those packages defined in the <code>dependencies</code> section of "package.json" then run the application.  </p>
+
+<p>In the case of a client app it is a little different.  Here, we should be able to clone the repository, run the same installation command with NODE_ENV set to "production", bundle our application (as we'll describe later using Webpack), and finally deploy it.</p>
+
+<p>It is easy to view the bundling step as a development concern so intuitively it makes sense to put those packages in <code>devDependencies</code>, but if we did that we wouldn't be able to bundle our app successfully when having NODE_ENV set to "production".  Therefore, if you see things being installed with <code>--save</code> when you think <code>--save-dev</code> makes more sense, it is likely for this reason.</p>
+</blockquote>
+
+<p>Let's go ahead and get ESLint from our handy friend NPM in addition to some other related dependencies.  The commands a little further down, which as suggested by the <code>eslint-config-airbnb</code> installation page, will get the package's <code>peerDependencies</code> then pipe them through some regex and install all of them in addition to the package itself.  Finally, we also need to install <code>babel-eslint</code> in order to properly lint certain ES6/ES7 features like class properties.</p>
+
+<h5>
+<a id="user-content-new-terms" class="anchor" href="#new-terms" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>New Terms</h5>
+
+<ul>
+<li>
+<code>peerDependencies</code>: a way for a package to tell <em>your</em> project (the parent) that it needs another package in order to work, but that package is <em>not</em> automatically installed.  Therefore if you don't include it in your project's <code>dependencies</code> NPM will throw a warning and the package you installed probably won't work correctly.</li>
+<li>RegEx: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp">regular expressions</a> are a way to match strings</li>
+<li>ES6/ES7: JavaScript (ES = ECMAScript = JavaScript) is always being improved upon and the improvements are only defined in a specification and the implementation of features is left up to the community.  That means all of the individual browsers and Node.js need implement any new features on their own.  This is why you'll often run into situations where a feature will be supported in one browser, but not another.  ES6 and ES7 are the two newest versions of JavaScript.  Because neither of them have wide support yet we transpile it into ES5 (with Babel) so that we can be reasonably confident it will run in most people's browsers.</li>
+</ul>
+
+<div class="highlight highlight-source-shell"><pre><span class="pl-k">export</span> PKG=eslint-config-airbnb<span class="pl-k">;</span>
+npm info <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$PKG</span><span class="pl-pds">"</span></span> peerDependencies --json \
+  <span class="pl-k">|</span> <span class="pl-c1">command</span> sed <span class="pl-s"><span class="pl-pds">'</span>s/[\{\},]//g ; s/: /@/g<span class="pl-pds">'</span></span> \
+  <span class="pl-k">|</span> xargs npm install --save-dev <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$PKG</span><span class="pl-pds">"</span></span>
+npm install --save-dev babel-eslint</pre></div>
+
+<h5>
+<a id="user-content-whats-going-on-here" class="anchor" href="#whats-going-on-here" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What's going on here?</h5>
+
+<ol>
+<li>put eslint-config-airbnb in a variable named PKG</li>
+<li>install eslint-config-airbnb and its peerDependencies
+
+<ul>
+<li>return the peerDependencies of eslint-config-airbnb as JSON</li>
+<li>convert each of the peerDependencies to an installable string format</li>
+<li>install each of the peerDependencies</li>
+</ul>
+</li>
+<li>install babel-eslint</li>
+</ol>
+
+<p>If you take a look at your <code>package.json</code> file now, there should be a new section called <code>devDependencies</code> similar to the one below.</p>
+
+<div class="highlight highlight-source-json"><pre>{
+  <span class="pl-s"><span class="pl-pds">"</span>babel-eslint<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>^6.1.2<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>eslint<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>^3.3.1<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>eslint-config-airbnb<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>^10.0.1<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>eslint-plugin-import<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>^1.13.0<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>eslint-plugin-jsx-a11y<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>^2.1.0<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>eslint-plugin-react<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>^6.1.2<span class="pl-pds">"</span></span>
+}</pre></div>
+
+<h4>
+<a id="user-content-youve-been-working-hard-heres-a-cat-gif" class="anchor" href="#youve-been-working-hard-heres-a-cat-gif" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>You've been working hard, here's a cat GIF</h4>
+
+<p><a href="https://camo.githubusercontent.com/167124a30961dd6b77a0310990e901d7963c53c3/687474703a2f2f692e696d6775722e636f6d2f61546d6a6153702e676966" target="_blank"><img src="https://camo.githubusercontent.com/167124a30961dd6b77a0310990e901d7963c53c3/687474703a2f2f692e696d6775722e636f6d2f61546d6a6153702e676966" alt="Cat GIF" data-canonical-src="http://i.imgur.com/aTmjaSp.gif" style="max-width:100%;"></a></p>
+
+<h4>
+<a id="user-content-configuration" class="anchor" href="#configuration" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Configuration</h4>
+
+<p>Now that we have our packages installed we need to tell ESLint to use the Airbnb rules when linting.  To do that we need to add a new file in the root of our project named ".eslintrc".  Make your file look like the one below which tells ESLint we want to use <code>babel-eslint</code> as our parser (this is so we can write really new JavaScript), we'll be writing code for the browser so ignore browser global variables, to use the <code>eslint-config-airbnb</code> rules, and to override a couple default rules (disable commas at the end of every line and ".jsx" file extensions).</p>
+
+<div class="highlight highlight-source-json"><pre>{
+  <span class="pl-s"><span class="pl-pds">"</span>parser<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>babel-eslint<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>env<span class="pl-pds">"</span></span>: {
+    <span class="pl-s"><span class="pl-pds">"</span>browser<span class="pl-pds">"</span></span>: <span class="pl-c1">true</span>
+  },
+  <span class="pl-s"><span class="pl-pds">"</span>extends<span class="pl-pds">"</span></span> : <span class="pl-s"><span class="pl-pds">"</span>airbnb<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>rules<span class="pl-pds">"</span></span>: {
+    <span class="pl-s"><span class="pl-pds">"</span>comma-dangle<span class="pl-pds">"</span></span>: <span class="pl-c1">0</span>,
+    <span class="pl-s"><span class="pl-pds">"</span>react/jsx-filename-extension<span class="pl-pds">"</span></span>: <span class="pl-c1">0</span>
+  }
+}</pre></div>
+
+<h4>
+<a id="user-content-script" class="anchor" href="#script" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Script</h4>
+
+<p>In your "package.json" file there's a <code>scripts</code> property.  Add <code>"lint": "eslint src test",</code> above the placeholder <code>test</code> script.  We can now execute <code>npm run lint</code> from the terminal to lint our code in the "src" and "test" directories.  The "test" directory is irrelevant for now.</p>
+
+<h4>
+<a id="user-content-but-wait-how-do-we-make-it-work-with-atom" class="anchor" href="#but-wait-how-do-we-make-it-work-with-atom" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>But wait, how do we make it work with Atom?</h4>
+
+<p>Oh, remember how I said Atom is awesome?  It has its own package manager to install plugins for the editor to add all sorts of functionality.  ESLint is one of those packages.  Surprise.</p>
+
+<p>If you installed Atom earlier you already have APM (Atom Package Manager) installed.  To get the ESLint plugin run the command below.</p>
+
+<div class="highlight highlight-source-shell"><pre>apm install linter-eslint</pre></div>
+
+<blockquote>
+<p>If you receive an <code>apm: command not found</code> error, open up Atom then click <em>Atom &gt; Install Shell Commands</em></p>
+</blockquote>
+
+<p>That was eerily similar to how we install NPM packages.  That's because APM is built on top of NPM.</p>
+
+<p>Go ahead and create an <code>index.js</code> file in the "src" folder and paste in the code below.  </p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">export</span> <span class="pl-v">default</span> <span class="pl-s"><span class="pl-pds">'</span>Hello!<span class="pl-pds">'</span></span></pre></div>
+
+<p>If ESLint is setup correctly you should get an error telling you that line 1 is missing a newline then when you fix that it'll say it's missing a semicolon.  Running <code>npm run lint</code> will return the same errors as well (you may get a deprecation warning about react/require-extension that you can safely ignore).</p>
+
+<blockquote>
+<p>If you aren't getting an error in Atom click <em>Atom &gt; Preferences</em> which should open up a new tab.  Click the <em>Packages</em> link on the lefthand side of the tab, then search for "linter-eslint" and disable/reenable the package.  The image below shows what you should see.</p>
+</blockquote>
+
+<p><a href="../../images/atom-linter-eslint.jpg" target="_blank"><img src="../../images/atom-linter-eslint.jpg" alt="Atom linter-eslint" style="max-width:100%;"></a></p>
+
+<h4>
+<a id="user-content-commit-our-changes" class="anchor" href="#commit-our-changes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Commit our changes</h4>
+
+<div class="highlight highlight-source-shell"><pre>git add <span class="pl-c1">.</span>
+git commit -m <span class="pl-s"><span class="pl-pds">'</span>added and configured ESLint...closes #2<span class="pl-pds">'</span></span>
+git push origin master</pre></div>
+
+<p><a href="https://github.com/bschnelle/react-starter-kit/tree/0f86dd4bdf46bae13191a4ed9d3bf078a8d50af0">My repo after this commit</a></p>
+
+<h4>
+<a id="user-content-summary" class="anchor" href="#summary" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Summary</h4>
+
+<p>We covered a lot here and we're making solid progress.  In the next part we'll get started with Webpack, a bundling tool on steroids.</p>

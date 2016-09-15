@@ -290,7 +290,7 @@ hook({
 
 If you rerun your tests now, they should all be passing again!
 
-![Dancing Kid](http://i.imgur.com/KnWUMK2.gif)
+![Dancing Kid](https://i.imgur.com/efPcwsX.gif)
 
 #### Does the button work? Kind of.
 Fire up your server and visit "/counter" again.  Click the button and watch the number go up.  Now click the link to Home then back to Counter and you'll notice that our counter is back at zero.  Shoot, we wanted to keep our hard work.
@@ -452,8 +452,6 @@ componentWillUnmount() {
 When we call `subscribe` it returns an `unsubscribe` object we can call to remove the listener from the store.  Simple as that.  `componentWillUnmount` is, you guessed it, another lifecycle hook.
 
 Now click the button all you want and go back and forth between routes.  No errors!
-
-![Dancing Trevor](http://i.imgur.com/vyPIi9M.gif)
 
 #### React Redux connect
 If you're thinking there has to be a better way to go about getting data from the store, you would be correct.  I just wanted to show you how things are implemented manually first.
