@@ -1,0 +1,38 @@
+@keyframes loader {
+  0% {
+    transform: scaley(1.0);
+  }
+  80% {
+    transform: scaley(0.3);
+  }
+  90% {
+    transform: scaley(1.0);
+  }
+}
+
+.loader {
+  align-items: center;
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+
+  > div {
+    animation: loader 0.9s -0.5s infinite cubic-bezier(.11,.49,.38,.78);
+    animation-fill-mode: both;
+    background-color: #000;
+    border-radius: 2px;
+    display: inline-block;
+    height: 55px;
+    margin: 2px;
+    vertical-align: middle;
+    width: 6px;
+
+    &:nth-child(2), &:nth-child(4) {
+      animation-delay: -0.25s !important;
+    }
+
+    &:nth-child(1), &:nth-child(5) {
+      animation-delay: 0s !important;
+    }
+  }
+}

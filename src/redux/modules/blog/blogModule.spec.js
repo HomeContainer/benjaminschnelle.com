@@ -127,9 +127,13 @@ describe('[Redux] BlogModule', () => {
     it('dispatches GET_POST_SUCCESS with resolved payload on success', (done) => {
       const content = 'real good post';
       const action = { type: GET_POST_SUCCESS, content, slug };
-      blogSvc.getPost.returns(Promise.resolve(content));
+
+      sinon.stub(blogSvc, 'parseMarkdown');
+      blogSvc.getPost.returns(Promise.resolve());
+      blogSvc.parseMarkdown.returns(Promise.resolve(content));
       blogModule.getPost(slug)(dispatch).then(() => {
         expect(dispatch).to.have.been.calledWith(action);
+        blogSvc.parseMarkdown.restore();
         done();
       });
     });

@@ -4,10 +4,12 @@ import { Map as iMap } from 'immutable';
 import blogService from '../../services/blog/blogService';
 import { getPost } from '../../redux/modules/blog/blogModule';
 import BlogPost from '../../components/BlogPost/BlogPost';
+import Loader from '../../components/Loader/Loader';
 
 export class BlogPostContainer extends Component {
 
   static propTypes = {
+    fetchingPost: PropTypes.bool,
     getPost: PropTypes.func.isRequired,
     params: PropTypes.object,
     post: PropTypes.instanceOf(iMap)
@@ -18,12 +20,15 @@ export class BlogPostContainer extends Component {
   }
 
   render() {
-    const { post } = this.props;
-    return post ? <BlogPost post={this.props.post} /> : null;
+    const { fetchingPost, post } = this.props;
+    return (
+      post && !fetchingPost ? <BlogPost post={this.props.post} /> : <Loader />
+    );
   }
 }
 
 const stateToProps = (state) => ({
+  fetchingPost: state.blog.get('fetchingPost'),
   post: blogService.selectActivePost(state.blog)
 });
 
