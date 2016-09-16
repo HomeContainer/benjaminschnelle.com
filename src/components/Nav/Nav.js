@@ -18,6 +18,10 @@ class Nav extends Component {
     return { navOpen: this.props.open };
   }
 
+  componentWillReceiveProps(nextProps) {
+    document.body.style.overflow = nextProps.open ? 'hidden' : '';
+  }
+
   render() {
     const { open, screen } = this.props;
     const className = `${classes.nav} ${open ? classes.open : ''}`;

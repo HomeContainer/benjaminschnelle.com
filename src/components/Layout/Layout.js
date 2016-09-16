@@ -61,7 +61,8 @@ export class Layout extends Component {
     }
 
     return (
-      <div className={classes.layout} style={layoutStyle}>
+      <div>
+        <div className={classes.layout} style={layoutStyle} />
         <div className={contentWrapperClass}>{children}</div>
 
         <MenuIconButton
