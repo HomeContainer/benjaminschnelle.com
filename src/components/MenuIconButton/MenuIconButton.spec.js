@@ -20,6 +20,11 @@ describe('MenuIconButton', () => {
     expect(wrapper.is('.myClass')).to.be.true;
   });
 
+  it('adds an .invertColor class if props.invertColor is true and props.open isn\'t', () => {
+    const wrapper = shallow(<MenuIconButton invertColor />);
+    expect(wrapper.is(`.${classes.invertColor}`)).to.be.true;
+  });
+
   it('adds an .open class to the button when props.open is true', () => {
     const wrapper = shallow(<MenuIconButton open />);
     expect(wrapper.is(`.${classes.open}`)).to.be.true;
