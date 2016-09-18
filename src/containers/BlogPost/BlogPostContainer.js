@@ -25,12 +25,12 @@ export class BlogPostContainer extends Component {
   render() {
     const { fetchingPost, post } = this.props;
     return (
-      post && !fetchingPost ? <BlogPost post={this.props.post} /> : <Loader />
+      post && !fetchingPost ? <BlogPost post={post} /> : <Loader />
     );
   }
 }
 
-const stateToProps = (state, props) => ({
+export const stateToProps = (state, props) => ({
   fetchingPost: state.blog.get('fetchingPost'),
   post: blogService.selectPost(state.blog, props.params.slug)
 });
