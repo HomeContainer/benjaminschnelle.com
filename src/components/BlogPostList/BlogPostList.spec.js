@@ -24,6 +24,17 @@ describe('BlogPostList', () => {
     expect(wrapper.find(Post)).to.have.length(2);
   });
 
+  it('sorts props.posts by date in descending order', () => {
+    const posts = fromJS([
+      { id: '0', date: new Date(2016, 1, 2) },
+      { id: '1', date: new Date(2016, 1, 3) },
+      { id: '2', date: new Date(2016, 1, 1) }
+    ]);
+    const router = {};
+    const wrapper = shallow(<BlogPostList posts={posts} router={router} />);
+    expect(wrapper.find(Post).first().prop('post').get('id')).to.equal('1');
+  });
+
   it('clicking a Post calls props.router.push with /blog/:post_slug', () => {
     const posts = fromJS([{ id: '0', slug: 'test-post' }]);
     const router = { push: sinon.stub() };
