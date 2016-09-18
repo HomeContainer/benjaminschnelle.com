@@ -1,9 +1,9 @@
 import React, { PropTypes } from 'react';
 import { Map as iMap } from 'immutable';
 import moment from 'moment';
-import classes from './Post.scss';
+import classes from './BlogPostListItem.scss';
 
-const Post = (props) => {
+const BlogPostListItem = (props) => {
   const { author, date, preview, title } = props.post.toObject();
   return (
     <div className={classes.post} onClick={props.onClick}>
@@ -22,9 +22,9 @@ const Post = (props) => {
   );
 };
 
-Post.propTypes = {
+BlogPostListItem.propTypes = {
   onClick: PropTypes.func.isRequired,
   post: PropTypes.instanceOf(iMap).isRequired
 };
 
-export default Post;
+export default BlogPostListItem;

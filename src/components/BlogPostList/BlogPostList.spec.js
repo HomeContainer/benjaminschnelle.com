@@ -4,7 +4,7 @@ import { fromJS } from 'immutable';
 import { shallow } from 'enzyme';
 import sinon from 'sinon';
 import { BlogPostList } from './BlogPostList';
-import Post from '../Post/Post';
+import BlogPostListItem from '../BlogPostListItem/BlogPostListItem';
 import classes from './BlogPostList.scss';
 
 describe('BlogPostList', () => {
@@ -16,12 +16,12 @@ describe('BlogPostList', () => {
     expect(wrapper.is(`.${classes.blogPostList}`)).to.be.true;
   });
 
-  it('renders an h1 and a Post component for every props.posts item', () => {
+  it('renders an h1 and a BlogPostListItem component for every props.posts item', () => {
     const posts = fromJS([{ id: '0' }, { id: '1' }]);
     const router = {};
     const wrapper = shallow(<BlogPostList posts={posts} router={router} />);
     expect(wrapper.contains(<h1>Blog.</h1>)).to.be.true;
-    expect(wrapper.find(Post)).to.have.length(2);
+    expect(wrapper.find(BlogPostListItem)).to.have.length(2);
   });
 
   it('sorts props.posts by date in descending order', () => {
@@ -32,14 +32,14 @@ describe('BlogPostList', () => {
     ]);
     const router = {};
     const wrapper = shallow(<BlogPostList posts={posts} router={router} />);
-    expect(wrapper.find(Post).first().prop('post').get('id')).to.equal('1');
+    expect(wrapper.find(BlogPostListItem).first().prop('post').get('id')).to.equal('1');
   });
 
-  it('clicking a Post calls props.router.push with /blog/:post_slug', () => {
+  it('clicking a BlogPostListItem calls props.router.push with /blog/:post_slug', () => {
     const posts = fromJS([{ id: '0', slug: 'test-post' }]);
     const router = { push: sinon.stub() };
     const wrapper = shallow(<BlogPostList posts={posts} router={router} />);
-    wrapper.find(Post).simulate('click');
+    wrapper.find(BlogPostListItem).simulate('click');
     expect(router.push).to.have.been.calledWith(`/blog/${posts.getIn(['0', 'slug'])}`);
   });
 });

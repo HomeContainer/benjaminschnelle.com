@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import { withRouter } from 'react-router';
 import { List as iList } from 'immutable';
-import Post from '../Post/Post';
+import BlogPostListItem from '../BlogPostListItem/BlogPostListItem';
 import classes from './BlogPostList.scss';
 
 export const BlogPostList = (props) => {
@@ -13,7 +13,7 @@ export const BlogPostList = (props) => {
   });
   const mappedPosts = sortedPosts.map((post) => {
     const onClick = () => props.router.push(`/blog/${post.get('slug')}`);
-    return <Post key={post.get('slug')} onClick={onClick} post={post} />;
+    return <BlogPostListItem key={post.get('slug')} onClick={onClick} post={post} />;
   });
   return (
     <div className={classes.blogPostList}>
