@@ -10,14 +10,12 @@ const Profile = () => (
       I'm a software developer and life is groovy.
     </p>
     <p>
-      My focus is on the JavaScript ecosystem -
-      primarily React, Redux, Webpack, Node.js, and
-      AWS.
+      Right now, my focus is on React, Redux, Webpack, Node.js, and AWS.
     </p>
     <p>
-      I created this site as a learning experience for myself and
-      anyone who happens to end up here.  The plan is to learn stuff,
-      then blog about it.
+      This site was created as a learning experience for myself and
+      anyone who happens to end up here.  The plan is to over-engineer this
+      web app and blog about my experiences doing so.
     </p>
     <p>Thanks for visiting!</p>
   </div>
