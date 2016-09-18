@@ -1,6 +1,7 @@
 import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
+import sinon from 'sinon';
 import Cell from '../Cell/Cell';
 import ContentCell from '../ContentCell/ContentCell';
 import { NavGrid } from './NavGrid';
@@ -51,6 +52,20 @@ describe('NavGrid', () => {
       it('renders 12 Cells', () => {
         expect(wrapper.find(Cell)).to.have.length(12);
       });
+    });
+  });
+
+  describe('ContentCells', () => {
+    it('clicking home/blog links calls router.push with route and context.toggleMenu', () => {
+      const router = { push: sinon.stub() };
+      const context = { toggleMenu: sinon.stub() };
+      const wrapper = shallow(<NavGrid router={router} userInfo={userInfo} />, { context });
+      wrapper.find(ContentCell).forEach((cell) => {
+        if (cell.prop('onClick')) cell.prop('onClick')();
+      });
+      expect(router.push).to.have.been.calledWith('/');
+      expect(router.push).to.have.been.calledWith('/blog');
+      expect(context.toggleMenu).to.have.been.calledTwice;
     });
   });
 });
