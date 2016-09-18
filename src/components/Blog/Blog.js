@@ -50,11 +50,4 @@ class Blog extends Component {
   }
 }
 
-Blog.propTypes = {
-  children: PropTypes.node,
-  posts: PropTypes.instanceOf(iList),
-  screen: PropTypes.string.isRequired,
-  setMenuColor: PropTypes.func.isRequired
-};
-
 export default Blog;
