@@ -31,10 +31,7 @@ class TabbedDrawer extends Component {
   }
 
   closeDrawer() {
-    this.setState({
-      activeTab: this.state.activeTab,
-      open: false
-    });
+    this.setState({ open: false });
   }
 
   mapTabs(tabs) {
