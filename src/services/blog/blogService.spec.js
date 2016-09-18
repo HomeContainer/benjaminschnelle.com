@@ -53,6 +53,19 @@ describe('[Service] BlogService', () => {
     });
   });
 
+  describe('parseMarkdown()', () => {
+    it('makes a POST to https://api.github.com/markdown', () => {
+      sinon.stub(fetch, 'default').returns(Promise.resolve());
+      const markdown = '**markdown**';
+      blogService.parseMarkdown(markdown);
+      const r = /^https:\/\/api\.github\.com\/markdown/;
+      const options = { method: 'POST', body: JSON.stringify({ text: markdown }) };
+
+      expect(fetch.default).to.have.been.calledWith(sinon.match(r), options);
+      fetch.default.restore();
+    });
+  });
+
   describe('selectPost()', () => {
     it('finds post with matching slug in state.posts and returns it', () => {
       const state = fromJS({
