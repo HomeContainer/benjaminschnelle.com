@@ -14,7 +14,7 @@ export const BlogPostList = (props) => {
   const mappedPosts = sortedPosts.map((post) => {
     const onClick = () => props.router.push(`/blog/${post.get('slug')}`);
     return <BlogPostListItem key={post.get('slug')} onClick={onClick} post={post} />;
-  });
+  }).toJS();
   return (
     <div className={classes.blogPostList}>
       <h1>Blog.</h1>

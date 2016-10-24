@@ -28,16 +28,19 @@
 .largeCell {
   @extend .cell;
   flex: 1 1 25%;
+  max-width: 25%;
 }
 
 .mediumCell {
   @extend .cell;
   flex: 1 1 33.3333%;
+  max-width: 33.3333%;
 }
 
 .smallCell {
   @extend .cell;
   flex: 1 1 50%;
+  max-width: 50%;
 }
 
 .social {

@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import { AppContainer } from 'react-hot-loader';
 import { browserHistory, Router } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
+import 'babel-polyfill';
 import 'isomorphic-fetch';
 import store from './redux/store';
 import routes from './routes';
