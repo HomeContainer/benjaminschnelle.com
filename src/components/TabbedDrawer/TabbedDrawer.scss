@@ -18,7 +18,7 @@
   width: 0px;
   z-index: 1;
   > div {
-    padding: 1.4rem;
+    height: 100%;
     width: 450px;
   }
 }
@@ -59,7 +59,7 @@
 }
 
 .tabs {
-  bottom: 2.8rem;
+  bottom: 3rem;
   position: absolute;
   right: 0;
   transform: translateX(100%);

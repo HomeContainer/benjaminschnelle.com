@@ -5,9 +5,8 @@ import Profile from './Profile';
 import classes from './Profile.scss';
 
 describe('Profile', () => {
-  it('renders an image, h2, and 4 paragraphs', () => {
+  it('renders an h2 and 4 paragraphs', () => {
     const wrapper = shallow(<Profile />);
-    expect(wrapper.find('img')).to.have.length(1);
     expect(wrapper.find('h2')).to.have.length(1);
     expect(wrapper.find('p')).to.have.length(4);
   });

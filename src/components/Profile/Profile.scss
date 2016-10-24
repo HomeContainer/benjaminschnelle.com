@@ -1,13 +1,20 @@
 @import '../../styles/config';
 
 .profile {
+  background-image: url(/images/me-full.jpg);
+  background-position: right;
+  background-repeat: no-repeat;
+  background-size: cover;
+  // border-right: solid 5px #fff;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: flex-end;
   padding: 3rem;
-  > img {
-    background-color: #EAEAEA;
-    border-radius: 50%;
-  }
-  > p {
-    color: lighten($textColor, 50%);
+
+  > div {
+    background-color: rgba(255, 255, 255, .85);
+    padding: 1.5rem;
   }
 }
 
